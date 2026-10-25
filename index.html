@@ -4,66 +4,318 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Tracker de Lectura</title>
-    <!-- Usamos Tailwind CSS para darle un diseño moderno y bonito sin necesidad de otro archivo -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Ocultar barra de desplazamiento en las pestañas para que se vea limpio en móviles */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Variables de color para mantener el diseño consistente */
+        :root {
+            --bg-color: #f1f5f9;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --success: #059669;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: 60px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 550px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 25px 0;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 26px;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Sistema de pestañas */
+        .tabs-container {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+            scrollbar-width: none; /* Firefox */
+        }
+        .tabs-container::-webkit-scrollbar {
+            display: none; /* Chrome/Safari/Edge */
+        }
+
+        .tab-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+        }
+        .tab-btn-new {
+            background: #e2e8f0;
+            border: none;
+            color: var(--text-main);
+        }
+
+        /* Tarjetas */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            position: relative;
+        }
+
+        .card-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--text-main);
+        }
+
+        /* Formularios */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+            background: #fafafa;
+        }
+        input:focus {
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 5px;
+        }
+        .btn-submit:hover {
+            background: var(--primary-hover);
+        }
+
+        /* Elementos de lectura */
+        .delete-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        .delete-btn:hover {
+            opacity: 1;
+        }
+
+        .book-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            padding-right: 30px;
+        }
+
+        /* Barra de progreso */
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        .progress-track {
+            background: var(--border-color);
+            border-radius: 10px;
+            height: 10px;
+            width: 100%;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: var(--primary);
+            height: 100%;
+            transition: width 0.4s ease;
+        }
+
+        /* Estadísticas */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        .stat-item.full {
+            grid-column: 1 / -1;
+        }
+        .stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 4px;
+        }
+        .stat-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        .stat-value.highlight { color: var(--primary); }
+        .stat-value.success { color: var(--success); }
+
+        /* Actualizar página */
+        .update-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .update-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+        .update-section input {
+            width: 80px;
+            padding: 8px;
+            text-align: center;
+        }
+        .btn-update {
+            background: var(--text-main);
+            color: white;
+            border: none;
+            padding: 9px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 30px 0;
+            font-size: 15px;
+        }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans pb-20">
+<body>
 
-    <div class="max-w-xl mx-auto p-4">
+    <div class="container">
         <!-- Encabezado -->
-        <header class="text-center py-6">
-            <h1 class="text-3xl font-bold text-indigo-600"><i class="fas fa-book-open mr-2"></i>Mis Lecturas</h1>
-            <p class="text-slate-500 text-sm mt-1">Calcula tu ritmo y organiza tus libros</p>
+        <header>
+            <h1>📚 Mis Lecturas</h1>
+            <p>Calcula tu ritmo y organiza tus textos</p>
         </header>
 
         <!-- Pestañas (Categorías) -->
-        <div class="flex items-center space-x-2 overflow-x-auto no-scrollbar mb-6 pb-2" id="tabsContainer">
-            <!-- Las pestañas se generan con JavaScript -->
+        <div class="tabs-container" id="tabsContainer">
+            <!-- Generado con JS -->
         </div>
 
-        <!-- Formulario para agregar libro -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 mb-8">
-            <h2 class="text-lg font-semibold mb-4 text-slate-700">Agregar nuevo texto</h2>
-            <form id="bookForm" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-medium text-slate-500 uppercase">Título del libro/texto</label>
-                    <input type="text" id="title" required class="mt-1 w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-500 uppercase">Total Páginas</label>
-                        <input type="number" id="totalPages" required min="1" class="mt-1 w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+        <!-- Formulario -->
+        <div class="card">
+            <h2 class="card-title">Agregar nuevo texto</h2>
+            <form id="bookForm">
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label>Título del libro/texto</label>
+                        <input type="text" id="title" required>
                     </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-500 uppercase">Minutos x página</label>
-                        <input type="number" id="minsPerPage" required min="0.1" step="0.1" placeholder="Ej: 1.5" class="mt-1 w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <div class="form-group">
+                        <label>Total Páginas</label>
+                        <input type="number" id="totalPages" required min="1">
                     </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-500 uppercase">Tiempo diario (min)</label>
-                        <input type="number" id="dailyMins" required min="1" placeholder="Ej: 15" class="mt-1 w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <div class="form-group">
+                        <label>Minutos x página</label>
+                        <input type="number" id="minsPerPage" required min="0.1" step="0.1" placeholder="Ej: 1.5">
                     </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-500 uppercase">Página actual</label>
-                        <input type="number" id="currentPage" required min="0" value="0" class="mt-1 w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <div class="form-group">
+                        <label>Tiempo diario (min)</label>
+                        <input type="number" id="dailyMins" required min="1" placeholder="Ej: 15">
+                    </div>
+                    <div class="form-group">
+                        <label>Página actual</label>
+                        <input type="number" id="currentPage" required min="0" value="0">
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition mt-2">
-                    Guardar Libro
-                </button>
+                <button type="submit" class="btn-submit">Guardar Libro</button>
             </form>
         </div>
 
         <!-- Lista de Libros -->
-        <div id="booksList" class="space-y-4">
-            <!-- Los libros se generan con JavaScript -->
+        <div id="booksList">
+            <!-- Generado con JS -->
         </div>
     </div>
 
@@ -75,13 +327,12 @@
             books: []
         };
 
-        // Cargar datos de LocalStorage al iniciar
         const savedData = localStorage.getItem('readingTrackerData');
         if (savedData) {
             appData = JSON.parse(savedData);
         }
 
-        // --- FUNCIONES DE CÁLCULO Y FECHAS ---
+        // --- FUNCIONES DE CÁLCULO ---
         function formatTime(minutes) {
             const h = Math.floor(minutes / 60);
             const m = Math.round(minutes % 60);
@@ -97,7 +348,6 @@
             const daysRemaining = Math.ceil(remainingMins / book.dailyMins);
             const percent = Math.min(((book.currentPage / book.totalPages) * 100), 100).toFixed(1);
 
-            // Proyectar fecha
             const finishDate = new Date();
             finishDate.setDate(finishDate.getDate() + daysRemaining);
             const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -110,7 +360,7 @@
             localStorage.setItem('readingTrackerData', JSON.stringify(appData));
         }
 
-        // --- RENDERIZADO DE INTERFAZ ---
+        // --- RENDERIZADO ---
         function renderTabs() {
             const tabsContainer = document.getElementById('tabsContainer');
             tabsContainer.innerHTML = '';
@@ -118,7 +368,7 @@
             appData.categories.forEach(cat => {
                 const btn = document.createElement('button');
                 const isActive = cat === appData.activeCategory;
-                btn.className = `whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition ${isActive ? 'bg-indigo-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`;
+                btn.className = isActive ? 'tab-btn active' : 'tab-btn';
                 btn.innerText = cat;
                 btn.onclick = () => {
                     appData.activeCategory = cat;
@@ -129,10 +379,9 @@
                 tabsContainer.appendChild(btn);
             });
 
-            // Botón para nueva categoría
             const addBtn = document.createElement('button');
-            addBtn.className = 'whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium bg-slate-200 text-slate-700 hover:bg-slate-300 transition';
-            addBtn.innerHTML = '<i class="fas fa-plus"></i> Nueva Lista';
+            addBtn.className = 'tab-btn tab-btn-new';
+            addBtn.innerText = '➕ Nueva Lista';
             addBtn.onclick = () => {
                 const newCat = prompt('Nombre de la nueva lista:');
                 if (newCat && !appData.categories.includes(newCat)) {
@@ -153,55 +402,49 @@
             const filteredBooks = appData.books.filter(b => b.category === appData.activeCategory);
 
             if (filteredBooks.length === 0) {
-                booksList.innerHTML = '<div class="text-center text-slate-400 py-8">No hay libros en esta lista aún.</div>';
+                booksList.innerHTML = '<div class="empty-state">No hay textos en esta lista aún.</div>';
                 return;
             }
 
-            // Invertir para mostrar el más reciente arriba
             filteredBooks.slice().reverse().forEach(book => {
                 const stats = calculateStats(book);
                 
                 const card = document.createElement('div');
-                card.className = 'bg-white rounded-xl shadow-sm border border-slate-200 p-5 relative';
+                card.className = 'card';
 
                 card.innerHTML = `
-                    <button onclick="deleteBook(${book.id})" class="absolute top-4 right-4 text-red-400 hover:text-red-600 transition">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    <h3 class="text-xl font-bold text-slate-800 pr-8 mb-3">${book.title}</h3>
+                    <button onclick="deleteBook(${book.id})" class="delete-btn" title="Eliminar">🗑️</button>
+                    <h3 class="book-title">${book.title}</h3>
                     
-                    <!-- Barra de progreso -->
-                    <div class="mb-4">
-                        <div class="flex justify-between text-xs mb-1 text-slate-500 font-medium">
+                    <div>
+                        <div class="progress-header">
                             <span>Progreso: ${stats.percent}%</span>
                             <span>Pág ${book.currentPage} de ${book.totalPages}</span>
                         </div>
-                        <div class="w-full bg-slate-200 rounded-full h-2.5">
-                            <div class="bg-indigo-500 h-2.5 rounded-full transition-all duration-500" style="width: ${stats.percent}%"></div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: ${stats.percent}%"></div>
                         </div>
                     </div>
 
-                    <!-- Estadísticas -->
-                    <div class="grid grid-cols-2 gap-3 text-sm text-slate-600 mb-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                        <div>
-                            <span class="block text-xs uppercase text-slate-400">Total tiempo lectura</span>
-                            <span class="font-semibold text-slate-700">${formatTime(stats.totalMins)}</span>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Total lectura</span>
+                            <span class="stat-value">${formatTime(stats.totalMins)}</span>
                         </div>
-                        <div>
-                            <span class="block text-xs uppercase text-slate-400">Faltan</span>
-                            <span class="font-semibold text-indigo-600">${stats.daysRemaining} días</span>
+                        <div class="stat-item">
+                            <span class="stat-label">Faltan</span>
+                            <span class="stat-value highlight">${stats.daysRemaining} días</span>
                         </div>
-                        <div class="col-span-2">
-                            <span class="block text-xs uppercase text-slate-400">Fecha de finalización proyectada</span>
-                            <span class="font-semibold text-emerald-600"><i class="far fa-calendar-check mr-1"></i> ${book.currentPage >= book.totalPages ? '¡Terminado!' : stats.dateStr}</span>
+                        <div class="stat-item full">
+                            <span class="stat-label">Fecha proyectada</span>
+                            <span class="stat-value success">📅 ${book.currentPage >= book.totalPages ? '¡Terminado!' : stats.dateStr}</span>
                         </div>
                     </div>
 
-                    <!-- Actualizar página -->
-                    <div class="flex items-center space-x-2">
-                        <label class="text-sm font-medium text-slate-600 whitespace-nowrap">Voy en la pág:</label>
-                        <input type="number" id="update-page-${book.id}" value="${book.currentPage}" class="w-20 p-1 border border-slate-300 rounded text-center focus:ring-2 focus:ring-indigo-500 outline-none">
-                        <button onclick="updatePage(${book.id})" class="bg-slate-800 text-white px-3 py-1 rounded text-sm hover:bg-slate-700 transition">Actualizar</button>
+                    <div class="update-section">
+                        <span class="update-label">Voy en la pág:</span>
+                        <input type="number" id="update-page-${book.id}" value="${book.currentPage}">
+                        <button onclick="updatePage(${book.id})" class="btn-update">Actualizar</button>
                     </div>
                 `;
                 booksList.appendChild(card);
@@ -233,7 +476,6 @@
             const newPage = parseInt(document.getElementById(`update-page-${id}`).value);
             const book = appData.books.find(b => b.id === id);
             if (book) {
-                // Validar que no se pase del total
                 book.currentPage = Math.max(0, Math.min(newPage, book.totalPages));
                 saveData();
                 renderBooks();
@@ -248,7 +490,6 @@
             }
         }
 
-        // --- INICIALIZAR APP ---
         renderTabs();
         renderBooks();
     </script>
