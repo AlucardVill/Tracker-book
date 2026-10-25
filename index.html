@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Tracker de Lectura</title>
     <style>
-        /* Variables de color para mantener el diseño consistente */
         :root {
             --bg-color: #f1f5f9;
             --text-main: #1e293b;
@@ -54,7 +53,6 @@
             font-size: 14px;
         }
 
-        /* Sistema de pestañas */
         .tabs-container {
             display: flex;
             gap: 10px;
@@ -91,7 +89,6 @@
             color: var(--text-main);
         }
 
-        /* Tarjetas */
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -106,10 +103,9 @@
             font-size: 18px;
             margin-bottom: 15px;
             color: var(--text-main);
-            padding-right: 60px; /* Espacio para los botones */
+            padding-right: 60px;
         }
 
-        /* Formularios */
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -172,7 +168,6 @@
             margin-top: 5px;
         }
 
-        /* Acciones de la tarjeta (Editar y Eliminar) */
         .card-actions {
             position: absolute;
             top: 18px;
@@ -193,7 +188,6 @@
             transform: scale(1.1);
         }
 
-        /* Sección de edición oculta */
         .edit-section {
             background: #f8fafc;
             border: 1px dashed var(--border-color);
@@ -202,7 +196,6 @@
             margin-bottom: 20px;
         }
 
-        /* Barra de progreso */
         .progress-header {
             display: flex;
             justify-content: space-between;
@@ -225,7 +218,6 @@
             transition: width 0.4s ease;
         }
 
-        /* Estadísticas */
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -254,7 +246,6 @@
         .stat-value.highlight { color: var(--primary); }
         .stat-value.success { color: var(--success); }
 
-        /* Actualizar página */
         .update-section {
             display: flex;
             align-items: center;
@@ -292,18 +283,13 @@
 <body>
 
     <div class="container">
-        <!-- Encabezado -->
         <header>
             <h1>📚 Mis Lecturas</h1>
             <p>Calcula tu ritmo y organiza tus textos</p>
         </header>
 
-        <!-- Pestañas (Categorías) -->
-        <div class="tabs-container" id="tabsContainer">
-            <!-- Generado con JS -->
-        </div>
+        <div class="tabs-container" id="tabsContainer"></div>
 
-        <!-- Formulario -->
         <div class="card">
             <h2 class="card-title">Agregar nuevo texto</h2>
             <form id="bookForm">
@@ -333,14 +319,10 @@
             </form>
         </div>
 
-        <!-- Lista de Libros -->
-        <div id="booksList">
-            <!-- Generado con JS -->
-        </div>
+        <div id="booksList"></div>
     </div>
 
     <script>
-        // --- ESTADO DE LA APLICACIÓN ---
         let appData = {
             categories: ['Lecturas Actuales', 'Por Leer'],
             activeCategory: 'Lecturas Actuales',
@@ -352,16 +334,17 @@
             appData = JSON.parse(savedData);
         }
 
-        // --- FUNCIONES DE CÁLCULO ---
         function formatTime(minutes) {
             const h = Math.floor(minutes / 60);
             const m = Math.round(minutes % 60);
-            if (h > 0) return `${h}h ${m}m`;
+            if (h > 0 && m > 0) return `${h}h ${m}m`;
+            if (h > 0) return `${h}h`;
             return `${m} min`;
         }
 
         function calculateStats(book) {
             const totalMins = book.totalPages * book.minsPerPage;
+            const readMins = book.currentPage * book.minsPerPage;
             const remainingPages = book.totalPages - book.currentPage;
             const remainingMins = remainingPages * book.minsPerPage;
             
@@ -373,14 +356,13 @@
             const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
             const dateStr = finishDate.toLocaleDateString('es-ES', dateOptions);
 
-            return { totalMins, remainingMins, daysRemaining, percent, dateStr };
+            return { totalMins, readMins, remainingMins, daysRemaining, percent, dateStr };
         }
 
         function saveData() {
             localStorage.setItem('readingTrackerData', JSON.stringify(appData));
         }
 
-        // --- RENDERIZADO ---
         function renderTabs() {
             const tabsContainer = document.getElementById('tabsContainer');
             tabsContainer.innerHTML = '';
@@ -440,7 +422,6 @@
                     
                     <h3 class="card-title">${book.title}</h3>
                     
-                    <!-- Formulario de edición oculto -->
                     <div id="edit-section-${book.id}" class="edit-section" style="display: none;">
                         <div class="form-grid">
                             <div class="form-group full">
@@ -479,15 +460,23 @@
 
                         <div class="stats-grid">
                             <div class="stat-item">
-                                <span class="stat-label">Total lectura</span>
+                                <span class="stat-label">Tiempo Leído</span>
+                                <span class="stat-value">${formatTime(stats.readMins)}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Tiempo Restante</span>
+                                <span class="stat-value">${formatTime(stats.remainingMins)}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Total del Libro</span>
                                 <span class="stat-value">${formatTime(stats.totalMins)}</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-label">Faltan</span>
+                                <span class="stat-label">Días Restantes</span>
                                 <span class="stat-value highlight">${stats.daysRemaining} días</span>
                             </div>
                             <div class="stat-item full">
-                                <span class="stat-label">Fecha proyectada</span>
+                                <span class="stat-label">Fecha Proyectada</span>
                                 <span class="stat-value success">📅 ${book.currentPage >= book.totalPages ? '¡Terminado!' : stats.dateStr}</span>
                             </div>
                         </div>
@@ -503,7 +492,6 @@
             });
         }
 
-        // --- ACCIONES ---
         document.getElementById('bookForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -542,7 +530,6 @@
             }
         }
 
-        // Funciones de edición
         function toggleEdit(id) {
             const editSection = document.getElementById(`edit-section-${id}`);
             const viewSection = document.getElementById(`view-section-${id}`);
@@ -564,7 +551,6 @@
                 book.minsPerPage = parseFloat(document.getElementById(`edit-mins-${id}`).value);
                 book.dailyMins = parseInt(document.getElementById(`edit-daily-${id}`).value);
                 
-                // Asegurar que la página actual no sea mayor que el nuevo total de páginas
                 if (book.currentPage > book.totalPages) {
                     book.currentPage = book.totalPages;
                 }
