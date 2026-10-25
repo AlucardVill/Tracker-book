@@ -61,10 +61,10 @@
             overflow-x: auto;
             padding-bottom: 15px;
             margin-bottom: 15px;
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none;
         }
         .tabs-container::-webkit-scrollbar {
-            display: none; /* Chrome/Safari/Edge */
+            display: none; 
         }
 
         .tab-btn {
@@ -106,6 +106,7 @@
             font-size: 18px;
             margin-bottom: 15px;
             color: var(--text-main);
+            padding-right: 60px; /* Espacio para los botones */
         }
 
         /* Formularios */
@@ -159,27 +160,46 @@
         .btn-submit:hover {
             background: var(--primary-hover);
         }
+        .btn-cancel {
+            background: var(--text-muted);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 5px;
+        }
 
-        /* Elementos de lectura */
-        .delete-btn {
+        /* Acciones de la tarjeta (Editar y Eliminar) */
+        .card-actions {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 18px;
+            right: 15px;
+            display: flex;
+            gap: 12px;
+        }
+        .icon-btn {
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 16px;
-            opacity: 0.6;
-            transition: opacity 0.2s;
+            font-size: 18px;
+            opacity: 0.5;
+            transition: opacity 0.2s, transform 0.2s;
         }
-        .delete-btn:hover {
+        .icon-btn:hover {
             opacity: 1;
+            transform: scale(1.1);
         }
 
-        .book-title {
-            font-size: 20px;
-            margin-bottom: 15px;
-            padding-right: 30px;
+        /* Sección de edición oculta */
+        .edit-section {
+            background: #f8fafc;
+            border: 1px dashed var(--border-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
         }
 
         /* Barra de progreso */
@@ -413,38 +433,70 @@
                 card.className = 'card';
 
                 card.innerHTML = `
-                    <button onclick="deleteBook(${book.id})" class="delete-btn" title="Eliminar">🗑️</button>
-                    <h3 class="book-title">${book.title}</h3>
+                    <div class="card-actions">
+                        <button onclick="toggleEdit(${book.id})" class="icon-btn" title="Editar">✏️</button>
+                        <button onclick="deleteBook(${book.id})" class="icon-btn" title="Eliminar">🗑️</button>
+                    </div>
                     
-                    <div>
-                        <div class="progress-header">
-                            <span>Progreso: ${stats.percent}%</span>
-                            <span>Pág ${book.currentPage} de ${book.totalPages}</span>
+                    <h3 class="card-title">${book.title}</h3>
+                    
+                    <!-- Formulario de edición oculto -->
+                    <div id="edit-section-${book.id}" class="edit-section" style="display: none;">
+                        <div class="form-grid">
+                            <div class="form-group full">
+                                <label>Título</label>
+                                <input type="text" id="edit-title-${book.id}" value="${book.title}" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Total Páginas</label>
+                                <input type="number" id="edit-total-${book.id}" value="${book.totalPages}" required min="1">
+                            </div>
+                            <div class="form-group">
+                                <label>Minutos x pág</label>
+                                <input type="number" id="edit-mins-${book.id}" value="${book.minsPerPage}" required min="0.1" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label>Tiempo diario (min)</label>
+                                <input type="number" id="edit-daily-${book.id}" value="${book.dailyMins}" required min="1">
+                            </div>
                         </div>
-                        <div class="progress-track">
-                            <div class="progress-fill" style="width: ${stats.percent}%"></div>
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="saveEdit(${book.id})" class="btn-submit">Guardar Cambios</button>
+                            <button onclick="toggleEdit(${book.id})" class="btn-cancel">Cancelar</button>
                         </div>
                     </div>
 
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <span class="stat-label">Total lectura</span>
-                            <span class="stat-value">${formatTime(stats.totalMins)}</span>
+                    <div id="view-section-${book.id}">
+                        <div>
+                            <div class="progress-header">
+                                <span>Progreso: ${stats.percent}%</span>
+                                <span>Pág ${book.currentPage} de ${book.totalPages}</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" style="width: ${stats.percent}%"></div>
+                            </div>
                         </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Faltan</span>
-                            <span class="stat-value highlight">${stats.daysRemaining} días</span>
-                        </div>
-                        <div class="stat-item full">
-                            <span class="stat-label">Fecha proyectada</span>
-                            <span class="stat-value success">📅 ${book.currentPage >= book.totalPages ? '¡Terminado!' : stats.dateStr}</span>
-                        </div>
-                    </div>
 
-                    <div class="update-section">
-                        <span class="update-label">Voy en la pág:</span>
-                        <input type="number" id="update-page-${book.id}" value="${book.currentPage}">
-                        <button onclick="updatePage(${book.id})" class="btn-update">Actualizar</button>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-label">Total lectura</span>
+                                <span class="stat-value">${formatTime(stats.totalMins)}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Faltan</span>
+                                <span class="stat-value highlight">${stats.daysRemaining} días</span>
+                            </div>
+                            <div class="stat-item full">
+                                <span class="stat-label">Fecha proyectada</span>
+                                <span class="stat-value success">📅 ${book.currentPage >= book.totalPages ? '¡Terminado!' : stats.dateStr}</span>
+                            </div>
+                        </div>
+
+                        <div class="update-section">
+                            <span class="update-label">Voy en la pág:</span>
+                            <input type="number" id="update-page-${book.id}" value="${book.currentPage}">
+                            <button onclick="updatePage(${book.id})" class="btn-update">Actualizar</button>
+                        </div>
                     </div>
                 `;
                 booksList.appendChild(card);
@@ -485,6 +537,38 @@
         function deleteBook(id) {
             if(confirm('¿Estás seguro de eliminar este texto?')) {
                 appData.books = appData.books.filter(b => b.id !== id);
+                saveData();
+                renderBooks();
+            }
+        }
+
+        // Funciones de edición
+        function toggleEdit(id) {
+            const editSection = document.getElementById(`edit-section-${id}`);
+            const viewSection = document.getElementById(`view-section-${id}`);
+            
+            if (editSection.style.display === 'none') {
+                editSection.style.display = 'block';
+                viewSection.style.display = 'none';
+            } else {
+                editSection.style.display = 'none';
+                viewSection.style.display = 'block';
+            }
+        }
+
+        function saveEdit(id) {
+            const book = appData.books.find(b => b.id === id);
+            if(book) {
+                book.title = document.getElementById(`edit-title-${id}`).value;
+                book.totalPages = parseInt(document.getElementById(`edit-total-${id}`).value);
+                book.minsPerPage = parseFloat(document.getElementById(`edit-mins-${id}`).value);
+                book.dailyMins = parseInt(document.getElementById(`edit-daily-${id}`).value);
+                
+                // Asegurar que la página actual no sea mayor que el nuevo total de páginas
+                if (book.currentPage > book.totalPages) {
+                    book.currentPage = book.totalPages;
+                }
+                
                 saveData();
                 renderBooks();
             }
