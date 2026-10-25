@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Tracker de Lectura</title>
+    <!-- Usamos Tailwind CSS para darle un diseño moderno y bonito sin necesidad de otro archivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Ocultar barra de desplazamiento en las pestañas para que se vea limpio en móviles */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans pb-20">
+
+    <div class="max-w-xl mx-auto p-4">
+        <!-- Encabezado -->
+        <header class="text-center py-6">
+            <h1 class="text-3xl font-bold text-indigo-600"><i class="fas fa-book-open mr-2"></i>Mis Lecturas</h1>
+            <p class="text-slate-500 text-sm mt-1">Calcula tu ritmo y organiza tus libros</p>
+        </header>
+
+        <!-- Pestañas (Categorías) -->
+        <div class="flex items-center space-x-2 overflow-x-auto no-scrollbar mb-6 pb-2" id="tabsContainer">
+            <!-- Las pestañas se generan con JavaScript -->
+        </div>
+
+        <!-- Formulario para agregar libro -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 mb-8">
+            <h2 class="text-lg font-semibold mb-4 text-slate-700">Agregar nuevo texto</h2>
+            <form id="bookForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-500 uppercase">Título del libro/texto</label>
+                    <input type="text" id="title" required class="mt-1 w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 uppercase">Total Páginas</label>
+                        <input type="number" id="totalPages" required min="1" class="mt-1 w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 uppercase">Minutos x página</label>
+                        <input type="number" id="minsPerPage" required min="0.1" step="0.1" placeholder="Ej: 1.5" class="mt-1 w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 uppercase">Tiempo diario (min)</label>
+                        <input type="number" id="dailyMins" required min="1" placeholder="Ej: 15" class="mt-1 w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 uppercase">Página actual</label>
+                        <input type="number" id="currentPage" required min="0" value="0" class="mt-1 w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition mt-2">
+                    Guardar Libro
+                </button>
+            </form>
+        </div>
+
+        <!-- Lista de Libros -->
+        <div id="booksList" class="space-y-4">
+            <!-- Los libros se generan con JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // --- ESTADO DE LA APLICACIÓN ---
+        let appData = {
+            categories: ['Lecturas Actuales', 'Por Leer'],
+            activeCategory: 'Lecturas Actuales',
+            books: []
+        };
+
+        // Cargar datos de LocalStorage al iniciar
+        const savedData = localStorage.getItem('readingTrackerData');
+        if (savedData) {
+            appData = JSON.parse(savedData);
+        }
+
+        // --- FUNCIONES DE CÁLCULO Y FECHAS ---
+        function formatTime(minutes) {
+            const h = Math.floor(minutes / 60);
+            const m = Math.round(minutes % 60);
+            if (h > 0) return `${h}h ${m}m`;
+            return `${m} min`;
+        }
+
+        function calculateStats(book) {
+            const totalMins = book.totalPages * book.minsPerPage;
+            const remainingPages = book.totalPages - book.currentPage;
+            const remainingMins = remainingPages * book.minsPerPage;
+            
+            const daysRemaining = Math.ceil(remainingMins / book.dailyMins);
+            const percent = Math.min(((book.currentPage / book.totalPages) * 100), 100).toFixed(1);
+
+            // Proyectar fecha
+            const finishDate = new Date();
+            finishDate.setDate(finishDate.getDate() + daysRemaining);
+            const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+            const dateStr = finishDate.toLocaleDateString('es-ES', dateOptions);
+
+            return { totalMins, remainingMins, daysRemaining, percent, dateStr };
+        }
+
+        function saveData() {
+            localStorage.setItem('readingTrackerData', JSON.stringify(appData));
+        }
+
+        // --- RENDERIZADO DE INTERFAZ ---
+        function renderTabs() {
+            const tabsContainer = document.getElementById('tabsContainer');
+            tabsContainer.innerHTML = '';
+
+            appData.categories.forEach(cat => {
+                const btn = document.createElement('button');
+                const isActive = cat === appData.activeCategory;
+                btn.className = `whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition ${isActive ? 'bg-indigo-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`;
+                btn.innerText = cat;
+                btn.onclick = () => {
+                    appData.activeCategory = cat;
+                    saveData();
+                    renderTabs();
+                    renderBooks();
+                };
+                tabsContainer.appendChild(btn);
+            });
+
+            // Botón para nueva categoría
+            const addBtn = document.createElement('button');
+            addBtn.className = 'whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium bg-slate-200 text-slate-700 hover:bg-slate-300 transition';
+            addBtn.innerHTML = '<i class="fas fa-plus"></i> Nueva Lista';
+            addBtn.onclick = () => {
+                const newCat = prompt('Nombre de la nueva lista:');
+                if (newCat && !appData.categories.includes(newCat)) {
+                    appData.categories.push(newCat);
+                    appData.activeCategory = newCat;
+                    saveData();
+                    renderTabs();
+                    renderBooks();
+                }
+            };
+            tabsContainer.appendChild(addBtn);
+        }
+
+        function renderBooks() {
+            const booksList = document.getElementById('booksList');
+            booksList.innerHTML = '';
+
+            const filteredBooks = appData.books.filter(b => b.category === appData.activeCategory);
+
+            if (filteredBooks.length === 0) {
+                booksList.innerHTML = '<div class="text-center text-slate-400 py-8">No hay libros en esta lista aún.</div>';
+                return;
+            }
+
+            // Invertir para mostrar el más reciente arriba
+            filteredBooks.slice().reverse().forEach(book => {
+                const stats = calculateStats(book);
+                
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl shadow-sm border border-slate-200 p-5 relative';
+
+                card.innerHTML = `
+                    <button onclick="deleteBook(${book.id})" class="absolute top-4 right-4 text-red-400 hover:text-red-600 transition">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <h3 class="text-xl font-bold text-slate-800 pr-8 mb-3">${book.title}</h3>
+                    
+                    <!-- Barra de progreso -->
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs mb-1 text-slate-500 font-medium">
+                            <span>Progreso: ${stats.percent}%</span>
+                            <span>Pág ${book.currentPage} de ${book.totalPages}</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-2.5">
+                            <div class="bg-indigo-500 h-2.5 rounded-full transition-all duration-500" style="width: ${stats.percent}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Estadísticas -->
+                    <div class="grid grid-cols-2 gap-3 text-sm text-slate-600 mb-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                        <div>
+                            <span class="block text-xs uppercase text-slate-400">Total tiempo lectura</span>
+                            <span class="font-semibold text-slate-700">${formatTime(stats.totalMins)}</span>
+                        </div>
+                        <div>
+                            <span class="block text-xs uppercase text-slate-400">Faltan</span>
+                            <span class="font-semibold text-indigo-600">${stats.daysRemaining} días</span>
+                        </div>
+                        <div class="col-span-2">
+                            <span class="block text-xs uppercase text-slate-400">Fecha de finalización proyectada</span>
+                            <span class="font-semibold text-emerald-600"><i class="far fa-calendar-check mr-1"></i> ${book.currentPage >= book.totalPages ? '¡Terminado!' : stats.dateStr}</span>
+                        </div>
+                    </div>
+
+                    <!-- Actualizar página -->
+                    <div class="flex items-center space-x-2">
+                        <label class="text-sm font-medium text-slate-600 whitespace-nowrap">Voy en la pág:</label>
+                        <input type="number" id="update-page-${book.id}" value="${book.currentPage}" class="w-20 p-1 border border-slate-300 rounded text-center focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <button onclick="updatePage(${book.id})" class="bg-slate-800 text-white px-3 py-1 rounded text-sm hover:bg-slate-700 transition">Actualizar</button>
+                    </div>
+                `;
+                booksList.appendChild(card);
+            });
+        }
+
+        // --- ACCIONES ---
+        document.getElementById('bookForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newBook = {
+                id: Date.now(),
+                title: document.getElementById('title').value,
+                category: appData.activeCategory,
+                totalPages: parseInt(document.getElementById('totalPages').value),
+                minsPerPage: parseFloat(document.getElementById('minsPerPage').value),
+                dailyMins: parseInt(document.getElementById('dailyMins').value),
+                currentPage: parseInt(document.getElementById('currentPage').value)
+            };
+
+            appData.books.push(newBook);
+            saveData();
+            renderBooks();
+            this.reset();
+            document.getElementById('currentPage').value = 0;
+        });
+
+        function updatePage(id) {
+            const newPage = parseInt(document.getElementById(`update-page-${id}`).value);
+            const book = appData.books.find(b => b.id === id);
+            if (book) {
+                // Validar que no se pase del total
+                book.currentPage = Math.max(0, Math.min(newPage, book.totalPages));
+                saveData();
+                renderBooks();
+            }
+        }
+
+        function deleteBook(id) {
+            if(confirm('¿Estás seguro de eliminar este texto?')) {
+                appData.books = appData.books.filter(b => b.id !== id);
+                saveData();
+                renderBooks();
+            }
+        }
+
+        // --- INICIALIZAR APP ---
+        renderTabs();
+        renderBooks();
+    </script>
+</body>
+</html>
