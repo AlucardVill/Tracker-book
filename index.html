@@ -5,149 +5,148 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Tracker de Lectura</title>
     <style>
+        /* Paleta de colores académicos y clásicos */
         :root {
-            --bg-color: #f1f5f9;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
+            --bg-color: #fdfbf7;      /* Pergamino claro */
+            --text-main: #1a1a1a;     /* Tinta oscura */
+            --text-muted: #5c5c5c;    /* Tinta diluida */
+            --primary: #722f37;       /* Rojo burdeos/vino tinto */
+            --primary-hover: #5a232b; 
             --card-bg: #ffffff;
-            --border-color: #e2e8f0;
-            --success: #059669;
-            --danger: #ef4444;
+            --border-color: #dcd7ce;  
+            --success: #2d6a4f;       /* Verde bosque clásico */
+            --danger: #9b2226;
+            --font-family: "Times New Roman", Times, serif;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color); color: var(--text-main); padding-bottom: 60px; line-height: 1.5;
+            font-family: var(--font-family);
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            padding-bottom: 60px; 
+            line-height: 1.6;
         }
 
         .container { max-width: 550px; margin: 0 auto; padding: 20px; }
 
-        header { text-align: center; padding: 25px 0 15px 0; }
-        h1 { color: var(--primary); font-size: 26px; margin-bottom: 5px; }
-        header p { color: var(--text-muted); font-size: 14px; margin-bottom: 15px; }
+        header { text-align: center; padding: 25px 0 15px 0; border-bottom: 2px solid var(--primary); margin-bottom: 20px; }
+        h1 { color: var(--primary); font-size: 30px; margin-bottom: 5px; font-weight: normal; letter-spacing: 1px; }
+        header p { color: var(--text-muted); font-size: 15px; font-style: italic; margin-bottom: 15px; }
 
         .btn-schedule {
-            background: var(--text-main); color: white; border: none; padding: 12px 20px; border-radius: 8px;
-            font-weight: bold; font-size: 15px; cursor: pointer; width: 100%; display: flex;
+            background: var(--text-main); color: white; border: 1px solid var(--text-main); padding: 12px 20px; border-radius: 4px;
+            font-size: 16px; cursor: pointer; width: 100%; display: flex; font-family: var(--font-family);
             align-items: center; justify-content: center; gap: 8px; transition: background 0.2s; margin-bottom: 20px;
         }
-        .btn-schedule:hover { background: #0f172a; }
+        .btn-schedule:hover { background: #333; }
 
-        .tabs-container {
-            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; margin-bottom: 15px; scrollbar-width: none;
-        }
+        .tabs-container { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; margin-bottom: 15px; scrollbar-width: none; }
         .tabs-container::-webkit-scrollbar { display: none; }
 
         .tab-btn {
-            background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-muted);
-            padding: 8px 18px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer;
+            background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted);
+            padding: 8px 16px; border-radius: 4px; font-size: 15px; cursor: pointer; font-family: var(--font-family);
             white-space: nowrap; transition: all 0.2s; display: flex; align-items: center; gap: 8px;
         }
-        .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2); }
-        .tab-btn-new { background: #e2e8f0; border: none; color: var(--text-main); }
+        .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .tab-btn-new { background: #eae5dc; border: 1px dashed var(--border-color); color: var(--text-main); }
         .tab-delete {
             background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%;
             width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;
             font-size: 12px; cursor: pointer;
         }
-        .tab-delete:hover { background: rgba(255,0,0,0.5); }
 
         .card {
-            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px;
-            padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); position: relative;
+            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px;
+            padding: 20px; margin-bottom: 20px; box-shadow: 2px 2px 8px rgba(0,0,0,0.04);
         }
-        .card.inactive { opacity: 0.7; }
+        .card.inactive { opacity: 0.7; background: #faf9f7; }
         
-        .card-header-controls {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
-            padding-bottom: 15px; border-bottom: 1px solid var(--border-color);
-        }
-        .status-toggle { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; font-weight: 600; }
-        .status-toggle input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary); }
-        .priority-control { display: flex; align-items: center; gap: 8px; }
-        .priority-control label { font-size: 10px; margin: 0; }
-        .priority-control input[type="range"] { width: 80px; accent-color: var(--primary); cursor: pointer; }
-
+        .card-header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
         .card-title {
-            font-size: 18px; margin-bottom: 15px; color: var(--primary); padding-right: 60px;
-            cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: color 0.2s;
+            font-size: 20px; color: var(--primary); font-weight: bold; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px; transition: color 0.2s; margin: 0;
         }
         .card-title:hover { color: var(--primary-hover); text-decoration: underline; }
+        .card-actions { display: flex; gap: 12px; }
+        
+        .card-controls {
+            display: flex; flex-direction: column; gap: 10px; background: var(--bg-color);
+            padding: 12px; border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 15px;
+            text-align: center;
+        }
+        .status-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; font-size: 14px; }
+        .status-toggle input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary); }
+        .priority-control { display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .priority-control label { font-size: 14px; margin: 0; text-transform: none; }
+        .priority-control input[type="range"] { width: 120px; accent-color: var(--primary); cursor: pointer; }
         
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         .form-group.full { grid-column: 1 / -1; }
 
-        label { display: block; font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 5px; }
+        label { display: block; font-size: 12px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 5px; }
         input[type="text"], input[type="number"], textarea {
-            width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px;
-            font-size: 14px; outline: none; transition: border-color 0.2s; background: #fafafa; font-family: inherit;
+            width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px;
+            font-size: 15px; outline: none; transition: border-color 0.2s; background: #faf9f7; font-family: var(--font-family);
         }
         input:focus, textarea:focus { border-color: var(--primary); background: white; }
 
-        .btn-submit { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: 5px; }
-        .btn-cancel { background: var(--text-muted); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; }
+        .btn-submit { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 5px; font-family: var(--font-family); }
+        .btn-cancel { background: var(--text-muted); color: white; border: none; padding: 12px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 5px; font-family: var(--font-family); }
 
-        .card-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 12px; }
-        .icon-btn { background: none; border: none; cursor: pointer; font-size: 18px; opacity: 0.5; transition: opacity 0.2s, transform 0.2s; }
-        .icon-btn:hover { opacity: 1; transform: scale(1.1); }
+        .icon-btn { background: none; border: none; cursor: pointer; font-size: 16px; opacity: 0.6; transition: opacity 0.2s; }
+        .icon-btn:hover { opacity: 1; }
 
-        .edit-section { background: #f8fafc; border: 1px dashed var(--border-color); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .edit-section { background: var(--bg-color); border: 1px dashed var(--border-color); padding: 15px; border-radius: 4px; margin-bottom: 20px; }
         
-        .progress-header { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
-        .progress-track { background: var(--border-color); border-radius: 10px; height: 10px; width: 100%; margin-bottom: 20px; overflow: hidden; }
+        .progress-header { display: flex; justify-content: space-between; font-size: 14px; color: var(--text-muted); margin-bottom: 6px; }
+        .progress-track { background: var(--border-color); border-radius: 2px; height: 8px; width: 100%; margin-bottom: 20px; overflow: hidden; }
         .progress-fill { background: var(--primary); height: 100%; transition: width 0.4s ease; }
 
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 20px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--bg-color); padding: 15px; border-radius: 4px; border: 1px solid var(--border-color); margin-bottom: 15px; }
         .stat-item.full { grid-column: 1 / -1; }
-        .stat-label { font-size: 11px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 4px; }
-        .stat-value { font-size: 14px; font-weight: 700; color: var(--text-main); }
-        .stat-value.highlight { color: var(--primary); }
-        .stat-value.success { color: var(--success); }
+        .stat-label { font-size: 10px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 4px; letter-spacing: 0.5px; }
+        .stat-value { font-size: 16px; color: var(--text-main); }
+        .stat-value.highlight { color: var(--primary); font-weight: bold; }
+        .stat-value.success { color: var(--success); font-style: italic; }
 
-        .update-section { display: flex; align-items: center; gap: 10px; }
-        .update-label { font-size: 14px; font-weight: 500; color: var(--text-main); }
-        .update-section input { width: 80px; padding: 8px; text-align: center; }
-        .btn-update { background: var(--text-main); color: white; border: none; padding: 9px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; }
-        .empty-state { text-align: center; color: var(--text-muted); padding: 30px 0; font-size: 15px; }
+        .update-section { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .update-label { font-size: 15px; color: var(--text-main); }
+        .update-section input { width: 80px; padding: 6px; text-align: center; }
+        .btn-update { background: var(--text-main); color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 14px; font-family: var(--font-family); }
+        
+        /* Temporizador */
+        .daily-timer { border: 1px solid var(--border-color); border-radius: 4px; padding: 15px; background: #ffffff; text-align: center; }
+        .timer-display { font-size: 24px; color: var(--primary); margin: 10px 0; font-variant-numeric: tabular-nums; }
+        .btn-timer { background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 4px; font-size: 15px; cursor: pointer; font-family: var(--font-family); display: inline-flex; align-items: center; gap: 8px; }
+        .btn-timer.running { background: #d97706; } /* Naranja para pausar */
+
+        .empty-state { text-align: center; color: var(--text-muted); padding: 30px 0; font-size: 16px; font-style: italic; }
 
         /* Modales */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5);
-            display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px;
-        }
-        .modal-content {
-            background: white; border-radius: 12px; width: 100%; max-width: 500px;
-            max-height: 90vh; overflow-y: auto; padding: 25px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-        .modal-close {
-            position: absolute; top: 15px; right: 15px; background: var(--border-color); border: none;
-            width: 30px; height: 30px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal-content { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 4px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 25px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-close { position: absolute; top: 15px; right: 15px; background: var(--card-bg); border: 1px solid var(--border-color); width: 30px; height: 30px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         
-        .checklist-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); }
-        .checklist-item input[type="checkbox"] { margin-top: 4px; width: 18px; height: 18px; cursor: pointer; }
-        .checklist-text { flex: 1; font-size: 14px; word-break: break-word; }
+        .checklist-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; background: var(--card-bg); padding: 10px; border-radius: 4px; border: 1px solid var(--border-color); }
+        .checklist-item input[type="checkbox"] { margin-top: 4px; width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary); }
+        .checklist-text { flex: 1; font-size: 15px; word-break: break-word; }
         .checklist-text.done { text-decoration: line-through; color: var(--text-muted); }
 
-        .schedule-item {
-            padding: 12px; border-left: 4px solid var(--primary); background: #f8fafc;
-            margin-bottom: 10px; border-radius: 4px; display: flex; flex-direction: column; gap: 4px;
-        }
-        .schedule-time { font-weight: 800; color: var(--primary); font-size: 15px; }
-        .schedule-title { font-weight: 600; color: var(--text-main); font-size: 16px; }
-        .schedule-meta { font-size: 12px; color: var(--text-muted); }
+        .schedule-item { padding: 12px; border-left: 4px solid var(--primary); background: var(--card-bg); margin-bottom: 10px; border-radius: 0 4px 4px 0; display: flex; flex-direction: column; gap: 4px; border-top: 1px solid var(--border-color); border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+        .schedule-time { font-weight: bold; color: var(--primary); font-size: 15px; }
+        .schedule-title { color: var(--text-main); font-size: 18px; }
+        .schedule-meta { font-size: 13px; color: var(--text-muted); font-style: italic; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <header>
-            <h1>📚 Mis Lecturas</h1>
-            <p>Calcula tu ritmo y organiza tus textos</p>
+            <h1>Registro de Lectura</h1>
+            <p>Planificación y seguimiento académico</p>
         </header>
 
         <button onclick="generateSchedule()" class="btn-schedule">📅 Generar Horario de Hoy</button>
@@ -155,11 +154,11 @@
         <div class="tabs-container" id="tabsContainer"></div>
 
         <div class="card">
-            <h2 class="card-title" style="color: var(--text-main); cursor: default; pointer-events: none;">Agregar nuevo texto</h2>
+            <h2 class="card-title" style="color: var(--text-main); cursor: default; margin-bottom: 15px; font-size: 18px;">Agregar nuevo texto</h2>
             <form id="bookForm">
                 <div class="form-grid">
                     <div class="form-group full">
-                        <label>Título del libro/texto</label>
+                        <label>Título de la obra</label>
                         <input type="text" id="title" required>
                     </div>
                     <div class="form-group">
@@ -171,7 +170,7 @@
                         <input type="number" id="minsPerPage" required min="0.1" step="0.1" placeholder="Ej: 1.5">
                     </div>
                     <div class="form-group">
-                        <label>Tiempo diario (min)</label>
+                        <label>Meta diaria (min)</label>
                         <input type="number" id="dailyMins" required min="1" placeholder="Ej: 15">
                     </div>
                     <div class="form-group">
@@ -179,7 +178,7 @@
                         <input type="number" id="currentPage" required min="0" value="0">
                     </div>
                 </div>
-                <button type="submit" class="btn-submit">Guardar Libro</button>
+                <button type="submit" class="btn-submit">Registrar Obra</button>
             </form>
         </div>
 
@@ -190,27 +189,27 @@
     <div id="bookModal" class="modal-overlay">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('bookModal')">&times;</button>
-            <h2 id="modalTitle" class="card-title" style="margin-bottom: 5px; color: var(--text-main); cursor: default;"></h2>
-            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 20px;">Espacio de trabajo</p>
+            <h2 id="modalTitle" class="card-title" style="margin-bottom: 5px; color: var(--text-main); cursor: default; font-size: 22px;"></h2>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px; font-style: italic;">Espacio de trabajo y apuntes</p>
             
             <label>Notas Libres (Se guardan al cerrar)</label>
-            <textarea id="modalNotes" rows="6" placeholder="Escribe tus apuntes, resúmenes o ideas aquí..."></textarea>
+            <textarea id="modalNotes" rows="6" placeholder="Escribe tus resúmenes, citas o ideas clave..."></textarea>
             
-            <label style="margin-top: 20px;">Checklist / Tareas</label>
+            <label style="margin-top: 20px;">Lista de tareas / Capítulos</label>
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <input type="text" id="newChecklistInput" placeholder="Ej: Leer capítulo 1...">
+                <input type="text" id="newChecklistInput" placeholder="Ej: Leer introducción...">
                 <button onclick="addChecklist()" class="btn-update">Añadir</button>
             </div>
             <div id="modalChecklist"></div>
         </div>
     </div>
 
-    <!-- Modal Generador de Horario -->
+    <!-- Modal Horario -->
     <div id="scheduleModal" class="modal-overlay">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('scheduleModal')">&times;</button>
-            <h2 style="font-size: 20px; color: var(--text-main); margin-bottom: 5px;">Tu Horario de Lectura</h2>
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Generado para los textos activos según su prioridad.</p>
+            <h2 style="font-size: 22px; color: var(--primary); margin-bottom: 5px;">Itinerario de Lectura</h2>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px; font-style: italic;">Calculado para los textos activos según prioridad.</p>
             <div id="scheduleContent"></div>
         </div>
     </div>
@@ -221,16 +220,18 @@
             activeCategory: 'Lecturas Actuales',
             books: []
         };
+        let activeTimers = {}; // Guarda los intervalos de los cronómetros
 
         const savedData = localStorage.getItem('readingTrackerData');
         if (savedData) {
             appData = JSON.parse(savedData);
-            // Actualización de compatibilidad para datos viejos
+            // Compatibilidad con datos anteriores
             appData.books.forEach(b => {
-                if(!b.notes) b.notes = "";
-                if(!b.checklists) b.checklists = [];
+                if(b.notes === undefined) b.notes = "";
+                if(b.checklists === undefined) b.checklists = [];
                 if(b.active === undefined) b.active = true;
                 if(b.priority === undefined) b.priority = 50;
+                if(b.dailySeconds === undefined) b.dailySeconds = 0;
             });
         }
 
@@ -264,14 +265,21 @@
             const tabsContainer = document.getElementById('tabsContainer');
             tabsContainer.innerHTML = '';
             appData.categories.forEach(cat => {
+                // Contar lecturas activas en esta categoría
+                const activeCount = appData.books.filter(b => b.category === cat && b.active).length;
+                
                 const btn = document.createElement('button');
                 const isActive = cat === appData.activeCategory;
                 btn.className = isActive ? 'tab-btn active' : 'tab-btn';
+                
+                const tabText = `${cat} (${activeCount})`;
+                
                 if(isActive) {
-                    btn.innerHTML = `${cat} <span class="tab-delete" onclick="deleteCategory('${cat}', event)" title="Eliminar lista">&times;</span>`;
+                    btn.innerHTML = `${tabText} <span class="tab-delete" onclick="deleteCategory('${cat}', event)" title="Eliminar lista">&times;</span>`;
                 } else {
-                    btn.innerText = cat;
+                    btn.innerText = tabText;
                 }
+                
                 btn.onclick = (e) => {
                     if(e.target.classList.contains('tab-delete')) return;
                     appData.activeCategory = cat;
@@ -283,9 +291,9 @@
             });
             const addBtn = document.createElement('button');
             addBtn.className = 'tab-btn tab-btn-new';
-            addBtn.innerText = '➕ Nueva Lista';
+            addBtn.innerText = '+ Nueva Categoría';
             addBtn.onclick = () => {
-                const newCat = prompt('Nombre de la nueva lista:');
+                const newCat = prompt('Nombre de la nueva categoría:');
                 if (newCat && !appData.categories.includes(newCat)) {
                     appData.categories.push(newCat);
                     appData.activeCategory = newCat;
@@ -297,8 +305,8 @@
 
         function deleteCategory(cat, event) {
             event.stopPropagation();
-            if (appData.categories.length === 1) { alert("No puedes eliminar la única lista que te queda."); return; }
-            if (confirm(`¿Estás seguro de eliminar "${cat}" y TODOS los textos que contiene?`)) {
+            if (appData.categories.length === 1) { alert("Debe mantener al menos una categoría."); return; }
+            if (confirm(`¿Eliminar la categoría "${cat}" y TODOS los textos que contiene?`)) {
                 appData.categories = appData.categories.filter(c => c !== cat);
                 appData.books = appData.books.filter(b => b.category !== cat);
                 appData.activeCategory = appData.categories[0];
@@ -312,25 +320,38 @@
             const filteredBooks = appData.books.filter(b => b.category === appData.activeCategory);
 
             if (filteredBooks.length === 0) {
-                booksList.innerHTML = '<div class="empty-state">No hay textos en esta lista aún.</div>'; return;
+                booksList.innerHTML = '<div class="empty-state">El registro está vacío.</div>'; return;
             }
 
-            // Ordenar visualmente: Activos primero, Inactivos después
             const sortedBooks = filteredBooks.slice().sort((a, b) => {
-                if(a.active === b.active) return b.id - a.id; // más recientes arriba
+                if(a.active === b.active) return b.id - a.id; 
                 return a.active ? -1 : 1;
             });
 
             sortedBooks.forEach(book => {
                 const stats = calculateStats(book);
+                const isTimerRunning = !!activeTimers[book.id];
+                const btnTimerText = isTimerRunning ? '⏸️ Pausar Sesión' : (book.dailySeconds > 0 ? '▶️ Continuar Sesión' : '▶️ Iniciar Sesión');
+                
                 const card = document.createElement('div');
                 card.className = `card ${!book.active ? 'inactive' : ''}`;
 
                 card.innerHTML = `
-                    <div class="card-header-controls">
+                    <div class="card-header-top">
+                        <h3 class="card-title" onclick="openNotesModal(${book.id})" title="Abrir espacio de notas">
+                            ${book.title} <span style="font-size: 16px;">📝</span>
+                        </h3>
+                        <div class="card-actions">
+                            <button onclick="toggleEdit(${book.id})" class="icon-btn" title="Editar">✏️</button>
+                            <button onclick="deleteBook(${book.id})" class="icon-btn" title="Eliminar">🗑️</button>
+                        </div>
+                    </div>
+
+                    <!-- Panel Central de Controles -->
+                    <div class="card-controls">
                         <label class="status-toggle">
                             <input type="checkbox" ${book.active ? 'checked' : ''} onchange="toggleActive(${book.id})">
-                            ${book.active ? 'Activa' : 'Inactiva'}
+                            ${book.active ? 'Lectura Activa' : 'Lectura Inactiva'}
                         </label>
                         <div class="priority-control">
                             <label>Prioridad: <span id="val-pri-${book.id}">${book.priority}%</span></label>
@@ -339,15 +360,6 @@
                                 onchange="updatePriority(${book.id}, this.value)">
                         </div>
                     </div>
-
-                    <div class="card-actions">
-                        <button onclick="toggleEdit(${book.id})" class="icon-btn" title="Editar">✏️</button>
-                        <button onclick="deleteBook(${book.id})" class="icon-btn" title="Eliminar">🗑️</button>
-                    </div>
-                    
-                    <h3 class="card-title" onclick="openNotesModal(${book.id})" title="Toca para abrir notas y checklist">
-                        ${book.title} <span style="font-size: 14px;">📝</span>
-                    </h3>
                     
                     <div id="edit-section-${book.id}" class="edit-section" style="display: none;">
                         <div class="form-grid">
@@ -364,7 +376,7 @@
                                 <input type="number" id="edit-mins-${book.id}" value="${book.minsPerPage}" required min="0.1" step="0.1">
                             </div>
                             <div class="form-group">
-                                <label>Tiempo diario (min)</label>
+                                <label>Meta diaria (min)</label>
                                 <input type="number" id="edit-daily-${book.id}" value="${book.dailyMins}" required min="1">
                             </div>
                         </div>
@@ -377,42 +389,63 @@
                     <div id="view-section-${book.id}">
                         <div>
                             <div class="progress-header">
-                                <span>Progreso: ${stats.percent}%</span>
+                                <span>Avance general: ${stats.percent}%</span>
                                 <span>Pág ${book.currentPage} de ${book.totalPages}</span>
                             </div>
                             <div class="progress-track"><div class="progress-fill" style="width: ${stats.percent}%"></div></div>
                         </div>
-                        <div class="stats-grid">
-                            <div class="stat-item"><span class="stat-label">Tiempo Leído</span><span class="stat-value">${formatTime(stats.readMins)}</span></div>
-                            <div class="stat-item"><span class="stat-label">Tiempo Restante</span><span class="stat-value">${formatTime(stats.remainingMins)}</span></div>
-                            <div class="stat-item"><span class="stat-label">Total del Libro</span><span class="stat-value">${formatTime(stats.totalMins)}</span></div>
-                            <div class="stat-item"><span class="stat-label">Días Restantes</span><span class="stat-value highlight">${stats.daysRemaining} días</span></div>
-                            <div class="stat-item full"><span class="stat-label">Fecha Proyectada</span><span class="stat-value success">📅 ${book.currentPage >= book.totalPages ? '¡Terminado!' : stats.dateStr}</span></div>
-                        </div>
+                        
                         <div class="update-section">
-                            <span class="update-label">Voy en la pág:</span>
+                            <span class="update-label">Página alcanzada:</span>
                             <input type="number" id="update-page-${book.id}" value="${book.currentPage}">
-                            <button onclick="updatePage(${book.id})" class="btn-update">Actualizar</button>
+                            <button onclick="updatePage(${book.id})" class="btn-update">Actualizar Progreso</button>
+                        </div>
+
+                        <!-- Temporizador de Sesión Diaria -->
+                        <div class="daily-timer">
+                            <label style="margin-bottom: 0;">Cronómetro de Sesión Diaria</label>
+                            <div id="timer-display-${book.id}" class="timer-display">00:00 / ${book.dailyMins}:00</div>
+                            
+                            <div class="progress-track" style="height: 6px; margin: 10px 0;">
+                                <div id="timer-fill-${book.id}" class="progress-fill" style="width: 0%; background: var(--success);"></div>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: center; gap: 10px; align-items: center;">
+                                <button id="btn-timer-${book.id}" onclick="toggleTimer(${book.id})" class="btn-timer ${isTimerRunning ? 'running' : ''}">
+                                    ${btnTimerText}
+                                </button>
+                                <button onclick="resetTimer(${book.id})" class="icon-btn" style="font-size: 18px;" title="Reiniciar contador de hoy">🔄</button>
+                            </div>
+                            <p id="timer-msg-${book.id}" style="color: var(--success); font-style: italic; font-weight: bold; margin-top: 10px; display: none;">
+                                ¡Objetivo de lectura diario alcanzado! 🏆
+                            </p>
+                        </div>
+
+                        <div class="stats-grid" style="margin-top: 15px;">
+                            <div class="stat-item"><span class="stat-label">Tiempo Leído</span><span class="stat-value">${formatTime(stats.readMins)}</span></div>
+                            <div class="stat-item"><span class="stat-label">Restante</span><span class="stat-value">${formatTime(stats.remainingMins)}</span></div>
+                            <div class="stat-item"><span class="stat-label">Duración Total</span><span class="stat-value">${formatTime(stats.totalMins)}</span></div>
+                            <div class="stat-item"><span class="stat-label">Días Faltantes</span><span class="stat-value highlight">${stats.daysRemaining}</span></div>
+                            <div class="stat-item full"><span class="stat-label">Proyección de Finalización</span><span class="stat-value success">${book.currentPage >= book.totalPages ? 'Obra Finalizada' : stats.dateStr}</span></div>
                         </div>
                     </div>
                 `;
                 booksList.appendChild(card);
+                
+                // Actualizar interfaz del temporizador inmediatamente después de renderizar
+                setTimeout(() => updateTimerUI(book.id), 0);
             });
         }
 
         document.getElementById('bookForm').addEventListener('submit', function(e) {
             e.preventDefault();
             appData.books.push({
-                id: Date.now(),
-                title: document.getElementById('title').value,
-                category: appData.activeCategory,
-                totalPages: parseInt(document.getElementById('totalPages').value),
-                minsPerPage: parseFloat(document.getElementById('minsPerPage').value),
-                dailyMins: parseInt(document.getElementById('dailyMins').value),
-                currentPage: parseInt(document.getElementById('currentPage').value),
-                notes: "", checklists: [], active: true, priority: 50
+                id: Date.now(), title: document.getElementById('title').value, category: appData.activeCategory,
+                totalPages: parseInt(document.getElementById('totalPages').value), minsPerPage: parseFloat(document.getElementById('minsPerPage').value),
+                dailyMins: parseInt(document.getElementById('dailyMins').value), currentPage: parseInt(document.getElementById('currentPage').value),
+                notes: "", checklists: [], active: true, priority: 50, dailySeconds: 0
             });
-            saveData(); renderBooks(); this.reset(); document.getElementById('currentPage').value = 0;
+            saveData(); renderTabs(); renderBooks(); this.reset(); document.getElementById('currentPage').value = 0;
         });
 
         function updatePage(id) {
@@ -422,7 +455,10 @@
         }
 
         function deleteBook(id) {
-            if(confirm('¿Eliminar este texto?')) { appData.books = appData.books.filter(b => b.id !== id); saveData(); renderBooks(); }
+            if(confirm('¿Eliminar este registro de forma permanente?')) { 
+                if(activeTimers[id]) clearInterval(activeTimers[id]);
+                appData.books = appData.books.filter(b => b.id !== id); saveData(); renderTabs(); renderBooks(); 
+            }
         }
 
         function toggleEdit(id) {
@@ -444,26 +480,83 @@
             }
         }
 
-        // Toggles y Prioridad
         function toggleActive(id) {
             const book = appData.books.find(b => b.id === id);
-            if(book) { book.active = !book.active; saveData(); renderBooks(); }
+            if(book) { book.active = !book.active; saveData(); renderTabs(); renderBooks(); }
         }
         function updatePriority(id, value) {
             const book = appData.books.find(b => b.id === id);
             if(book) { book.priority = parseInt(value); saveData(); }
         }
 
-        // Generador de Horario
-        function generateSchedule() {
-            // Filtrar y ordenar TODAS las lecturas activas (sin importar la pestaña actual)
-            const activeBooks = appData.books.filter(b => b.active === true && b.currentPage < b.totalPages);
+        // --- Funciones del Temporizador ---
+        function toggleTimer(id) {
+            const book = appData.books.find(b => b.id === id);
+            const btn = document.getElementById(`btn-timer-${id}`);
             
-            if(activeBooks.length === 0) {
-                alert("No tienes lecturas activas o incompletas para programar.");
-                return;
+            if (activeTimers[id]) {
+                // Pausar
+                clearInterval(activeTimers[id]);
+                delete activeTimers[id];
+                btn.innerHTML = '▶️ Continuar Sesión';
+                btn.classList.remove('running');
+                saveData(); 
+            } else {
+                // Iniciar
+                btn.innerHTML = '⏸️ Pausar Sesión';
+                btn.classList.add('running');
+                activeTimers[id] = setInterval(() => {
+                    if (!book.dailySeconds) book.dailySeconds = 0;
+                    book.dailySeconds++;
+                    updateTimerUI(id);
+                    // Guardar automáticamente cada minuto para no perder datos si cierra de golpe
+                    if(book.dailySeconds % 60 === 0) saveData(); 
+                }, 1000);
             }
+        }
 
+        function updateTimerUI(id) {
+            const book = appData.books.find(b => b.id === id);
+            if (!book) return;
+            
+            const targetSeconds = book.dailyMins * 60;
+            const currentSecs = book.dailySeconds || 0;
+            
+            const m = Math.floor(currentSecs / 60).toString().padStart(2, '0');
+            const s = (currentSecs % 60).toString().padStart(2, '0');
+            
+            const display = document.getElementById(`timer-display-${id}`);
+            if (display) display.innerText = `${m}:${s} / ${book.dailyMins}:00`;
+            
+            const percent = Math.min((currentSecs / targetSeconds) * 100, 100);
+            const fill = document.getElementById(`timer-fill-${id}`);
+            if (fill) fill.style.width = `${percent}%`;
+            
+            const msg = document.getElementById(`timer-msg-${id}`);
+            if (msg) {
+                if (currentSecs >= targetSeconds) msg.style.display = 'block';
+                else msg.style.display = 'none';
+            }
+        }
+
+        function resetTimer(id) {
+            if(confirm('¿Desea reiniciar a cero el tiempo contado de esta sesión?')) {
+                const book = appData.books.find(b => b.id === id);
+                if (book) {
+                    book.dailySeconds = 0;
+                    if(activeTimers[id]) {
+                        clearInterval(activeTimers[id]);
+                        delete activeTimers[id];
+                    }
+                    saveData();
+                    renderBooks(); 
+                }
+            }
+        }
+
+        function generateSchedule() {
+            const activeBooks = appData.books.filter(b => b.active === true && b.currentPage < b.totalPages);
+            if(activeBooks.length === 0) { alert("No existen lecturas activas pendientes para programar."); return; }
             activeBooks.sort((a, b) => b.priority - a.priority);
 
             let currentTime = new Date();
@@ -474,22 +567,18 @@
                 const startTime = currentTime.toLocaleTimeString([], formatTimeOpts);
                 currentTime.setMinutes(currentTime.getMinutes() + book.dailyMins);
                 const endTime = currentTime.toLocaleTimeString([], formatTimeOpts);
-
                 scheduleHTML += `
                     <div class="schedule-item">
                         <span class="schedule-time">${startTime} - ${endTime}</span>
                         <span class="schedule-title">${book.title}</span>
-                        <span class="schedule-meta">Prioridad: ${book.priority}% | Duración: ${book.dailyMins} min | En la lista: ${book.category}</span>
-                    </div>
-                `;
+                        <span class="schedule-meta">Prioridad: ${book.priority}% | Duración: ${book.dailyMins} min | Categoría: ${book.category}</span>
+                    </div>`;
             });
-
             document.getElementById('scheduleContent').innerHTML = scheduleHTML;
             document.getElementById('scheduleModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
 
-        // Funciones del Modal General
         function closeModal(modalId) {
             if(modalId === 'bookModal' && currentModalBookId) {
                 const book = appData.books.find(b => b.id === currentModalBookId);
@@ -500,7 +589,6 @@
             document.body.style.overflow = 'auto';
         }
 
-        // Modal Notas
         function openNotesModal(id) {
             currentModalBookId = id;
             const book = appData.books.find(b => b.id === id);
