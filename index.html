@@ -5,16 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Tracker de Lectura</title>
     <style>
-        /* Paleta de colores académicos y clásicos */
         :root {
-            --bg-color: #fdfbf7;      /* Pergamino claro */
-            --text-main: #1a1a1a;     /* Tinta oscura */
-            --text-muted: #5c5c5c;    /* Tinta diluida */
-            --primary: #722f37;       /* Rojo burdeos/vino tinto */
+            --bg-color: #fdfbf7;
+            --text-main: #1a1a1a;
+            --text-muted: #5c5c5c;
+            --primary: #722f37;
             --primary-hover: #5a232b; 
             --card-bg: #ffffff;
             --border-color: #dcd7ce;  
-            --success: #2d6a4f;       /* Verde bosque clásico */
+            --success: #2d6a4f;
             --danger: #9b2226;
             --font-family: "Times New Roman", Times, serif;
         }
@@ -117,15 +116,13 @@
         .update-section input { width: 80px; padding: 6px; text-align: center; }
         .btn-update { background: var(--text-main); color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 14px; font-family: var(--font-family); }
         
-        /* Temporizador */
         .daily-timer { border: 1px solid var(--border-color); border-radius: 4px; padding: 15px; background: #ffffff; text-align: center; }
         .timer-display { font-size: 24px; color: var(--primary); margin: 10px 0; font-variant-numeric: tabular-nums; }
         .btn-timer { background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 4px; font-size: 15px; cursor: pointer; font-family: var(--font-family); display: inline-flex; align-items: center; gap: 8px; }
-        .btn-timer.running { background: #d97706; } /* Naranja para pausar */
+        .btn-timer.running { background: #d97706; }
 
         .empty-state { text-align: center; color: var(--text-muted); padding: 30px 0; font-size: 16px; font-style: italic; }
 
-        /* Modales */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
         .modal-content { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 4px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 25px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .modal-close { position: absolute; top: 15px; right: 15px; background: var(--card-bg); border: 1px solid var(--border-color); width: 30px; height: 30px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -185,7 +182,6 @@
         <div id="booksList"></div>
     </div>
 
-    <!-- Modal Notas y Checklist -->
     <div id="bookModal" class="modal-overlay">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('bookModal')">&times;</button>
@@ -204,7 +200,6 @@
         </div>
     </div>
 
-    <!-- Modal Horario -->
     <div id="scheduleModal" class="modal-overlay">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('scheduleModal')">&times;</button>
@@ -220,12 +215,11 @@
             activeCategory: 'Lecturas Actuales',
             books: []
         };
-        let activeTimers = {}; // Guarda los intervalos de los cronómetros
+        let activeTimers = {}; 
 
         const savedData = localStorage.getItem('readingTrackerData');
         if (savedData) {
             appData = JSON.parse(savedData);
-            // Compatibilidad con datos anteriores
             appData.books.forEach(b => {
                 if(b.notes === undefined) b.notes = "";
                 if(b.checklists === undefined) b.checklists = [];
@@ -265,13 +259,10 @@
             const tabsContainer = document.getElementById('tabsContainer');
             tabsContainer.innerHTML = '';
             appData.categories.forEach(cat => {
-                // Contar lecturas activas en esta categoría
                 const activeCount = appData.books.filter(b => b.category === cat && b.active).length;
-                
                 const btn = document.createElement('button');
                 const isActive = cat === appData.activeCategory;
                 btn.className = isActive ? 'tab-btn active' : 'tab-btn';
-                
                 const tabText = `${cat} (${activeCount})`;
                 
                 if(isActive) {
@@ -279,13 +270,10 @@
                 } else {
                     btn.innerText = tabText;
                 }
-                
                 btn.onclick = (e) => {
                     if(e.target.classList.contains('tab-delete')) return;
                     appData.activeCategory = cat;
-                    saveData();
-                    renderTabs();
-                    renderBooks();
+                    saveData(); renderTabs(); renderBooks();
                 };
                 tabsContainer.appendChild(btn);
             });
@@ -331,7 +319,7 @@
             sortedBooks.forEach(book => {
                 const stats = calculateStats(book);
                 const isTimerRunning = !!activeTimers[book.id];
-                const btnTimerText = isTimerRunning ? '⏸️ Pausar Sesión' : (book.dailySeconds > 0 ? '▶️ Continuar Sesión' : '▶️ Iniciar Sesión');
+                const btnTimerText = isTimerRunning ? '⏸️ Pausar' : (book.dailySeconds > 0 ? '▶️ Continuar' : '▶️ Iniciar');
                 
                 const card = document.createElement('div');
                 card.className = `card ${!book.active ? 'inactive' : ''}`;
@@ -347,7 +335,6 @@
                         </div>
                     </div>
 
-                    <!-- Panel Central de Controles -->
                     <div class="card-controls">
                         <label class="status-toggle">
                             <input type="checkbox" ${book.active ? 'checked' : ''} onchange="toggleActive(${book.id})">
@@ -401,20 +388,18 @@
                             <button onclick="updatePage(${book.id})" class="btn-update">Actualizar Progreso</button>
                         </div>
 
-                        <!-- Temporizador de Sesión Diaria -->
                         <div class="daily-timer">
                             <label style="margin-bottom: 0;">Cronómetro de Sesión Diaria</label>
                             <div id="timer-display-${book.id}" class="timer-display">00:00 / ${book.dailyMins}:00</div>
-                            
                             <div class="progress-track" style="height: 6px; margin: 10px 0;">
                                 <div id="timer-fill-${book.id}" class="progress-fill" style="width: 0%; background: var(--success);"></div>
                             </div>
-                            
-                            <div style="display: flex; justify-content: center; gap: 10px; align-items: center;">
+                            <div style="display: flex; justify-content: center; gap: 15px; align-items: center; margin-top: 12px;">
                                 <button id="btn-timer-${book.id}" onclick="toggleTimer(${book.id})" class="btn-timer ${isTimerRunning ? 'running' : ''}">
                                     ${btnTimerText}
                                 </button>
-                                <button onclick="resetTimer(${book.id})" class="icon-btn" style="font-size: 18px;" title="Reiniciar contador de hoy">🔄</button>
+                                <button onclick="editTimer(${book.id})" class="icon-btn" style="font-size: 18px;" title="Ingresar tiempo manualmente">✏️</button>
+                                <button onclick="resetTimer(${book.id})" class="icon-btn" style="font-size: 18px;" title="Reiniciar a cero">🔄</button>
                             </div>
                             <p id="timer-msg-${book.id}" style="color: var(--success); font-style: italic; font-weight: bold; margin-top: 10px; display: none;">
                                 ¡Objetivo de lectura diario alcanzado! 🏆
@@ -426,13 +411,11 @@
                             <div class="stat-item"><span class="stat-label">Restante</span><span class="stat-value">${formatTime(stats.remainingMins)}</span></div>
                             <div class="stat-item"><span class="stat-label">Duración Total</span><span class="stat-value">${formatTime(stats.totalMins)}</span></div>
                             <div class="stat-item"><span class="stat-label">Días Faltantes</span><span class="stat-value highlight">${stats.daysRemaining}</span></div>
-                            <div class="stat-item full"><span class="stat-label">Proyección de Finalización</span><span class="stat-value success">${book.currentPage >= book.totalPages ? 'Obra Finalizada' : stats.dateStr}</span></div>
+                            <div class="stat-item full"><span class="stat-label">Proyección Finalización</span><span class="stat-value success">${book.currentPage >= book.totalPages ? 'Obra Finalizada' : stats.dateStr}</span></div>
                         </div>
                     </div>
                 `;
                 booksList.appendChild(card);
-                
-                // Actualizar interfaz del temporizador inmediatamente después de renderizar
                 setTimeout(() => updateTimerUI(book.id), 0);
             });
         }
@@ -495,21 +478,15 @@
             const btn = document.getElementById(`btn-timer-${id}`);
             
             if (activeTimers[id]) {
-                // Pausar
-                clearInterval(activeTimers[id]);
-                delete activeTimers[id];
-                btn.innerHTML = '▶️ Continuar Sesión';
-                btn.classList.remove('running');
+                clearInterval(activeTimers[id]); delete activeTimers[id];
+                btn.innerHTML = '▶️ Continuar'; btn.classList.remove('running');
                 saveData(); 
             } else {
-                // Iniciar
-                btn.innerHTML = '⏸️ Pausar Sesión';
-                btn.classList.add('running');
+                btn.innerHTML = '⏸️ Pausar'; btn.classList.add('running');
                 activeTimers[id] = setInterval(() => {
                     if (!book.dailySeconds) book.dailySeconds = 0;
                     book.dailySeconds++;
                     updateTimerUI(id);
-                    // Guardar automáticamente cada minuto para no perder datos si cierra de golpe
                     if(book.dailySeconds % 60 === 0) saveData(); 
                 }, 1000);
             }
@@ -521,7 +498,6 @@
             
             const targetSeconds = book.dailyMins * 60;
             const currentSecs = book.dailySeconds || 0;
-            
             const m = Math.floor(currentSecs / 60).toString().padStart(2, '0');
             const s = (currentSecs % 60).toString().padStart(2, '0');
             
@@ -539,17 +515,29 @@
             }
         }
 
+        function editTimer(id) {
+            const book = appData.books.find(b => b.id === id);
+            if (book) {
+                const currentMins = Math.floor((book.dailySeconds || 0) / 60);
+                const input = prompt("¿Cuántos minutos exactos llevas leyendo hoy?", currentMins);
+                if (input !== null && input.trim() !== "") {
+                    const parsed = parseInt(input);
+                    if (!isNaN(parsed) && parsed >= 0) {
+                        book.dailySeconds = parsed * 60;
+                        saveData();
+                        updateTimerUI(id);
+                    }
+                }
+            }
+        }
+
         function resetTimer(id) {
-            if(confirm('¿Desea reiniciar a cero el tiempo contado de esta sesión?')) {
+            if(confirm('¿Desea reiniciar a cero el tiempo de esta sesión?')) {
                 const book = appData.books.find(b => b.id === id);
                 if (book) {
                     book.dailySeconds = 0;
-                    if(activeTimers[id]) {
-                        clearInterval(activeTimers[id]);
-                        delete activeTimers[id];
-                    }
-                    saveData();
-                    renderBooks(); 
+                    if(activeTimers[id]) { clearInterval(activeTimers[id]); delete activeTimers[id]; }
+                    saveData(); renderBooks(); 
                 }
             }
         }
