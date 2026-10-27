@@ -204,7 +204,7 @@
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('scheduleModal')">&times;</button>
             <h2 style="font-size: 22px; color: var(--primary); margin-bottom: 5px;">Itinerario de Lectura</h2>
-            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px; font-style: italic;">Calculado para los textos activos según prioridad.</p>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px; font-style: italic;">Calculado para los textos activos según prioridad y tiempo restante de hoy.</p>
             <div id="scheduleContent"></div>
         </div>
     </div>
@@ -472,7 +472,6 @@
             if(book) { book.priority = parseInt(value); saveData(); }
         }
 
-        // --- Funciones del Temporizador ---
         function toggleTimer(id) {
             const book = appData.books.find(b => b.id === id);
             const btn = document.getElementById(`btn-timer-${id}`);
@@ -543,23 +542,39 @@
         }
 
         function generateSchedule() {
-            const activeBooks = appData.books.filter(b => b.active === true && b.currentPage < b.totalPages);
-            if(activeBooks.length === 0) { alert("No existen lecturas activas pendientes para programar."); return; }
-            activeBooks.sort((a, b) => b.priority - a.priority);
+            // Filtrar lecturas activas pendientes
+            let activeBooks = appData.books.filter(b => b.active === true && b.currentPage < b.totalPages);
+            
+            // Filtrar y calcular solo los minutos que faltan por leer hoy
+            let booksToRead = [];
+            activeBooks.forEach(book => {
+                const readMinsToday = Math.floor((book.dailySeconds || 0) / 60);
+                const remainingMins = book.dailyMins - readMinsToday;
+                if (remainingMins > 0) {
+                    booksToRead.push({ ...book, remainingMins: remainingMins });
+                }
+            });
+
+            if(booksToRead.length === 0) { 
+                alert("¡Felicidades! Ya cumpliste el tiempo de todas tus lecturas activas por hoy (o no hay lecturas pendientes)."); 
+                return; 
+            }
+
+            booksToRead.sort((a, b) => b.priority - a.priority);
 
             let currentTime = new Date();
             const formatTimeOpts = { hour: '2-digit', minute: '2-digit', hour12: false };
             let scheduleHTML = '';
 
-            activeBooks.forEach(book => {
+            booksToRead.forEach(book => {
                 const startTime = currentTime.toLocaleTimeString([], formatTimeOpts);
-                currentTime.setMinutes(currentTime.getMinutes() + book.dailyMins);
+                currentTime.setMinutes(currentTime.getMinutes() + book.remainingMins);
                 const endTime = currentTime.toLocaleTimeString([], formatTimeOpts);
                 scheduleHTML += `
                     <div class="schedule-item">
                         <span class="schedule-time">${startTime} - ${endTime}</span>
                         <span class="schedule-title">${book.title}</span>
-                        <span class="schedule-meta">Prioridad: ${book.priority}% | Duración: ${book.dailyMins} min | Categoría: ${book.category}</span>
+                        <span class="schedule-meta">Prioridad: ${book.priority}% | Duración restante: ${book.remainingMins} min (Meta: ${book.dailyMins} min) | Categoría: ${book.category}</span>
                     </div>`;
             });
             document.getElementById('scheduleContent').innerHTML = scheduleHTML;
