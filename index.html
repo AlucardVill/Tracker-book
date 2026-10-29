@@ -26,7 +26,7 @@
             font-family: var(--font-family);
             background-color: var(--bg-color); 
             color: var(--text-main); 
-            padding-bottom: 60px; 
+            padding-bottom: 100px; 
             line-height: 1.6;
         }
 
@@ -389,6 +389,60 @@
 
         .btn-footer-row { display: flex; gap: 8px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
         .btn-footer-row button { flex: 1; min-width: 140px; padding: 10px 14px; font-size: 13px; font-family: var(--font-family); border-radius: 4px; cursor: pointer; transition: all 0.15s; touch-action: manipulation; }
+
+        /* ============================================================ */
+        /* BOTÓN FLOTANTE (FAB) PARA AGREGAR LIBRO                       */
+        /* ============================================================ */
+        .fab-add {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-size: 34px;
+            font-weight: 300;
+            line-height: 1;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(114, 47, 55, 0.45);
+            z-index: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+            padding-bottom: 3px;
+        }
+        .fab-add:hover {
+            transform: scale(1.06);
+            box-shadow: 0 6px 20px rgba(114, 47, 55, 0.55);
+        }
+        .fab-add:active {
+            transform: scale(0.94);
+        }
+        .fab-add.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.8);
+        }
+
+        /* Modal del formulario añadir libro */
+        .add-book-modal-title {
+            font-size: 22px;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        .add-book-modal-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -426,8 +480,19 @@
             <button class="search-clear" id="searchClear" onclick="clearSearch()" aria-label="Limpiar búsqueda">×</button>
         </div>
 
-        <div class="card">
-            <h2 class="card-title" style="color: var(--text-main); cursor: default; margin-bottom: 15px; font-size: 18px;">Agregar nuevo texto</h2>
+        <div id="booksList"></div>
+    </div>
+
+    <!-- FAB Agregar libro -->
+    <button id="fabAdd" class="fab-add" onclick="openAddBookModal()" aria-label="Agregar nuevo libro" title="Agregar nuevo libro">+</button>
+
+    <!-- Modal Agregar Libro -->
+    <div id="addBookModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('addBookModal')">&times;</button>
+            <h2 class="add-book-modal-title">Agregar nuevo texto</h2>
+            <p class="add-book-modal-subtitle">Se añadirá a la categoría: <strong id="addBookCategoryLabel">—</strong></p>
+            
             <form id="bookForm">
                 <div class="form-grid">
                     <div class="form-group full">
@@ -454,8 +519,6 @@
                 <button type="submit" class="btn-submit">Registrar Obra</button>
             </form>
         </div>
-
-        <div id="booksList"></div>
     </div>
 
     <div id="bookModal" class="modal-overlay">
@@ -574,12 +637,24 @@
         }
 
         const savedData = localStorage.getItem('readingTrackerData');
-        // ⚠️ Ahora son MUTABLES: cambian cuando hay rollover de día
         let currentDateStr = new Date().toDateString();
         let isoToday = getLocalISO();
 
         // ============================================================
-        // ROLLOVER DE DÍA — reutilizable (inicial + visibilitychange + interval)
+        // FAB VISIBILITY
+        // ============================================================
+        function updateFabVisibility() {
+            const fab = document.getElementById('fabAdd');
+            if (!fab) return;
+            const anyOpen = ['bookModal', 'scheduleModal', 'metricsModal', 'addBookModal'].some(id => {
+                const el = document.getElementById(id);
+                return el && el.style.display === 'flex';
+            });
+            fab.classList.toggle('hidden', anyOpen);
+        }
+
+        // ============================================================
+        // ROLLOVER DE DÍA
         // ============================================================
         function performDayRollover() {
             const nowDateStr = new Date().toDateString();
@@ -620,7 +695,6 @@
             currentDateStr = nowDateStr;
             isoToday = newIsoToday;
             
-            // Resetear timers activos (que apuntaban al día anterior)
             Object.keys(activeTimers).forEach(id => {
                 try { clearInterval(activeTimers[id].interval); } catch(e) {}
                 delete activeTimers[id];
@@ -648,7 +722,6 @@
                 }
             });
 
-            // Rollover si corresponde (usa la función reutilizable)
             performDayRollover();
         } else {
             appData.lastDate = currentDateStr;
@@ -801,7 +874,6 @@
             return `${m} min`;
         }
 
-        // ⚠️ calculateStats usa `new Date()` siempre → fechas frescas al llamar
         function calculateStats(book) {
             const totalMins = book.totalPages * book.minsPerPage;
             const readMins = book.currentPage * book.minsPerPage;
@@ -1086,6 +1158,29 @@
             }
         }
 
+        // ============================================================
+        // MODAL AGREGAR LIBRO
+        // ============================================================
+        function openAddBookModal() {
+            const label = document.getElementById('addBookCategoryLabel');
+            if (label) label.textContent = appData.activeCategory;
+            
+            document.getElementById('addBookModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            updateFabVisibility();
+            
+            // Focus al título tras la animación
+            setTimeout(() => {
+                const titleInput = document.getElementById('title');
+                if (titleInput) {
+                    try { titleInput.focus(); } catch(e) {}
+                }
+            }, 100);
+        }
+
+        // ============================================================
+        // LIBROS — Búsqueda global + Orden por prioridad
+        // ============================================================
         function renderBooks() {
             const booksList = document.getElementById('booksList');
             booksList.innerHTML = '';
@@ -1124,9 +1219,11 @@
                 booksList.appendChild(header);
             }
 
+            // ⭐ ORDEN: activos primero, luego por prioridad descendente, luego por id descendente
             const sortedBooks = filteredBooks.slice().sort((a, b) => {
-                if(a.active === b.active) return b.id - a.id; 
-                return a.active ? -1 : 1;
+                if(a.active !== b.active) return a.active ? -1 : 1;
+                if(a.priority !== b.priority) return b.priority - a.priority;
+                return b.id - a.id;
             });
 
             sortedBooks.forEach(book => {
@@ -1257,6 +1354,9 @@
             document.getElementById('searchContainer').classList.remove('search-active');
             
             saveData(); renderTabs(); renderBooks(); this.reset(); document.getElementById('currentPage').value = 0;
+            
+            // Cerrar modal
+            closeModal('addBookModal');
         });
 
         function updatePage(id) {
@@ -1309,7 +1409,12 @@
         }
         function updatePriority(id, value) {
             const book = appData.books.find(b => b.id === id);
-            if(book) { book.priority = parseInt(value); saveData(); }
+            if(book) { 
+                book.priority = parseInt(value); 
+                saveData(); 
+                // Reordenar visualmente
+                renderBooks();
+            }
         }
 
         function toggleTimer(id) {
@@ -1492,6 +1597,7 @@
             document.getElementById('scheduleContent').innerHTML = scheduleHTML;
             document.getElementById('scheduleModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
+            updateFabVisibility();
         }
 
         function computeYRange(chartData, xMin, xMax) {
@@ -1621,6 +1727,7 @@
             
             document.getElementById('metricsModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
+            updateFabVisibility();
             
             updateMetricsStatus();
             
@@ -1727,7 +1834,6 @@
             }
         }
 
-        // ⚠️ Ahora `calculateStats` usa `new Date()` → al abrir el modal o refrescar, fechas frescas
         function renderFinishInfo(allActiveBooks, colorMap, finishEl) {
             const visibleBooks = allActiveBooks.filter(b => b.metricVisible !== false);
             
@@ -2252,6 +2358,7 @@
             }
             document.getElementById(modalId).style.display = 'none';
             document.body.style.overflow = 'auto';
+            updateFabVisibility();
         }
 
         function openNotesModal(id) {
@@ -2263,6 +2370,7 @@
             renderChecklists();
             document.getElementById('bookModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
+            updateFabVisibility();
         }
 
         function renderChecklists() {
@@ -2302,14 +2410,14 @@
         });
 
         // ============================================================
-        // REFRESCO AL VOLVER A FOCO / VISIBILIDAD / PERIÓDICO
+        // REFRESCO AL VOLVER A FOCO
         // ============================================================
         let lastFocusRefresh = 0;
         
         function refreshOnFocus() {
             if (document.hidden) return;
             const now = Date.now();
-            if (now - lastFocusRefresh < 800) return; // evita duplicados focus+visibility
+            if (now - lastFocusRefresh < 800) return;
             lastFocusRefresh = now;
             
             const rolled = performDayRollover();
@@ -2335,7 +2443,6 @@
         });
         window.addEventListener('focus', refreshOnFocus);
         
-        // Chequeo periódico por si la app queda abierta toda la noche
         setInterval(() => {
             if (document.hidden) return;
             if (performDayRollover()) {
