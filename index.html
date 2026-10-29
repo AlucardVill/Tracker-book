@@ -546,7 +546,7 @@
             const readMins = book.currentPage * book.minsPerPage;
             const remainingPages = book.totalPages - book.currentPage;
             const remainingMins = remainingPages * book.minsPerPage;
-            const daysRemaining = Math.ceil(remainingMins / book.dailyMins);
+            const daysRemaining = book.dailyMins > 0 ? Math.ceil(remainingMins / book.dailyMins) : 0;
             const percent = Math.min(((book.currentPage / book.totalPages) * 100), 100).toFixed(1);
             const finishDate = new Date();
             finishDate.setDate(finishDate.getDate() + daysRemaining);
@@ -1086,7 +1086,7 @@
             if (!progressChartInstance) return;
             const finishes = progressChartInstance._bookFinishes || [];
             if (finishes.length === 0) {
-                alert('No hay fechas finales configuradas (libros ya terminados).');
+                alert('No hay fechas finales por mostrar (los libros están terminados o no hay activos).');
                 return;
             }
             const maxFinishIdx = Math.max(...finishes.map(f => f.idx));
@@ -1106,55 +1106,72 @@
             
             document.getElementById('metricsModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
-            renderMetricsChart();
+            
+            // PRIMERO: actualizar los textos (no depende del chart)
             updateMetricsStatus();
+            
+            // SEGUNDO: renderizar la gráfica (envuelto en try/catch por si algo falla)
+            try {
+                renderMetricsChart();
+            } catch (err) {
+                console.error('Error al renderizar la gráfica:', err);
+            }
+            
             setTimeout(() => {
-                if (progressChartInstance) progressChartInstance.resize();
+                if (progressChartInstance) {
+                    try { progressChartInstance.resize(); } catch(e) { console.error(e); }
+                }
                 updateNavUI();
             }, 50);
         }
 
         function updateMetricsStatus() {
-            const activeBooks = appData.books.filter(b => b.active);
-            const el = document.getElementById('metricsStatus');
-            const finishEl = document.getElementById('metricsFinishInfo');
-            if (!el || !finishEl) return;
-            
-            if (activeBooks.length === 0) {
-                el.innerHTML = '<em>Sin lecturas activas</em>';
-                finishEl.innerHTML = '';
-                return;
-            }
-            
-            const parts = activeBooks.map(book => {
-                const goalSecs = book.dailyMins * 60;
-                const secs = book.dailySeconds || 0;
-                const pts = secs === 0 ? -1 : secs / goalSecs;
-                const pct = Math.round((secs / goalSecs) * 100);
-                const sign = pts >= 0 ? '+' : '';
-                const check = secs >= goalSecs ? ' ✅' : '';
-                const color = secs >= goalSecs 
-                    ? 'var(--success)' 
-                    : (secs === 0 ? 'var(--danger)' : 'var(--text-main)');
-                return `<span style="color: ${color}">${book.title}: <strong>${sign}${pts.toFixed(2)}</strong> (${pct}%)${check}</span>`;
-            });
-            
-            el.innerHTML = `<strong>Hoy:</strong> ${parts.join(' · ')}`;
-            
-            // Info de fecha final
-            const finishRows = activeBooks.map(book => {
-                const stats = calculateStats(book);
-                if (book.currentPage >= book.totalPages) {
-                    return `<span class="finish-row">🏁 <strong>${book.title}</strong>: terminado</span>`;
+            try {
+                const activeBooks = appData.books.filter(b => b.active);
+                const el = document.getElementById('metricsStatus');
+                const finishEl = document.getElementById('metricsFinishInfo');
+                if (!el || !finishEl) return;
+                
+                if (activeBooks.length === 0) {
+                    el.innerHTML = '<em>Sin lecturas activas</em>';
+                    finishEl.innerHTML = '<em>—</em>';
+                    return;
                 }
-                const d = stats.finishDate;
-                const dd = String(d.getDate()).padStart(2, '0');
-                const mm = String(d.getMonth() + 1).padStart(2, '0');
-                const yy = d.getFullYear();
-                return `<span class="finish-row">📅 <strong>${book.title}</strong>: ${dd}/${mm}/${yy} · en ${stats.daysRemaining} días</span>`;
-            }).join('');
-            
-            finishEl.innerHTML = `<strong style="color: var(--success)">Fechas finales estimadas</strong>${finishRows}`;
+                
+                const parts = activeBooks.map(book => {
+                    const goalSecs = book.dailyMins * 60;
+                    const secs = book.dailySeconds || 0;
+                    const pts = secs === 0 ? -1 : secs / goalSecs;
+                    const pct = goalSecs > 0 ? Math.round((secs / goalSecs) * 100) : 0;
+                    const sign = pts >= 0 ? '+' : '';
+                    const check = secs >= goalSecs ? ' ✅' : '';
+                    const color = secs >= goalSecs 
+                        ? 'var(--success)' 
+                        : (secs === 0 ? 'var(--danger)' : 'var(--text-main)');
+                    return `<span style="color: ${color}">${book.title}: <strong>${sign}${pts.toFixed(2)}</strong> (${pct}%)${check}</span>`;
+                });
+                
+                el.innerHTML = `<strong>Hoy:</strong> ${parts.join(' · ')}`;
+                
+                // Info de fecha final
+                const finishRows = activeBooks.map(book => {
+                    const stats = calculateStats(book);
+                    if (book.currentPage >= book.totalPages) {
+                        return `<span class="finish-row">🏁 <strong>${book.title}</strong>: terminado</span>`;
+                    }
+                    const d = stats.finishDate;
+                    const dd = String(d.getDate()).padStart(2, '0');
+                    const mm = String(d.getMonth() + 1).padStart(2, '0');
+                    const yy = d.getFullYear();
+                    return `<span class="finish-row">📅 <strong>${book.title}</strong>: ${dd}/${mm}/${yy} · en ${stats.daysRemaining} días</span>`;
+                }).join('');
+                
+                finishEl.innerHTML = `<strong style="color: var(--success)">Fechas finales estimadas</strong>${finishRows}`;
+            } catch (err) {
+                console.error('Error en updateMetricsStatus:', err);
+                const finishEl = document.getElementById('metricsFinishInfo');
+                if (finishEl) finishEl.innerHTML = '<em style="color: var(--danger)">Error al calcular fechas</em>';
+            }
         }
 
         function applyDynamicY(chart) {
@@ -1194,7 +1211,11 @@
         function refreshMetricsChart() {
             if (!progressChartInstance) return;
             if (document.getElementById('metricsModal').style.display !== 'flex') return;
-            renderMetricsChart();
+            try {
+                renderMetricsChart();
+            } catch (err) {
+                console.error('Error refrescando gráfica:', err);
+            }
         }
 
         let chartRefreshTimeout = null;
@@ -1210,9 +1231,13 @@
             const ctx = document.getElementById('progressChart').getContext('2d');
             const activeBooks = appData.books.filter(b => b.active);
             
-            if (progressChartInstance) { progressChartInstance.destroy(); progressChartInstance = null; }
+            if (progressChartInstance) { 
+                try { progressChartInstance.destroy(); } catch(e) {}
+                progressChartInstance = null; 
+            }
             if (activeBooks.length === 0) return;
             
+            // Fecha inicio
             let earliestDateStr = isoToday;
             activeBooks.forEach(book => {
                 const dates = [
@@ -1225,14 +1250,14 @@
                 }
             });
             
-            // Calcular días de finalización por libro
+            // Días de fin por libro
             const finishDaysList = activeBooks.map(book => {
+                if (book.dailyMins <= 0) return 0;
                 const remainingMins = Math.max(0, book.totalPages - book.currentPage) * book.minsPerPage;
                 return Math.ceil(remainingMins / book.dailyMins);
             });
             const maxFinishDays = Math.max(0, ...finishDaysList);
             
-            // Extensión dinámica: cubrir el finishIdx + margen
             const maxFutureDays = Math.max(14, maxFinishDays + 7, Math.ceil(maxFinishDays * 1.5));
             
             const startDate = new Date(earliestDateStr + 'T00:00:00');
@@ -1263,6 +1288,7 @@
             const brightColors = ['#e63946', '#00b4d8', '#2a9d8f', '#ffb703', '#9b5de5', '#f72585', '#06d6a0', '#ef476f'];
             
             const bookTargets = activeBooks.map(book => {
+                if (book.dailyMins <= 0) return 1;
                 return Math.max(1, Math.ceil((book.totalPages * book.minsPerPage) / book.dailyMins));
             });
             
@@ -1293,7 +1319,7 @@
                     if (i === todayIdx) {
                         secs = book.dailySeconds || 0;
                         if (secs >= goalSecs) goalMetToday = true;
-                        if (secs > 0) cumScore += secs / goalSecs;
+                        if (secs > 0 && goalSecs > 0) cumScore += secs / goalSecs;
                         dataPoints.push(cumScore);
                         return;
                     }
@@ -1302,7 +1328,7 @@
                     secs = log ? (log.seconds || 0) : 0;
                     
                     if (secs === 0) cumScore -= 1;
-                    else cumScore += secs / goalSecs;
+                    else if (goalSecs > 0) cumScore += secs / goalSecs;
                     
                     dataPoints.push(cumScore);
                 });
@@ -1331,10 +1357,7 @@
                     pointHoverRadius: 8,
                     fill: false,
                     tension: 0,
-                    spanGaps: false,
-                    _book: book,
-                    _isProjection: false,
-                    _isWarning: false
+                    spanGaps: false
                 });
                 
                 bookMetadata.push({
@@ -1362,13 +1385,9 @@
                         borderDash: [6, 5],
                         pointRadius: 0,
                         pointHoverRadius: 4,
-                        pointBackgroundColor: meta.color,
                         fill: false,
                         tension: 0,
-                        spanGaps: false,
-                        _book: meta.book,
-                        _isProjection: true,
-                        _isWarning: false
+                        spanGaps: false
                     });
                 }
                 
@@ -1390,47 +1409,33 @@
                         pointHoverRadius: 4,
                         fill: false,
                         tension: 0,
-                        spanGaps: false,
-                        _book: meta.book,
-                        _isProjection: false,
-                        _isWarning: true
+                        spanGaps: false
                     });
                 }
             });
             
-            // Datasets de fin (marcas invisibles para que el plugin las dibuje)
-            const finishDatasets = [];
+            // Marcas de fin (se pasan por opciones al plugin, NO como datasets)
+            const finishes = [];
             bookMetadata.forEach((meta, i) => {
                 if (meta.book.currentPage >= meta.book.totalPages) return;
                 const daysRemaining = finishDaysList[i];
                 if (daysRemaining <= 0) return;
                 const finishIdx = todayIdx + daysRemaining;
-                if (finishIdx >= timelineDates.length) return;
-                
-                // Dataset "fantasma" que solo sirve para que el plugin tenga info
-                const finishData = timelineDates.map(() => null);
-                finishDatasets.push({
-                    label: `📅 Fin: ${meta.book.title}`,
-                    data: finishData,
-                    borderColor: meta.color,
-                    pointRadius: 0,
-                    pointHoverRadius: 0,
-                    fill: false,
-                    _isFinishMarker: true,
-                    _finishIdx: finishIdx,
-                    _finishDate: timelineDates[finishIdx],
-                    _finishTarget: meta.target,
-                    _finishColor: meta.color,
-                    _finishTitle: meta.book.title
+                if (finishIdx >= timelineDates.length || finishIdx < 0) return;
+                finishes.push({
+                    idx: finishIdx,
+                    date: timelineDates[finishIdx],
+                    color: meta.color,
+                    target: meta.target,
+                    title: meta.book.title
                 });
             });
             
-            const datasets = [...baseDatasets, ...projectionDatasets, ...finishDatasets];
+            const datasets = [...baseDatasets, ...projectionDatasets];
             
-            // Rango Y — incluir marcas de fin (targets)
+            // Rango Y — incluir targets
             let actualMax = 0, actualMin = 0, hasData = false;
             datasets.forEach(ds => {
-                if (ds._isFinishMarker) return;
                 ds.data.forEach(v => {
                     if (typeof v === 'number' && isFinite(v)) {
                         hasData = true;
@@ -1439,7 +1444,6 @@
                     }
                 });
             });
-            // Incluir targets de libros
             bookTargets.forEach(t => { if (t > actualMax) actualMax = t; });
             
             let finalMin = actualMin;
@@ -1495,24 +1499,24 @@
                 }
             };
             
-            // Plugin: líneas de fin (vertical) y target (horizontal)
+            // Plugin lee las finishes desde chart.options.plugins.finishMarkers.finishes
             const finishMarkers = {
                 id: 'finishMarkers',
                 afterDatasetsDraw(chart) {
                     const { ctx, chartArea, scales } = chart;
                     if (!scales.x || !scales.y) return;
                     
-                    const finishDs = chart.data.datasets.filter(ds => ds._isFinishMarker);
-                    if (finishDs.length === 0) return;
+                    const finList = (chart.options.plugins && chart.options.plugins.finishMarkers && chart.options.plugins.finishMarkers.finishes) || [];
+                    if (finList.length === 0) return;
                     
                     ctx.save();
                     
-                    // Primero: horizontales de target
-                    finishDs.forEach(ds => {
-                        const y = scales.y.getPixelForValue(ds._finishTarget);
+                    // Horizontales (targets)
+                    finList.forEach(f => {
+                        const y = scales.y.getPixelForValue(f.target);
                         if (y < chartArea.top + 2 || y > chartArea.bottom - 2) return;
                         
-                        ctx.strokeStyle = ds._finishColor + '70';
+                        ctx.strokeStyle = f.color + '70';
                         ctx.lineWidth = 1.5;
                         ctx.setLineDash([4, 4]);
                         ctx.beginPath();
@@ -1521,17 +1525,12 @@
                         ctx.stroke();
                     });
                     
-                    // Segundo: verticales de fin con label
-                    const seenX = new Set();
-                    finishDs.forEach((ds, i) => {
-                        const x = scales.x.getPixelForValue(ds._finishIdx);
+                    // Verticales con badge
+                    finList.forEach((f, i) => {
+                        const x = scales.x.getPixelForValue(f.idx);
                         if (x < chartArea.left || x > chartArea.right) return;
                         
-                        const xKey = Math.round(x);
-                        if (seenX.has(xKey)) return;
-                        seenX.add(xKey);
-                        
-                        ctx.strokeStyle = ds._finishColor;
+                        ctx.strokeStyle = f.color;
                         ctx.lineWidth = 2;
                         ctx.setLineDash([6, 4]);
                         ctx.beginPath();
@@ -1539,41 +1538,37 @@
                         ctx.lineTo(x, chartArea.bottom);
                         ctx.stroke();
                         
-                        // Label: fecha + target
-                        const p = ds._finishDate.split('-');
+                        const p = f.date.split('-');
                         const dateLabel = `📅 ${p[2]}/${p[1]}`;
-                        const targetLabel = `🎯 +${ds._finishTarget}d`;
+                        const targetLabel = `🎯 +${f.target}d`;
                         
+                        ctx.setLineDash([]);
                         ctx.font = 'bold 10px "Times New Roman", serif';
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        
                         const dateW = ctx.measureText(dateLabel).width;
+                        ctx.font = 'italic 9px "Times New Roman", serif';
                         const targetW = ctx.measureText(targetLabel).width;
                         const boxW = Math.max(dateW, targetW) + 10;
                         const boxH = 30;
                         
-                        const bx = Math.max(chartArea.left, Math.min(x - boxW / 2, chartArea.right - boxW));
-                        const by = chartArea.top + 28 + i * 34;
+                        const bx = Math.max(chartArea.left + 2, Math.min(x - boxW / 2, chartArea.right - boxW - 2));
+                        const by = chartArea.top + 28 + (i % 3) * 34;
                         
-                        // Fondo
                         ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-                        ctx.strokeStyle = ds._finishColor;
+                        ctx.strokeStyle = f.color;
                         ctx.lineWidth = 1.5;
-                        ctx.setLineDash([]);
                         ctx.beginPath();
                         ctx.rect(bx, by, boxW, boxH);
                         ctx.fill();
                         ctx.stroke();
                         
-                        // Texto fecha
-                        ctx.fillStyle = ds._finishColor;
+                        ctx.fillStyle = f.color;
                         ctx.font = 'bold 10px "Times New Roman", serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
                         ctx.fillText(dateLabel, bx + boxW / 2, by + 9);
                         
-                        // Texto target
                         ctx.font = 'italic 9px "Times New Roman", serif';
-                        ctx.fillStyle = ds._finishColor + 'cc';
+                        ctx.fillStyle = f.color + 'cc';
                         ctx.fillText(targetLabel, bx + boxW / 2, by + 21);
                     });
                     
@@ -1612,16 +1607,10 @@
                     plugins: {
                         legend: {
                             position: 'bottom',
-                            labels: { usePointStyle: true, boxWidth: 10, font: { size: 11 }, filter: (item, chart) => {
-                                // Ocultar los datasets de marca de fin de la leyenda
-                                const ds = chart.data.datasets[item.datasetIndex];
-                                return !ds._isFinishMarker;
-                            }}
+                            labels: { usePointStyle: true, boxWidth: 10, font: { size: 11 } }
                         },
                         tooltip: {
                             filter: (item) => {
-                                const ds = item.dataset;
-                                if (ds._isFinishMarker) return false;
                                 return item.parsed.y !== null && item.parsed.y !== undefined;
                             },
                             callbacks: {
@@ -1637,18 +1626,23 @@
                                     const v = c.parsed.y;
                                     if (v === null || v === undefined) return '';
                                     const idx = c.dataIndex;
+                                    const book = c.dataset._book;
                                     
-                                    if (c.dataset._isProjection) {
+                                    // Detectar si es proyección/warning por el sufijo del label
+                                    const labelStr = c.dataset.label || '';
+                                    const isProjection = labelStr.endsWith('📈');
+                                    const isWarning = labelStr.endsWith('📉');
+                                    
+                                    if (isProjection) {
                                         const display = Number.isInteger(v) ? v : v.toFixed(1);
                                         return `📈 Si cumples: ${display > 0 ? '+' : ''}${display}`;
                                     }
-                                    if (c.dataset._isWarning) {
+                                    if (isWarning) {
                                         const display = Number.isInteger(v) ? v : v.toFixed(1);
                                         return `📉 Si no lees: ${display > 0 ? '+' : ''}${display}`;
                                     }
                                     
-                                    const book = c.dataset._book;
-                                    const goalSecs = book.dailyMins * 60;
+                                    const goalSecs = (book.dailyMins || 1) * 60;
                                     let delta = '';
                                     
                                     if (idx === todayIdx && book) {
@@ -1674,6 +1668,7 @@
                                 }
                             }
                         },
+                        finishMarkers: { finishes: finishes },
                         ...(zoomEnabled ? {
                             zoom: {
                                 pan: { enabled: false },
@@ -1696,26 +1691,15 @@
                 plugins: [zeroLine, todayMarker, finishMarkers]
             });
             
+            // Datos extra para navegación
             progressChartInstance._timelineDates = timelineDates;
             progressChartInstance._todayIdx = todayIdx;
+            progressChartInstance._bookFinishes = finishes;
             
-            // Guardar info de finishes para el botón "Ir al final"
-            const bookFinishes = [];
-            bookMetadata.forEach((meta, i) => {
-                if (meta.book.currentPage >= meta.book.totalPages) return;
-                const daysRemaining = finishDaysList[i];
-                if (daysRemaining <= 0) return;
-                const finishIdx = todayIdx + daysRemaining;
-                if (finishIdx >= timelineDates.length) return;
-                bookFinishes.push({
-                    idx: finishIdx,
-                    date: timelineDates[finishIdx],
-                    title: meta.book.title,
-                    color: meta.color,
-                    target: meta.target
-                });
+            // Asignar _book a cada dataset (para tooltips)
+            baseDatasets.forEach((ds, i) => {
+                progressChartInstance.data.datasets[i]._book = activeBooks[i];
             });
-            progressChartInstance._bookFinishes = bookFinishes;
         }
 
         function closeModal(modalId) {
