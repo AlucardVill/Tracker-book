@@ -151,6 +151,12 @@
         .chart-container { position: relative; height: 350px; width: 100%; margin-top: 20px; }
         .btn-reset-zoom { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted); padding: 6px 14px; border-radius: 4px; font-size: 13px; cursor: pointer; font-family: var(--font-family); transition: all 0.2s; }
         .btn-reset-zoom:hover { border-color: var(--primary); color: var(--primary); }
+        
+        .today-badge { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 12px; padding: 12px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; font-size: 13px; }
+        .today-badge .badge-item { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; background: var(--bg-color); border-radius: 3px; border: 1px solid var(--border-color); }
+        .today-badge .badge-score { font-weight: bold; font-size: 15px; }
+        .today-badge .badge-mins { color: var(--text-muted); font-size: 11px; font-style: italic; }
+        .today-badge .badge-empty { color: var(--text-muted); font-style: italic; }
     </style>
 </head>
 <body>
@@ -244,11 +250,17 @@
             <div class="chart-container">
                 <canvas id="progressChart"></canvas>
             </div>
-            <div style="display: flex; justify-content: center; margin-top: 12px;">
+            
+            <div id="metricsTodayBadge" class="today-badge">
+                <span class="badge-empty">Sin lecturas activas</span>
+            </div>
+            
+            <div style="display: flex; justify-content: center; margin-top: 12px; gap: 10px;">
                 <button onclick="resetZoom()" class="btn-reset-zoom">🔄 Reajustar vista</button>
+                <button onclick="renderMetricsChart()" class="btn-reset-zoom">↻ Refrescar ahora</button>
             </div>
             <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 10px;">
-                *Arrastra para desplazarte · Rueda del ratón o pinza para hacer zoom · El eje Y se ajusta automáticamente al zoom.
+                *Se actualiza cada 2 s mientras el modal está abierto · Arrastra para desplazarte · Rueda del ratón para zoom.
             </p>
         </div>
     </div>
@@ -256,7 +268,8 @@
     <script>
         Chart.defaults.font.family = '"Times New Roman", Times, serif';
         Chart.defaults.color = '#5c5c5c';
-        let progressChartInstance = null; 
+        let progressChartInstance = null;
+        let metricsRefreshInterval = null;
 
         let appData = {
             categories: ['Lecturas Actuales', 'Por Leer'],
@@ -583,7 +596,7 @@
                 }
                 
                 saveData(); renderBooks(); 
-                if(document.getElementById('metricsModal').style.display === 'flex') renderMetricsChart();
+                refreshMetricsIfOpen();
             }
         }
 
@@ -634,6 +647,7 @@
                 
                 btn.innerHTML = '▶️ Continuar'; btn.classList.remove('running');
                 saveData(); updateTimerUI(id);
+                refreshMetricsIfOpen();
             } else {
                 btn.innerHTML = '⏸️ Pausar'; btn.classList.add('running');
                 activeTimers[id] = {
@@ -683,6 +697,7 @@
                             activeTimers[id].startTick = Date.now();
                         }
                         saveData(); updateTimerUI(id);
+                        refreshMetricsIfOpen();
                     }
                 }
             }
@@ -694,7 +709,8 @@
                 if (book) {
                     book.dailySeconds = 0;
                     if(activeTimers[id]) { clearInterval(activeTimers[id].interval); delete activeTimers[id]; }
-                    saveData(); renderBooks(); 
+                    saveData(); renderBooks();
+                    refreshMetricsIfOpen();
                 }
             }
         }
@@ -785,12 +801,91 @@
         }
 
         // ============================================================
-        // GRÁFICA DE MÉTRICAS — Puntuación proporcional por día
+        // GRÁFICA DE MÉTRICAS
         // ============================================================
         function openMetricsModal() {
             document.getElementById('metricsModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
             renderMetricsChart();
+            if (metricsRefreshInterval) clearInterval(metricsRefreshInterval);
+            metricsRefreshInterval = setInterval(() => {
+                if (document.getElementById('metricsModal').style.display === 'flex') {
+                    refreshMetricsData();
+                }
+            }, 2000);
+        }
+
+        function refreshMetricsIfOpen() {
+            if (document.getElementById('metricsModal').style.display === 'flex' && progressChartInstance) {
+                refreshMetricsData();
+            }
+        }
+
+        // Actualiza SOLO los datos sin destruir el chart (preserva zoom/pan)
+        function refreshMetricsData() {
+            if (!progressChartInstance) return;
+            const timelineDates = progressChartInstance._timelineDates;
+            const todayIdx = progressChartInstance._todayIdx;
+            if (!timelineDates || todayIdx === undefined) return;
+            
+            progressChartInstance.data.datasets.forEach(ds => {
+                const book = ds._book;
+                if (!book) return;
+                const goalSecs = book.dailyMins * 60;
+                let cumScore = 0;
+                const dataPoints = [];
+                
+                timelineDates.forEach((date, i) => {
+                    if (i > todayIdx) {
+                        dataPoints.push(cumScore);
+                    } else {
+                        let secs = 0, hasData = false;
+                        if (i === todayIdx) {
+                            if ((book.dailySeconds || 0) > 0) { secs = book.dailySeconds; hasData = true; }
+                        } else {
+                            const log = (book.dailyLog || []).find(l => l.date === date);
+                            if (log) { secs = log.seconds || 0; hasData = true; }
+                        }
+                        if (hasData) {
+                            if (secs === 0) cumScore -= 1;
+                            else cumScore += secs / goalSecs;
+                        }
+                        dataPoints.push(cumScore);
+                    }
+                });
+                ds.data = dataPoints;
+            });
+            
+            progressChartInstance.update('none');
+            updateTodayBadge();
+        }
+
+        function updateTodayBadge() {
+            const badge = document.getElementById('metricsTodayBadge');
+            if (!badge) return;
+            const activeBooks = appData.books.filter(b => b.active);
+            if (activeBooks.length === 0) {
+                badge.innerHTML = '<span class="badge-empty">Sin lecturas activas</span>';
+                return;
+            }
+            badge.innerHTML = activeBooks.map(book => {
+                const goalSecs = book.dailyMins * 60;
+                const secs = book.dailySeconds || 0;
+                let score, mins, color, sign;
+                if (secs === 0) {
+                    score = -1; color = 'var(--danger)'; mins = 'sin leer'; sign = '';
+                } else {
+                    score = secs / goalSecs; mins = `${Math.floor(secs/60)}/${book.dailyMins} min`;
+                    color = score >= 1 ? 'var(--success)' : '#d97706';
+                    sign = '+';
+                }
+                const disp = score.toFixed(1);
+                return `<span class="badge-item">
+                    <strong class="badge-score" style="color:${color}">${sign}${disp}</strong>
+                    <span>${book.title}</span>
+                    <em class="badge-mins">(${mins})</em>
+                </span>`;
+            }).join('');
         }
 
         function applyDynamicY(chart) {
@@ -843,7 +938,7 @@
             const activeBooks = appData.books.filter(b => b.active);
             
             if (progressChartInstance) { progressChartInstance.destroy(); progressChartInstance = null; }
-            if (activeBooks.length === 0) return;
+            if (activeBooks.length === 0) { updateTodayBadge(); return; }
             
             const now = new Date();
             const renderTodayISO = getLocalISO(now);
@@ -865,7 +960,6 @@
             
             const brightColors = ['#e63946', '#00b4d8', '#2a9d8f', '#ffb703', '#9b5de5', '#f72585', '#06d6a0', '#ef476f'];
             
-            // OBJETIVO FIJO: días totales para terminar el libro a ritmo de meta
             const bookTargets = activeBooks.map(book => {
                 return Math.max(1, Math.ceil((book.totalPages * book.minsPerPage) / book.dailyMins));
             });
@@ -881,19 +975,13 @@
                         dataPoints.push(cumScore);
                     } else {
                         let secs = 0, hasData = false;
-                        
                         if (i === todayIdx) {
-                            if ((book.dailySeconds || 0) > 0) {
-                                secs = book.dailySeconds;
-                                hasData = true;
-                            }
+                            if ((book.dailySeconds || 0) > 0) { secs = book.dailySeconds; hasData = true; }
                         } else {
                             const log = (book.dailyLog || []).find(l => l.date === date);
                             if (log) { secs = log.seconds || 0; hasData = true; }
                         }
-                        
                         if (hasData) {
-                            // PROPORCIONAL: más lectura = más puntos. Falta total = -1.
                             if (secs === 0) cumScore -= 1;
                             else cumScore += secs / goalSecs;
                         }
@@ -902,7 +990,7 @@
                 });
                 
                 const color = brightColors[index % brightColors.length];
-                const radii = timelineDates.map((_, i) => i === todayIdx ? 8 : (i < todayIdx ? 4 : 0));
+                const radii = timelineDates.map((_, i) => i === todayIdx ? 9 : (i < todayIdx ? 4 : 0));
                 
                 return {
                     label: book.title,
@@ -914,7 +1002,7 @@
                     pointBackgroundColor: color,
                     pointBorderColor: '#ffffff',
                     pointBorderWidth: 2,
-                    pointHoverRadius: 7,
+                    pointHoverRadius: 8,
                     fill: false,
                     tension: 0.15,
                     _book: book,
@@ -925,7 +1013,6 @@
                 };
             });
             
-            // Plugin: línea del cero
             const zeroLine = {
                 id: 'zeroLine',
                 beforeDatasetsDraw(chart) {
@@ -945,7 +1032,6 @@
                 }
             };
             
-            // Plugin: línea de objetivo (días totales para terminar)
             const targetLine = {
                 id: 'targetLine',
                 beforeDatasetsDraw(chart) {
@@ -971,9 +1057,30 @@
                 }
             };
             
+            // Plugin: destacar el punto de hoy
+            const todayHighlight = {
+                id: 'todayHighlight',
+                afterDatasetsDraw(chart) {
+                    const todayIdxChart = chart._todayIdx;
+                    if (todayIdxChart === undefined) return;
+                    const xScale = chart.scales.x;
+                    if (todayIdxChart < Math.floor(xScale.min) || todayIdxChart > Math.ceil(xScale.max)) return;
+                    const x = xScale.getPixelForValue(todayIdxChart);
+                    const { ctx, chartArea } = chart;
+                    ctx.save();
+                    ctx.strokeStyle = 'rgba(114, 47, 55, 0.25)';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([4, 4]);
+                    ctx.beginPath();
+                    ctx.moveTo(x, chartArea.top);
+                    ctx.lineTo(x, chartArea.bottom);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            };
+            
             const zoomEnabled = typeof ChartZoom !== 'undefined';
             
-            // Rango Y: considerar datos reales Y objetivo
             let actualMax = 0, actualMin = 0;
             datasets.forEach(ds => {
                 ds.data.forEach(v => {
@@ -1074,13 +1181,22 @@
                         } : {})
                     }
                 },
-                plugins: [zeroLine, targetLine]
+                plugins: [zeroLine, targetLine, todayHighlight]
             });
             
+            // Guardar metadatos para el refresh ligero
             progressChartInstance._maxTargetScore = maxTarget;
+            progressChartInstance._timelineDates = timelineDates;
+            progressChartInstance._todayIdx = todayIdx;
+            
+            updateTodayBadge();
         }
 
         function closeModal(modalId) {
+            if(modalId === 'metricsModal' && metricsRefreshInterval) {
+                clearInterval(metricsRefreshInterval);
+                metricsRefreshInterval = null;
+            }
             if(modalId === 'bookModal' && currentModalBookId) {
                 const book = appData.books.find(b => b.id === currentModalBookId);
                 if(book) { book.notes = document.getElementById('modalNotes').value; saveData(); }
