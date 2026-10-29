@@ -236,13 +236,13 @@
         <div class="modal-content" style="max-width: 650px;">
             <button class="modal-close" onclick="closeModal('metricsModal')">&times;</button>
             <h2 style="font-size: 22px; color: var(--primary); margin-bottom: 5px;">Métricas de Progreso</h2>
-            <p style="font-size: 14px; color: var(--text-muted); font-style: italic;">Avance en páginas leídas acumuladas por cada obra activa.</p>
+            <p style="font-size: 14px; color: var(--text-muted); font-style: italic;">Ascenso en páginas alcanzadas para cada obra activa.</p>
             
             <div class="chart-container">
                 <canvas id="progressChart"></canvas>
             </div>
             <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 15px;">
-                *Las líneas conectan desde la página inicial de registro hasta tus actualizaciones.
+                *La línea inicia en el punto cero y asciende de forma continua a medida que avanzas.
             </p>
         </div>
     </div>
@@ -275,7 +275,6 @@
                 if(b.active === undefined) b.active = true;
                 if(b.priority === undefined) b.priority = 50;
                 if(b.dailySeconds === undefined) b.dailySeconds = 0;
-                if(b.initialPage === undefined) b.initialPage = 0;
                 
                 if(b.history === undefined) {
                     b.history = [{ date: isoToday, page: b.currentPage }];
@@ -529,7 +528,7 @@
                 id: Date.now(), title: document.getElementById('title').value, category: appData.activeCategory,
                 totalPages: parseInt(document.getElementById('totalPages').value), minsPerPage: parseFloat(document.getElementById('minsPerPage').value),
                 dailyMins: parseInt(document.getElementById('dailyMins').value), currentPage: initPage,
-                initialPage: initPage, notes: "", checklists: [], active: true, priority: 50, dailySeconds: 0,
+                notes: "", checklists: [], active: true, priority: 50, dailySeconds: 0,
                 history: [{ date: isoToday, page: initPage }] 
             });
             saveData(); renderTabs(); renderBooks(); this.reset(); document.getElementById('currentPage').value = 0;
@@ -751,7 +750,7 @@
             document.body.style.overflow = 'hidden';
         }
 
-        // --- Gráfica con punto inicial "Inicio" en 0 para visualización ascendente inmediata ---
+        // --- Gráfica con trazo diagonal visible y de alto contraste ---
         function openMetricsModal() {
             document.getElementById('metricsModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
@@ -772,58 +771,42 @@
             allDates.add(isoToday);
             
             let sortedDatesArray = Array.from(allDates).sort();
-            let continuousDates = [];
-            
-            if (sortedDatesArray.length > 0) {
-                let firstDate = new Date(sortedDatesArray[0]);
-                let lastDate = new Date(sortedDatesArray[sortedDatesArray.length - 1]);
-                let curr = new Date(firstDate.getTime());
-                
-                curr.setMinutes(curr.getMinutes() + curr.getTimezoneOffset());
-                lastDate.setMinutes(lastDate.getMinutes() + lastDate.getTimezoneOffset());
 
-                while(curr <= lastDate) {
-                    continuousDates.push(curr.toISOString().split('T')[0]);
-                    curr.setDate(curr.getDate() + 1);
-                }
-            } else {
-                continuousDates = [isoToday];
-            }
-
-            // Crear etiquetas del eje X agregando 'Inicio' al principio
             let labels = ['Inicio'];
-            continuousDates.forEach(d => {
+            sortedDatesArray.forEach(d => {
                 const split = d.split('-');
                 labels.push(`${split[2]}/${split[1]}`);
             });
 
-            const colors = ['#722f37', '#2d6a4f', '#1d3557', '#d4a373', '#e07a5f', '#3d405b'];
+            // Colores vibrantes de alta visibilidad
+            const brightColors = ['#e63946', '#00b4d8', '#2a9d8f', '#ffb703', '#9b5de5', '#f72585'];
 
             const datasets = activeBooks.map((book, index) => {
-                let dataPoints = [0]; // La línea empieza en 0
-                let basePage = (book.initialPage !== undefined) ? book.initialPage : 0;
-                let currentAccumulated = 0;
-                let lastPage = basePage;
+                let dataPoints = [0]; // Nace en 0 para trazar la ascensión hacia la derecha
 
-                continuousDates.forEach(date => {
+                sortedDatesArray.forEach(date => {
                     let entry = book.history ? book.history.find(h => h.date === date) : null;
                     if (entry) {
-                        let pagesReadThisDay = Math.max(0, entry.page - lastPage);
-                        currentAccumulated += pagesReadThisDay;
-                        lastPage = entry.page;
+                        dataPoints.push(entry.page);
+                    } else {
+                        dataPoints.push(book.currentPage);
                     }
-                    dataPoints.push(currentAccumulated);
                 });
+
+                const color = brightColors[index % brightColors.length];
 
                 return {
                     label: book.title,
                     data: dataPoints,
-                    borderColor: colors[index % colors.length],
-                    backgroundColor: colors[index % colors.length],
-                    borderWidth: 2,
-                    tension: 0.2, 
-                    pointRadius: 4,
-                    pointHoverRadius: 6
+                    borderColor: color,
+                    backgroundColor: color,
+                    borderWidth: 4,               // Grosor visible del trazo
+                    pointRadius: 6,               // Puntos marcados
+                    pointBackgroundColor: color,
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    fill: false,                  // Trazo limpio sin sombras oscuras
+                    tension: 0.1                  // Línea diagonal inclinada hacia la derecha
                 };
             });
 
@@ -841,18 +824,20 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            title: { display: true, text: 'Páginas Leídas Acumuladas', font: { family: '"Times New Roman", serif', size: 14 } },
-                            grid: { color: (context) => context.tick.value === 0 ? '#1a1a1a' : '#eae5dc' } 
+                            title: { display: true, text: 'Páginas Alcanzadas', font: { family: '"Times New Roman", serif', size: 14 } },
+                            grid: { color: 'rgba(150, 150, 150, 0.2)' } 
                         },
-                        x: { title: { display: true, text: 'Línea de Tiempo', font: { family: '"Times New Roman", serif', size: 14 } } }
+                        x: { 
+                            title: { display: true, text: 'Línea de Tiempo', font: { family: '"Times New Roman", serif', size: 14 } },
+                            grid: { display: false } // Oculta las cuadrículas verticales para dejar limpio el trazo
+                        }
                     },
                     plugins: {
-                        legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { family: '"Times New Roman", serif', size: 12 } } },
+                        legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 10, font: { family: '"Times New Roman", serif', size: 13 } } },
                         tooltip: {
                             callbacks: {
                                 label: function(context) { 
-                                    let val = context.parsed.y;
-                                    return `${context.dataset.label}: +${val} pág.`; 
+                                    return `${context.dataset.label}: Pág. ${context.parsed.y}`; 
                                 }
                             }
                         }
