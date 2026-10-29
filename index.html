@@ -340,7 +340,6 @@
         }
         .meta-pages-success strong { color: var(--success); }
 
-        /* Toggle velocidad de proyección */
         .projection-source-toggle {
             display: inline-flex;
             align-items: center;
@@ -684,7 +683,6 @@
         // HELPERS — VELOCIDAD, META Y PROYECCIÓN
         // ============================================================
         
-        // Velocidad efectiva para la META y SCORE (adaptativa si está activa)
         function getEffectiveMinsPerPage(book) {
             if (!book.adaptiveSpeed) return book.minsPerPage;
             
@@ -707,12 +705,10 @@
             return Math.max(0.1, Math.min(10, result));
         }
 
-        // Velocidad para PROYECCIÓN de fecha (respeta projectionSource)
         function getProjectionMinsPerPage(book) {
             if (!book.adaptiveSpeed) return book.minsPerPage;
             const source = book.projectionSource || 'auto';
             if (source === 'manual') return book.minsPerPage;
-            // 'adaptive' o 'auto'
             return getEffectiveMinsPerPage(book);
         }
 
@@ -727,7 +723,6 @@
             return (book.pageTimingLog || []).some(l => l.seconds > 0 && l.endPage > l.startPage);
         }
 
-        // Meta diaria en PÁGINAS (basada en velocidad efectiva)
         function getMetaPaginas(book) {
             if (!book.dailyMins || book.dailyMins <= 0) return 1;
             const effMins = getEffectiveMinsPerPage(book);
@@ -735,10 +730,11 @@
             return Math.max(1, Math.round(book.dailyMins / effMins));
         }
 
+        // ⭐ PROTECCIÓN 1: nunca devuelve páginas negativas
         function getPaginasLeidasHoy(book) {
             if (!book.pagesLog) return 0;
             const todayEntry = book.pagesLog.find(l => l.date === isoToday);
-            return todayEntry ? (todayEntry.pages || 0) : 0;
+            return todayEntry ? Math.max(0, (todayEntry.pages || 0)) : 0;
         }
 
         function getScoreForDate(book, date) {
@@ -746,35 +742,19 @@
             const entry = book.pagesLog.find(l => l.date === date);
             
             if (date === isoToday) {
-                const leidas = entry ? (entry.pages || 0) : 0;
+                const leidas = entry ? Math.max(0, (entry.pages || 0)) : 0;
                 if (leidas === 0) return 0;
                 const meta = getMetaPaginas(book);
                 return leidas / meta;
             }
             
             if (!entry) return -1;
-            const pages = entry.pages || 0;
+            const pages = Math.max(0, entry.pages || 0);
             if (pages === 0) return -1;
             const metaDelDia = entry.metaPages || getMetaPaginas(book);
             return pages / metaDelDia;
         }
 
-        // Cambiar el origen de velocidad para proyección (toggle de la tarjeta)
-        function cycleProjectionSource(bookId) {
-            const book = appData.books.find(b => b.id === bookId);
-            if (!book) return;
-            const current = book.projectionSource || 'auto';
-            book.projectionSource = (current === 'manual') ? 'adaptive' : 'manual';
-            saveData();
-            renderBooks();
-            if (document.getElementById('metricsModal').style.display === 'flex') {
-                refreshMetricsChart();
-                updateMetricsStatus();
-            }
-            if (navigator.vibrate) { try { navigator.vibrate(15); } catch(e) {} }
-        }
-
-        // Set directo desde los pills
         function setProjectionSource(bookId, source) {
             const book = appData.books.find(b => b.id === bookId);
             if (!book) return;
@@ -863,6 +843,16 @@
                 if(b.pagesLog === undefined) b.pagesLog = [];
                 if(b.projectionSource === undefined) b.projectionSource = 'auto';
                 
+                // ⭐ PROTECCIÓN 2: SANEAMIENTO DE DATOS ANTIGUOS
+                // Si hay páginas negativas guardadas (por el bug anterior), las limpiamos.
+                if (b.pagesLog && Array.isArray(b.pagesLog)) {
+                    b.pagesLog.forEach(entry => {
+                        if (entry.pages !== undefined && entry.pages < 0) {
+                            entry.pages = 0; // Reseteamos a 0 si estaba en negativo
+                        }
+                    });
+                }
+                
                 if(b.history === undefined) {
                     b.history = [{ date: isoToday, page: b.currentPage }];
                 }
@@ -900,8 +890,9 @@
             let metCount = 0;
             activeBooks.forEach(b => {
                 totalSecs += (b.dailySeconds || 0);
-                totalPages += getPaginasLeidasHoy(b);
-                if (getPaginasLeidasHoy(b) >= getMetaPaginas(b)) metCount++;
+                const pagHoy = getPaginasLeidasHoy(b);
+                totalPages += pagHoy;
+                if (pagHoy >= getMetaPaginas(b)) metCount++;
             });
             
             const totalMins = Math.floor(totalSecs / 60);
@@ -1003,6 +994,12 @@
                         if (b.pagesLog === undefined) b.pagesLog = [];
                         if (b.projectionSource === undefined) b.projectionSource = 'auto';
                         if (b.history === undefined) b.history = [{ date: isoToday, page: b.currentPage || 0 }];
+                        
+                        if (b.pagesLog && Array.isArray(b.pagesLog)) {
+                            b.pagesLog.forEach(entry => {
+                                if (entry.pages !== undefined && entry.pages < 0) entry.pages = 0;
+                            });
+                        }
                     });
                     if (!imported.availableHours) imported.availableHours = [];
                     if (!imported.categories.includes(imported.activeCategory) && imported.categories.length > 0) {
@@ -1029,21 +1026,17 @@
             return `${m} min`;
         }
 
-        // ⭐ calculateStats usa PROJ para fechas/tiempo restante, EFF para meta
         function calculateStats(book) {
             const effMins = getEffectiveMinsPerPage(book);
             const projMins = getProjectionMinsPerPage(book);
             
-            // Uso projMins para tiempo restante y fecha (proyección)
             const totalMins = book.totalPages * projMins;
             const readMins = book.currentPage * projMins;
             const remainingPages = book.totalPages - book.currentPage;
             const remainingMins = remainingPages * projMins;
             
-            // Meta (basada en velocidad efectiva, para el score)
             const metaPaginas = getMetaPaginas(book);
             
-            // Días restantes según la PROYECCIÓN
             const daysRemaining = book.dailyMins > 0 && projMins > 0 
                 ? Math.ceil((remainingPages * projMins) / book.dailyMins) 
                 : 0;
@@ -1550,6 +1543,7 @@
             closeModal('addBookModal');
         });
 
+        // ⭐ PROTECCIÓN 3: Lógica de actualización segura de páginas
         function applyPageChange(bookId, newPage, fromTimer = false) {
             const book = appData.books.find(b => b.id === bookId);
             if (!book) return false;
@@ -1566,11 +1560,19 @@
                 entry = { date: isoToday, pages: 0, startPage: oldPage, endPage: clampedPage };
                 book.pagesLog.push(entry);
             }
-            entry.pages = (entry.pages || 0) + delta;
+            
+            // Si avanza, sumamos. Si retrocede, restamos hasta un mínimo de 0 (nunca negativo)
+            if (delta > 0) {
+                entry.pages = Math.max(0, (entry.pages || 0)) + delta;
+            } else if (delta < 0) {
+                entry.pages = Math.max(0, (entry.pages || 0) + delta);
+            }
+            
             entry.endPage = clampedPage;
             
             if (book.adaptiveSpeed) {
                 const secondsToday = book.dailySeconds || 0;
+                // Solo registramos velocidad adaptativa si hubo avance real
                 if (secondsToday > 0 && delta > 0) {
                     if (!book.pageTimingLog) book.pageTimingLog = [];
                     let timingEntry = book.pageTimingLog.find(l => l.date === isoToday);
@@ -2140,7 +2142,6 @@
                 }
             });
             
-            // ⭐ Días restantes con PROJ velocity (para marcadores y líneas)
             const finishDaysList = activeBooks.map(book => {
                 if (book.dailyMins <= 0) return 0;
                 const projMins = getProjectionMinsPerPage(book);
@@ -2173,7 +2174,6 @@
             
             const labels = timelineDates.map(d => { const p = d.split('-'); return `${p[2]}/${p[1]}`; });
             
-            // ⭐ bookTargets con PROJ (para la proyección positiva)
             const bookTargets = activeBooks.map(book => {
                 if (book.dailyMins <= 0) return 1;
                 const projMins = getProjectionMinsPerPage(book);
@@ -2468,7 +2468,7 @@
                                         delta = ` (${pagHoy}/${metaP} pág hoy)`;
                                     } else if (idx < todayIdx && book) {
                                         const entry = (book.pagesLog || []).find(l => l.date === timelineDates[idx]);
-                                        const pag = entry ? entry.pages : 0;
+                                        const pag = entry ? Math.max(0, entry.pages) : 0;
                                         const metaDelDia = entry?.metaPages || metaP;
                                         delta = ` (${pag}/${metaDelDia} pág)`;
                                     }
