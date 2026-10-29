@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Tracker de Lectura</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2"></script>
     <style>
         :root {
             --bg-color: #fdfbf7;
@@ -236,13 +237,13 @@
         <div class="modal-content" style="max-width: 650px;">
             <button class="modal-close" onclick="closeModal('metricsModal')">&times;</button>
             <h2 style="font-size: 22px; color: var(--primary); margin-bottom: 5px;">Métricas de Progreso</h2>
-            <p style="font-size: 14px; color: var(--text-muted); font-style: italic;">Línea de tiempo móvil: muestra los últimos días pasados, el presente y los próximos 3 días futuros.</p>
+            <p style="font-size: 14px; color: var(--text-muted); font-style: italic;">Cada línea sube <strong>+1</strong> al cumplir el objetivo diario y baja <strong>−1</strong> si no lees. Arrastra la gráfica para explorar días futuros.</p>
             
             <div class="chart-container">
                 <canvas id="progressChart"></canvas>
             </div>
             <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 15px;">
-                *La ventana avanza automáticamente conforme transcurren los días.
+                *Arrastra para desplazarte · Rueda del ratón o pinza para hacer zoom · La sección punteada = días futuros.
             </p>
         </div>
     </div>
@@ -261,9 +262,13 @@
         };
         let activeTimers = {}; 
 
+        function getLocalISO(d = new Date()) {
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        }
+
         const savedData = localStorage.getItem('readingTrackerData');
         const currentDateStr = new Date().toDateString();
-        const isoToday = new Date().toISOString().split('T')[0]; 
+        const isoToday = getLocalISO();
 
         if (savedData) {
             appData = JSON.parse(savedData);
@@ -275,6 +280,7 @@
                 if(b.active === undefined) b.active = true;
                 if(b.priority === undefined) b.priority = 50;
                 if(b.dailySeconds === undefined) b.dailySeconds = 0;
+                if(b.dailyLog === undefined) b.dailyLog = [];
                 
                 if(b.history === undefined) {
                     b.history = [{ date: isoToday, page: b.currentPage }];
@@ -282,12 +288,34 @@
             });
 
             if (appData.lastDate !== currentDateStr) {
+                const lastDate = new Date(appData.lastDate);
+                const todayDate = new Date(currentDateStr);
+                const daysDiff = Math.round((todayDate - lastDate) / 86400000);
+                
                 appData.books.forEach(b => {
+                    const goalSecs = b.dailyMins * 60;
+                    
+                    if (b.active) {
+                        const lastISO = getLocalISO(lastDate);
+                        const idx = b.dailyLog.findIndex(l => l.date === lastISO);
+                        const entry = { date: lastISO, seconds: b.dailySeconds || 0, met: (b.dailySeconds || 0) >= goalSecs };
+                        if (idx >= 0) b.dailyLog[idx] = entry;
+                        else b.dailyLog.push(entry);
+                        
+                        for (let i = 1; i < daysDiff; i++) {
+                            const md = new Date(lastDate);
+                            md.setDate(md.getDate() + i);
+                            const mISO = getLocalISO(md);
+                            const idx2 = b.dailyLog.findIndex(l => l.date === mISO);
+                            const entry2 = { date: mISO, seconds: 0, met: false };
+                            if (idx2 >= 0) b.dailyLog[idx2] = entry2;
+                            else b.dailyLog.push(entry2);
+                        }
+                    }
+                    
                     b.dailySeconds = 0;
                     const todayEntry = b.history.find(h => h.date === isoToday);
-                    if(!todayEntry) {
-                        b.history.push({ date: isoToday, page: b.currentPage });
-                    }
+                    if(!todayEntry) b.history.push({ date: isoToday, page: b.currentPage });
                 });
                 appData.lastDate = currentDateStr;
                 saveData();
@@ -529,7 +557,8 @@
                 totalPages: parseInt(document.getElementById('totalPages').value), minsPerPage: parseFloat(document.getElementById('minsPerPage').value),
                 dailyMins: parseInt(document.getElementById('dailyMins').value), currentPage: initPage,
                 notes: "", checklists: [], active: true, priority: 50, dailySeconds: 0,
-                history: [{ date: isoToday, page: initPage }] 
+                history: [{ date: isoToday, page: initPage }],
+                dailyLog: []
             });
             saveData(); renderTabs(); renderBooks(); this.reset(); document.getElementById('currentPage').value = 0;
         });
@@ -750,7 +779,7 @@
             document.body.style.overflow = 'hidden';
         }
 
-        // --- Gráfica Dinámica (4 días pasados + Hoy + 3 días futuros) ---
+        // --- Gráfica Dinámica: sube/baja según objetivo diario ---
         function openMetricsModal() {
             document.getElementById('metricsModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
@@ -761,102 +790,151 @@
             const ctx = document.getElementById('progressChart').getContext('2d');
             const activeBooks = appData.books.filter(b => b.active);
             
-            if (activeBooks.length === 0) {
-                if(progressChartInstance) progressChartInstance.destroy();
-                return;
-            }
-
-            // Ventana móvil: 4 días hacia atrás, el día de hoy, y 3 días hacia adelante
-            let timelineDates = [];
-            let todayObj = new Date();
-            for (let i = -4; i <= 3; i++) {
-                let d = new Date(todayObj);
+            if (progressChartInstance) { progressChartInstance.destroy(); progressChartInstance = null; }
+            if (activeBooks.length === 0) return;
+            
+            const now = new Date();
+            const renderTodayISO = getLocalISO(now);
+            const baseDate = new Date(now);
+            baseDate.setHours(0, 0, 0, 0);
+            
+            const timelineDates = [];
+            for (let i = -7; i <= 60; i++) {
+                const d = new Date(baseDate);
                 d.setDate(d.getDate() + i);
-                let iso = d.toISOString().split('T')[0];
-                timelineDates.push(iso);
+                timelineDates.push(getLocalISO(d));
             }
-
-            let labels = timelineDates.map(d => {
-                const split = d.split('-');
-                return `${split[2]}/${split[1]}`;
+            const todayIdx = timelineDates.indexOf(renderTodayISO);
+            
+            const labels = timelineDates.map(d => {
+                const p = d.split('-');
+                return `${p[2]}/${p[1]}`;
             });
-
-            const brightColors = ['#e63946', '#00b4d8', '#2a9d8f', '#ffb703', '#9b5de5', '#f72585'];
-
+            
+            const brightColors = ['#e63946', '#00b4d8', '#2a9d8f', '#ffb703', '#9b5de5', '#f72585', '#06d6a0', '#ef476f'];
+            
             const datasets = activeBooks.map((book, index) => {
-                let dataPoints = [];
-
-                timelineDates.forEach(date => {
-                    if (date <= isoToday) {
-                        // Para días pasados y hoy, mostrar la página real acumulada registrada
-                        let pageAtDate = 0;
-                        if (book.history && book.history.length > 0) {
-                            let pastEntries = book.history.filter(h => h.date <= date);
-                            if (pastEntries.length > 0) {
-                                pageAtDate = Math.max(...pastEntries.map(h => h.page));
-                            } else {
-                                pageAtDate = book.history[0].page;
+                let cumScore = 0;
+                const dataPoints = [];
+                const goalSecs = book.dailyMins * 60;
+                
+                timelineDates.forEach((date, i) => {
+                    if (i > todayIdx) {
+                        dataPoints.push(cumScore);
+                    } else {
+                        let met = false, hasData = false;
+                        
+                        if (i === todayIdx) {
+                            if ((book.dailySeconds || 0) > 0) {
+                                met = (book.dailySeconds || 0) >= goalSecs;
+                                hasData = true;
                             }
                         } else {
-                            pageAtDate = book.currentPage;
+                            const log = (book.dailyLog || []).find(l => l.date === date);
+                            if (log) { met = log.met; hasData = true; }
                         }
-                        dataPoints.push(pageAtDate);
-                    } else {
-                        // Para días futuros, la línea se detiene visualmente en la página actual (plana hacia adelante)
-                        dataPoints.push(book.currentPage);
+                        
+                        if (hasData) cumScore += met ? 1 : -1;
+                        dataPoints.push(cumScore);
                     }
                 });
-
+                
                 const color = brightColors[index % brightColors.length];
-
+                const radii = timelineDates.map((_, i) => i === todayIdx ? 8 : (i < todayIdx ? 4 : 0));
+                
                 return {
                     label: book.title,
                     data: dataPoints,
                     borderColor: color,
-                    backgroundColor: color,
-                    borderWidth: 4,
-                    pointRadius: 5,
+                    backgroundColor: color + '20',
+                    borderWidth: 3,
+                    pointRadius: radii,
                     pointBackgroundColor: color,
                     pointBorderColor: '#ffffff',
                     pointBorderWidth: 2,
+                    pointHoverRadius: 7,
                     fill: false,
-                    tension: 0.1
+                    tension: 0.15,
+                    segment: {
+                        borderDash: (s) => (s.p1DataIndex > todayIdx ? [6, 5] : undefined)
+                    }
                 };
             });
-
-            if(progressChartInstance) progressChartInstance.destroy();
-
+            
+            const zeroLine = {
+                id: 'zeroLine',
+                beforeDatasetsDraw(chart) {
+                    const { ctx, chartArea, scales } = chart;
+                    if (!scales.y) return;
+                    const y = scales.y.getPixelForValue(0);
+                    if (y < chartArea.top || y > chartArea.bottom) return;
+                    ctx.save();
+                    ctx.strokeStyle = 'rgba(114, 47, 55, 0.5)';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([6, 4]);
+                    ctx.beginPath();
+                    ctx.moveTo(chartArea.left, y);
+                    ctx.lineTo(chartArea.right, y);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            };
+            
+            const zoomEnabled = typeof ChartZoom !== 'undefined';
+            
             progressChartInstance = new Chart(ctx, {
                 type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: datasets
-                },
+                data: { labels, datasets },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
                     scales: {
                         y: {
-                            beginAtZero: true,
-                            title: { display: true, text: 'Páginas Alcanzadas', font: { family: '"Times New Roman", serif', size: 14 } },
-                            grid: { color: 'rgba(150, 150, 150, 0.2)' } 
+                            title: { display: true, text: 'Balance (objetivos cumplidos − fallidos)', font: { size: 13 } },
+                            grid: { color: 'rgba(150, 150, 150, 0.15)' },
+                            ticks: { precision: 0, stepSize: 2 }
                         },
-                        x: { 
-                            title: { display: true, text: 'Línea de Tiempo (Pasado, Hoy y Futuro)', font: { family: '"Times New Roman", serif', size: 14 } },
-                            grid: { display: false } 
+                        x: {
+                            min: 0,
+                            max: Math.min(21, timelineDates.length - 1),
+                            title: { display: true, text: '← Arrastra para ver más días →', font: { size: 12 } },
+                            grid: { display: false },
+                            ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 12 }
                         }
                     },
                     plugins: {
-                        legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 10, font: { family: '"Times New Roman", serif', size: 13 } } },
+                        legend: {
+                            position: 'bottom',
+                            labels: { usePointStyle: true, boxWidth: 10, font: { size: 12 } }
+                        },
                         tooltip: {
                             callbacks: {
-                                label: function(context) { 
-                                    return `${context.dataset.label}: Pág. ${context.parsed.y}`; 
+                                title: (items) => {
+                                    const idx = items[0].dataIndex;
+                                    const p = timelineDates[idx].split('-');
+                                    let t = `${p[2]}/${p[1]}/${p[0]}`;
+                                    if (idx === todayIdx) t += ' · Hoy';
+                                    else if (idx > todayIdx) t += ' · Futuro';
+                                    else t += ' · Pasado';
+                                    return t;
+                                },
+                                label: (c) => {
+                                    const v = c.parsed.y;
+                                    return `${c.dataset.label}: ${v > 0 ? '+' : ''}${v}`;
                                 }
                             }
-                        }
+                        },
+                        ...(zoomEnabled ? {
+                            zoom: {
+                                pan: { enabled: true, mode: 'x' },
+                                zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' },
+                                limits: { x: { min: 0, max: timelineDates.length - 1 } }
+                            }
+                        } : {})
                     }
-                }
+                },
+                plugins: [zeroLine]
             });
         }
 
