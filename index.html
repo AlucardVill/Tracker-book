@@ -152,11 +152,11 @@
         .btn-reset-zoom { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted); padding: 6px 14px; border-radius: 4px; font-size: 13px; cursor: pointer; font-family: var(--font-family); transition: all 0.2s; }
         .btn-reset-zoom:hover { border-color: var(--primary); color: var(--primary); }
         
-        .today-badge { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 12px; padding: 12px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; font-size: 13px; }
-        .today-badge .badge-item { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; background: var(--bg-color); border-radius: 3px; border: 1px solid var(--border-color); }
-        .today-badge .badge-score { font-weight: bold; font-size: 15px; }
-        .today-badge .badge-mins { color: var(--text-muted); font-size: 11px; font-style: italic; }
-        .today-badge .badge-empty { color: var(--text-muted); font-style: italic; }
+        .metrics-status { 
+            font-size: 13px; color: var(--text-main); text-align: center; margin-top: 10px; 
+            padding: 10px; background: var(--card-bg); border: 1px solid var(--border-color); 
+            border-radius: 4px; line-height: 1.8;
+        }
     </style>
 </head>
 <body>
@@ -213,16 +213,13 @@
         <div id="booksList"></div>
     </div>
 
-    <!-- Modales -->
     <div id="bookModal" class="modal-overlay">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('bookModal')">&times;</button>
             <h2 id="modalTitle" class="card-title" style="margin-bottom: 5px; color: var(--text-main); cursor: default; font-size: 22px;"></h2>
             <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px; font-style: italic;">Espacio de trabajo y apuntes</p>
-            
             <label>Notas Libres (Se guardan al cerrar)</label>
             <textarea id="modalNotes" rows="6" placeholder="Escribe tus resúmenes, citas o ideas clave..."></textarea>
-            
             <label style="margin-top: 20px;">Lista de tareas / Capítulos</label>
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                 <input type="text" id="newChecklistInput" placeholder="Ej: Leer introducción...">
@@ -245,22 +242,20 @@
         <div class="modal-content" style="max-width: 650px;">
             <button class="modal-close" onclick="closeModal('metricsModal')">&times;</button>
             <h2 style="font-size: 22px; color: var(--primary); margin-bottom: 5px;">Métricas de Progreso</h2>
-            <p style="font-size: 14px; color: var(--text-muted); font-style: italic;">La línea sube <strong>proporcionalmente</strong> a lo que lees: la meta diaria da <strong>+1</strong>, leer el doble da <strong>+2</strong>, no leer resta <strong>−1</strong>. La línea verde marca los días totales para terminar el libro.</p>
+            <p style="font-size: 14px; color: var(--text-muted); font-style: italic;">
+                Línea <strong>sólida</strong> = tu progreso real (sube +1 si cumples, baja −1 si no lees). Línea <strong>gris punteada</strong> = advertencia: si no lees, seguirás bajando −1 por día.
+            </p>
+            
+            <div id="metricsStatus" class="metrics-status">Cargando…</div>
             
             <div class="chart-container">
                 <canvas id="progressChart"></canvas>
             </div>
-            
-            <div id="metricsTodayBadge" class="today-badge">
-                <span class="badge-empty">Sin lecturas activas</span>
-            </div>
-            
-            <div style="display: flex; justify-content: center; margin-top: 12px; gap: 10px;">
+            <div style="display: flex; justify-content: center; margin-top: 12px;">
                 <button onclick="resetZoom()" class="btn-reset-zoom">🔄 Reajustar vista</button>
-                <button onclick="renderMetricsChart()" class="btn-reset-zoom">↻ Refrescar ahora</button>
             </div>
             <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 10px;">
-                *Se actualiza cada 2 s mientras el modal está abierto · Arrastra para desplazarte · Rueda del ratón para zoom.
+                *Arrastra para desplazarte · Rueda del ratón o pinza para hacer zoom · Se actualiza en vivo mientras lees.
             </p>
         </div>
     </div>
@@ -268,8 +263,7 @@
     <script>
         Chart.defaults.font.family = '"Times New Roman", Times, serif';
         Chart.defaults.color = '#5c5c5c';
-        let progressChartInstance = null;
-        let metricsRefreshInterval = null;
+        let progressChartInstance = null; 
 
         let appData = {
             categories: ['Lecturas Actuales', 'Por Leer'],
@@ -586,17 +580,16 @@
             const book = appData.books.find(b => b.id === id);
             if (book) { 
                 book.currentPage = Math.max(0, Math.min(newPage, book.totalPages)); 
-                
                 if(!book.history) book.history = [];
                 const existingIndex = book.history.findIndex(h => h.date === isoToday);
-                if (existingIndex >= 0) {
-                    book.history[existingIndex].page = book.currentPage; 
-                } else {
-                    book.history.push({ date: isoToday, page: book.currentPage }); 
-                }
+                if (existingIndex >= 0) book.history[existingIndex].page = book.currentPage; 
+                else book.history.push({ date: isoToday, page: book.currentPage }); 
                 
                 saveData(); renderBooks(); 
-                refreshMetricsIfOpen();
+                if(document.getElementById('metricsModal').style.display === 'flex') {
+                    refreshMetricsChart();
+                    updateMetricsStatus();
+                }
             }
         }
 
@@ -647,7 +640,10 @@
                 
                 btn.innerHTML = '▶️ Continuar'; btn.classList.remove('running');
                 saveData(); updateTimerUI(id);
-                refreshMetricsIfOpen();
+                if (document.getElementById('metricsModal').style.display === 'flex') {
+                    refreshMetricsChart();
+                    updateMetricsStatus();
+                }
             } else {
                 btn.innerHTML = '⏸️ Pausar'; btn.classList.add('running');
                 activeTimers[id] = {
@@ -681,6 +677,11 @@
                 if (currentSecs >= targetSeconds) msg.style.display = 'block';
                 else msg.style.display = 'none';
             }
+            
+            if (document.getElementById('metricsModal').style.display === 'flex') {
+                updateMetricsStatus();
+                scheduleChartRefresh();
+            }
         }
 
         function editTimer(id) {
@@ -697,7 +698,10 @@
                             activeTimers[id].startTick = Date.now();
                         }
                         saveData(); updateTimerUI(id);
-                        refreshMetricsIfOpen();
+                        if (document.getElementById('metricsModal').style.display === 'flex') {
+                            refreshMetricsChart();
+                            updateMetricsStatus();
+                        }
                     }
                 }
             }
@@ -709,8 +713,11 @@
                 if (book) {
                     book.dailySeconds = 0;
                     if(activeTimers[id]) { clearInterval(activeTimers[id].interval); delete activeTimers[id]; }
-                    saveData(); renderBooks();
-                    refreshMetricsIfOpen();
+                    saveData(); renderBooks(); 
+                    if (document.getElementById('metricsModal').style.display === 'flex') {
+                        refreshMetricsChart();
+                        updateMetricsStatus();
+                    }
                 }
             }
         }
@@ -801,91 +808,42 @@
         }
 
         // ============================================================
-        // GRÁFICA DE MÉTRICAS
+        // GRÁFICA — Progreso real + Advertencia descendente
         // ============================================================
         function openMetricsModal() {
             document.getElementById('metricsModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
             renderMetricsChart();
-            if (metricsRefreshInterval) clearInterval(metricsRefreshInterval);
-            metricsRefreshInterval = setInterval(() => {
-                if (document.getElementById('metricsModal').style.display === 'flex') {
-                    refreshMetricsData();
-                }
-            }, 2000);
+            updateMetricsStatus();
+            setTimeout(() => {
+                if (progressChartInstance) progressChartInstance.resize();
+            }, 30);
         }
 
-        function refreshMetricsIfOpen() {
-            if (document.getElementById('metricsModal').style.display === 'flex' && progressChartInstance) {
-                refreshMetricsData();
-            }
-        }
-
-        // Actualiza SOLO los datos sin destruir el chart (preserva zoom/pan)
-        function refreshMetricsData() {
-            if (!progressChartInstance) return;
-            const timelineDates = progressChartInstance._timelineDates;
-            const todayIdx = progressChartInstance._todayIdx;
-            if (!timelineDates || todayIdx === undefined) return;
-            
-            progressChartInstance.data.datasets.forEach(ds => {
-                const book = ds._book;
-                if (!book) return;
-                const goalSecs = book.dailyMins * 60;
-                let cumScore = 0;
-                const dataPoints = [];
-                
-                timelineDates.forEach((date, i) => {
-                    if (i > todayIdx) {
-                        dataPoints.push(cumScore);
-                    } else {
-                        let secs = 0, hasData = false;
-                        if (i === todayIdx) {
-                            if ((book.dailySeconds || 0) > 0) { secs = book.dailySeconds; hasData = true; }
-                        } else {
-                            const log = (book.dailyLog || []).find(l => l.date === date);
-                            if (log) { secs = log.seconds || 0; hasData = true; }
-                        }
-                        if (hasData) {
-                            if (secs === 0) cumScore -= 1;
-                            else cumScore += secs / goalSecs;
-                        }
-                        dataPoints.push(cumScore);
-                    }
-                });
-                ds.data = dataPoints;
-            });
-            
-            progressChartInstance.update('none');
-            updateTodayBadge();
-        }
-
-        function updateTodayBadge() {
-            const badge = document.getElementById('metricsTodayBadge');
-            if (!badge) return;
+        function updateMetricsStatus() {
             const activeBooks = appData.books.filter(b => b.active);
+            const el = document.getElementById('metricsStatus');
+            if (!el) return;
+            
             if (activeBooks.length === 0) {
-                badge.innerHTML = '<span class="badge-empty">Sin lecturas activas</span>';
+                el.innerHTML = '<em>Sin lecturas activas</em>';
                 return;
             }
-            badge.innerHTML = activeBooks.map(book => {
+            
+            const parts = activeBooks.map(book => {
                 const goalSecs = book.dailyMins * 60;
                 const secs = book.dailySeconds || 0;
-                let score, mins, color, sign;
-                if (secs === 0) {
-                    score = -1; color = 'var(--danger)'; mins = 'sin leer'; sign = '';
-                } else {
-                    score = secs / goalSecs; mins = `${Math.floor(secs/60)}/${book.dailyMins} min`;
-                    color = score >= 1 ? 'var(--success)' : '#d97706';
-                    sign = '+';
-                }
-                const disp = score.toFixed(1);
-                return `<span class="badge-item">
-                    <strong class="badge-score" style="color:${color}">${sign}${disp}</strong>
-                    <span>${book.title}</span>
-                    <em class="badge-mins">(${mins})</em>
-                </span>`;
-            }).join('');
+                const pts = secs === 0 ? -1 : secs / goalSecs;
+                const pct = Math.round((secs / goalSecs) * 100);
+                const sign = pts >= 0 ? '+' : '';
+                const check = secs >= goalSecs ? ' ✅' : '';
+                const color = secs >= goalSecs 
+                    ? 'var(--success)' 
+                    : (secs === 0 ? 'var(--danger)' : 'var(--text-main)');
+                return `<span style="color: ${color}">${book.title}: <strong>${sign}${pts.toFixed(2)}</strong> (${pct}%)${check}</span>`;
+            });
+            
+            el.innerHTML = `<strong>Hoy:</strong> ${parts.join(' · ')}`;
         }
 
         function applyDynamicY(chart) {
@@ -894,6 +852,7 @@
             const { min, max } = xScale;
             let minY = Infinity, maxY = -Infinity, hasData = false;
             chart.data.datasets.forEach(ds => {
+                if (ds._isWarning) return;
                 const start = Math.max(0, Math.floor(min));
                 const end = Math.min(ds.data.length - 1, Math.ceil(max));
                 for (let i = start; i <= end; i++) {
@@ -916,21 +875,49 @@
             if (!progressChartInstance) return;
             if (progressChartInstance.resetZoom) progressChartInstance.resetZoom();
             
-            let actualMax = 0, actualMin = 0;
+            let actualMax = 0, actualMin = 0, hasData = false;
             progressChartInstance.data.datasets.forEach(ds => {
                 ds.data.forEach(v => {
                     if (typeof v === 'number' && isFinite(v)) {
+                        hasData = true;
                         if (v > actualMax) actualMax = v;
                         if (v < actualMin) actualMin = v;
                     }
                 });
             });
-            const target = progressChartInstance._maxTargetScore || 0;
-            const maxY = Math.max(actualMax, target) + 2;
-            const minY = Math.min(actualMin - 2, -2);
-            progressChartInstance.options.scales.y.min = minY;
-            progressChartInstance.options.scales.y.max = maxY;
+            
+            const range = Math.max(actualMax - actualMin, 3);
+            const pad = Math.max(1, range * 0.15);
+            progressChartInstance.options.scales.y.min = Math.floor(actualMin - pad);
+            progressChartInstance.options.scales.y.max = Math.ceil(actualMax + pad);
             progressChartInstance.update();
+        }
+
+        function refreshMetricsChart() {
+            if (!progressChartInstance) return;
+            if (document.getElementById('metricsModal').style.display !== 'flex') return;
+            
+            const saved = {
+                xMin: progressChartInstance.options.scales.x.min,
+                xMax: progressChartInstance.options.scales.x.max
+            };
+            
+            renderMetricsChart();
+            
+            if (progressChartInstance && saved) {
+                progressChartInstance.options.scales.x.min = saved.xMin;
+                progressChartInstance.options.scales.x.max = saved.xMax;
+                progressChartInstance.update('none');
+            }
+        }
+
+        let chartRefreshTimeout = null;
+        function scheduleChartRefresh() {
+            if (chartRefreshTimeout) return;
+            chartRefreshTimeout = setTimeout(() => {
+                chartRefreshTimeout = null;
+                refreshMetricsChart();
+            }, 2500);
         }
 
         function renderMetricsChart() {
@@ -938,20 +925,35 @@
             const activeBooks = appData.books.filter(b => b.active);
             
             if (progressChartInstance) { progressChartInstance.destroy(); progressChartInstance = null; }
-            if (activeBooks.length === 0) { updateTodayBadge(); return; }
+            if (activeBooks.length === 0) return;
             
-            const now = new Date();
-            const renderTodayISO = getLocalISO(now);
-            const baseDate = new Date(now);
-            baseDate.setHours(0, 0, 0, 0);
+            let earliestDateStr = isoToday;
+            activeBooks.forEach(book => {
+                const dates = [
+                    ...(book.history || []).map(h => h.date),
+                    ...(book.dailyLog || []).map(l => l.date)
+                ].filter(Boolean);
+                if (dates.length > 0) {
+                    const e = dates.sort()[0];
+                    if (e < earliestDateStr) earliestDateStr = e;
+                }
+            });
+            
+            const startDate = new Date(earliestDateStr + 'T00:00:00');
+            startDate.setDate(startDate.getDate() - 1);
+            
+            const endDate = new Date();
+            endDate.setDate(endDate.getDate() + 14);
+            endDate.setHours(0, 0, 0, 0);
             
             const timelineDates = [];
-            for (let i = -7; i <= 60; i++) {
-                const d = new Date(baseDate);
-                d.setDate(d.getDate() + i);
-                timelineDates.push(getLocalISO(d));
+            const cursor = new Date(startDate);
+            while (cursor <= endDate) {
+                timelineDates.push(getLocalISO(cursor));
+                cursor.setDate(cursor.getDate() + 1);
             }
-            const todayIdx = timelineDates.indexOf(renderTodayISO);
+            
+            const todayIdx = timelineDates.indexOf(isoToday);
             
             const labels = timelineDates.map(d => {
                 const p = d.split('-');
@@ -960,58 +962,154 @@
             
             const brightColors = ['#e63946', '#00b4d8', '#2a9d8f', '#ffb703', '#9b5de5', '#f72585', '#06d6a0', '#ef476f'];
             
-            const bookTargets = activeBooks.map(book => {
-                return Math.max(1, Math.ceil((book.totalPages * book.minsPerPage) / book.dailyMins));
-            });
-            const maxTarget = Math.max(...bookTargets, 5);
+            // Calcular score de hoy por libro (para la advertencia)
+            const scoreAtTodayByBook = {};
             
             const datasets = activeBooks.map((book, index) => {
-                let cumScore = 0;
-                const dataPoints = [];
                 const goalSecs = book.dailyMins * 60;
                 
+                const allDates = [
+                    ...(book.history || []).map(h => h.date),
+                    ...(book.dailyLog || []).map(l => l.date)
+                ].filter(Boolean).sort();
+                const firstDate = allDates[0] || isoToday;
+                const startIdx = timelineDates.indexOf(firstDate);
+                
+                let cumScore = 0;
+                const dataPoints = [];
+                let goalMetToday = false;
+                
                 timelineDates.forEach((date, i) => {
-                    if (i > todayIdx) {
-                        dataPoints.push(cumScore);
-                    } else {
-                        let secs = 0, hasData = false;
-                        if (i === todayIdx) {
-                            if ((book.dailySeconds || 0) > 0) { secs = book.dailySeconds; hasData = true; }
-                        } else {
-                            const log = (book.dailyLog || []).find(l => l.date === date);
-                            if (log) { secs = log.seconds || 0; hasData = true; }
-                        }
-                        if (hasData) {
-                            if (secs === 0) cumScore -= 1;
-                            else cumScore += secs / goalSecs;
-                        }
-                        dataPoints.push(cumScore);
+                    if (i === startIdx - 1) {
+                        dataPoints.push(0);
+                        return;
                     }
+                    if (i < startIdx - 1) {
+                        dataPoints.push(null);
+                        return;
+                    }
+                    if (i > todayIdx) {
+                        dataPoints.push(null);
+                        return;
+                    }
+                    
+                    let secs = 0;
+                    
+                    if (i === todayIdx) {
+                        secs = book.dailySeconds || 0;
+                        if (secs >= goalSecs) goalMetToday = true;
+                        // Hoy: no castigar si aún no ha leído, solo sumar si leyó
+                        if (secs > 0) {
+                            cumScore += secs / goalSecs;
+                        }
+                        dataPoints.push(cumScore);
+                        return;
+                    }
+                    
+                    // Días pasados
+                    const log = (book.dailyLog || []).find(l => l.date === date);
+                    if (log) {
+                        secs = log.seconds || 0;
+                    } else {
+                        // Sin log = no leyó = -1
+                        secs = 0;
+                    }
+                    
+                    if (secs === 0) cumScore -= 1;
+                    else cumScore += secs / goalSecs;
+                    
+                    dataPoints.push(cumScore);
                 });
                 
+                scoreAtTodayByBook[book.id] = cumScore;
+                
                 const color = brightColors[index % brightColors.length];
-                const radii = timelineDates.map((_, i) => i === todayIdx ? 9 : (i < todayIdx ? 4 : 0));
+                
+                const radii = timelineDates.map((_, i) => {
+                    if (i === todayIdx) return goalMetToday ? 11 : (book.dailySeconds > 0 ? 9 : 6);
+                    if (i < todayIdx && i >= startIdx) return 5;
+                    if (i === startIdx - 1) return 4;
+                    return 0;
+                });
                 
                 return {
-                    label: book.title,
+                    label: book.title + (goalMetToday ? ' 🏆' : ''),
                     data: dataPoints,
                     borderColor: color,
-                    backgroundColor: color + '20',
+                    backgroundColor: color + '25',
                     borderWidth: 3,
                     pointRadius: radii,
-                    pointBackgroundColor: color,
+                    pointBackgroundColor: timelineDates.map((_, i) => 
+                        i === todayIdx && goalMetToday ? '#2d6a4f' : color
+                    ),
                     pointBorderColor: '#ffffff',
                     pointBorderWidth: 2,
                     pointHoverRadius: 8,
                     fill: false,
-                    tension: 0.15,
+                    tension: 0,
+                    spanGaps: false,
                     _book: book,
-                    _target: bookTargets[index],
-                    segment: {
-                        borderDash: (s) => (s.p1DataIndex > todayIdx ? [6, 5] : undefined)
-                    }
+                    _isWarning: false
                 };
             });
+            
+            // Advertencia gris punteada: pendiente descendente si NO lees desde hoy
+            // Se calcula sobre el primer libro activo (o el de peor score)
+            const worstBook = activeBooks.reduce((worst, book) => {
+                const score = scoreAtTodayByBook[book.id] || 0;
+                const worstScore = worst ? (scoreAtTodayByBook[worst.id] || 0) : Infinity;
+                return score < worstScore ? book : worst;
+            }, null);
+            
+            let warningDataset = null;
+            if (worstBook) {
+                const startScore = scoreAtTodayByBook[worstBook.id] || 0;
+                const warningData = timelineDates.map((date, i) => {
+                    if (i < todayIdx) return null;
+                    if (i === todayIdx) return startScore;
+                    const daysAhead = i - todayIdx;
+                    return Math.max(startScore - daysAhead, -15);  // tope -15
+                });
+                
+                warningDataset = {
+                    label: '⚠️ Si no lees (proyección)',
+                    data: warningData,
+                    borderColor: 'rgba(150, 150, 150, 0.7)',
+                    backgroundColor: 'rgba(150, 150, 150, 0.1)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    pointHoverRadius: 4,
+                    fill: false,
+                    tension: 0,
+                    spanGaps: false,
+                    _isWarning: true
+                };
+            }
+            
+            // Cálculo del rango Y — incluye tanto datos reales como advertencia
+            let actualMax = 0, actualMin = 0, hasData = false;
+            const allDatasets = warningDataset ? [...datasets, warningDataset] : datasets;
+            allDatasets.forEach(ds => {
+                ds.data.forEach(v => {
+                    if (typeof v === 'number' && isFinite(v)) {
+                        hasData = true;
+                        if (v > actualMax) actualMax = v;
+                        if (v < actualMin) actualMin = v;
+                    }
+                });
+            });
+            
+            let finalMin = actualMin;
+            let finalMax = actualMax;
+            if (finalMax - finalMin < 3) {
+                const mid = (finalMax + finalMin) / 2;
+                finalMin = mid - 1.5;
+                finalMax = mid + 1.5;
+            }
+            const pad = Math.max(1, (finalMax - finalMin) * 0.15);
+            const initialMinY = Math.floor(finalMin - pad);
+            const initialMaxY = Math.ceil(finalMax + pad);
             
             const zeroLine = {
                 id: 'zeroLine',
@@ -1021,8 +1119,8 @@
                     const y = scales.y.getPixelForValue(0);
                     if (y < chartArea.top || y > chartArea.bottom) return;
                     ctx.save();
-                    ctx.strokeStyle = 'rgba(114, 47, 55, 0.5)';
-                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = 'rgba(114, 47, 55, 0.35)';
+                    ctx.lineWidth = 1.5;
                     ctx.setLineDash([6, 4]);
                     ctx.beginPath();
                     ctx.moveTo(chartArea.left, y);
@@ -1032,84 +1130,52 @@
                 }
             };
             
-            const targetLine = {
-                id: 'targetLine',
+            const todayMarker = {
+                id: 'todayMarker',
                 beforeDatasetsDraw(chart) {
                     const { ctx, chartArea, scales } = chart;
-                    if (!scales.y) return;
-                    const target = chart._maxTargetScore;
-                    if (!target) return;
-                    const y = scales.y.getPixelForValue(target);
-                    if (y < chartArea.top + 5 || y > chartArea.bottom - 5) return;
+                    if (!scales.x) return;
+                    const x = scales.x.getPixelForValue(todayIdx);
+                    if (x < chartArea.left || x > chartArea.right) return;
                     ctx.save();
-                    ctx.strokeStyle = 'rgba(45, 106, 79, 0.55)';
+                    ctx.strokeStyle = 'rgba(114, 47, 55, 0.3)';
                     ctx.lineWidth = 1.5;
-                    ctx.setLineDash([3, 4]);
-                    ctx.beginPath();
-                    ctx.moveTo(chartArea.left, y);
-                    ctx.lineTo(chartArea.right, y);
-                    ctx.stroke();
-                    ctx.fillStyle = 'rgba(45, 106, 79, 0.8)';
-                    ctx.font = 'italic 11px "Times New Roman", serif';
-                    ctx.textAlign = 'right';
-                    ctx.fillText(`Meta final: +${target} días`, chartArea.right - 6, y - 5);
-                    ctx.restore();
-                }
-            };
-            
-            // Plugin: destacar el punto de hoy
-            const todayHighlight = {
-                id: 'todayHighlight',
-                afterDatasetsDraw(chart) {
-                    const todayIdxChart = chart._todayIdx;
-                    if (todayIdxChart === undefined) return;
-                    const xScale = chart.scales.x;
-                    if (todayIdxChart < Math.floor(xScale.min) || todayIdxChart > Math.ceil(xScale.max)) return;
-                    const x = xScale.getPixelForValue(todayIdxChart);
-                    const { ctx, chartArea } = chart;
-                    ctx.save();
-                    ctx.strokeStyle = 'rgba(114, 47, 55, 0.25)';
-                    ctx.lineWidth = 2;
-                    ctx.setLineDash([4, 4]);
+                    ctx.setLineDash([3, 3]);
                     ctx.beginPath();
                     ctx.moveTo(x, chartArea.top);
                     ctx.lineTo(x, chartArea.bottom);
                     ctx.stroke();
+                    ctx.fillStyle = 'rgba(114, 47, 55, 0.85)';
+                    ctx.font = 'bold italic 11px "Times New Roman", serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('HOY', x, chartArea.top + 12);
                     ctx.restore();
                 }
             };
             
             const zoomEnabled = typeof ChartZoom !== 'undefined';
             
-            let actualMax = 0, actualMin = 0;
-            datasets.forEach(ds => {
-                ds.data.forEach(v => {
-                    if (typeof v === 'number' && isFinite(v)) {
-                        if (v > actualMax) actualMax = v;
-                        if (v < actualMin) actualMin = v;
-                    }
-                });
-            });
-            const initialMaxY = Math.max(actualMax, maxTarget) + 2;
-            const initialMinY = Math.min(actualMin - 2, -2);
+            const finalDatasets = warningDataset ? [...datasets, warningDataset] : datasets;
             
             progressChartInstance = new Chart(ctx, {
                 type: 'line',
-                data: { labels, datasets },
+                data: { labels, datasets: finalDatasets },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: false,
                     interaction: { mode: 'index', intersect: false },
                     scales: {
                         y: {
                             min: initialMinY,
                             max: initialMaxY,
-                            title: { display: true, text: 'Progreso (días de lectura acumulados)', font: { size: 12 } },
-                            grid: { color: 'rgba(150, 150, 150, 0.15)' }
+                            title: { display: true, text: 'Progreso acumulado (+1 por día cumplido, −1 si no lees)', font: { size: 11 } },
+                            grid: { color: 'rgba(150, 150, 150, 0.15)' },
+                            ticks: { precision: 0, stepSize: 1 }
                         },
                         x: {
                             min: 0,
-                            max: Math.min(21, timelineDates.length - 1),
+                            max: Math.min(timelineDates.length - 1, todayIdx + 8),
                             title: { display: true, text: '← Arrastra para ver más días →', font: { size: 12 } },
                             grid: { display: false },
                             ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 12 }
@@ -1121,19 +1187,26 @@
                             labels: { usePointStyle: true, boxWidth: 10, font: { size: 12 } }
                         },
                         tooltip: {
+                            filter: (item) => item.parsed.y !== null && item.parsed.y !== undefined,
                             callbacks: {
                                 title: (items) => {
                                     const idx = items[0].dataIndex;
                                     const p = timelineDates[idx].split('-');
                                     let t = `${p[2]}/${p[1]}/${p[0]}`;
-                                    if (idx === todayIdx) t += ' · Hoy';
+                                    if (idx === todayIdx) t += ' · HOY';
                                     else if (idx > todayIdx) t += ' · Futuro';
-                                    else t += ' · Pasado';
                                     return t;
                                 },
                                 label: (c) => {
                                     const v = c.parsed.y;
+                                    if (v === null || v === undefined) return '';
                                     const idx = c.dataIndex;
+                                    
+                                    if (c.dataset._isWarning) {
+                                        const display = Number.isInteger(v) ? v : v.toFixed(1);
+                                        return `⚠️ Si no lees: ${display > 0 ? '+' : ''}${display}`;
+                                    }
+                                    
                                     const book = c.dataset._book;
                                     const goalSecs = book.dailyMins * 60;
                                     let delta = '';
@@ -1143,6 +1216,8 @@
                                         if (secs > 0) {
                                             const pct = Math.round((secs / goalSecs) * 100);
                                             delta = ` (hoy: ${Math.floor(secs/60)}/${book.dailyMins} min · ${pct}%)`;
+                                        } else {
+                                            delta = ' (aún sin leer hoy)';
                                         }
                                     } else if (idx < todayIdx && book) {
                                         const log = (book.dailyLog || []).find(l => l.date === timelineDates[idx]);
@@ -1151,15 +1226,13 @@
                                             delta = ` (${Math.floor(log.seconds/60)}/${book.dailyMins} min · ${pct}%)`;
                                         } else if (log) {
                                             delta = ' (no leíste)';
+                                        } else {
+                                            delta = ' (no leíste)';
                                         }
                                     }
                                     
-                                    const display = Number.isInteger(v) ? v : v.toFixed(1);
+                                    const display = Number.isInteger(v) ? v : v.toFixed(2);
                                     return `${c.dataset.label}: ${display > 0 ? '+' : ''}${display}${delta}`;
-                                },
-                                afterLabel: (c) => {
-                                    if (c.dataIndex > todayIdx) return '(proyección)';
-                                    return '';
                                 }
                             }
                         },
@@ -1181,22 +1254,11 @@
                         } : {})
                     }
                 },
-                plugins: [zeroLine, targetLine, todayHighlight]
+                plugins: [zeroLine, todayMarker]
             });
-            
-            // Guardar metadatos para el refresh ligero
-            progressChartInstance._maxTargetScore = maxTarget;
-            progressChartInstance._timelineDates = timelineDates;
-            progressChartInstance._todayIdx = todayIdx;
-            
-            updateTodayBadge();
         }
 
         function closeModal(modalId) {
-            if(modalId === 'metricsModal' && metricsRefreshInterval) {
-                clearInterval(metricsRefreshInterval);
-                metricsRefreshInterval = null;
-            }
             if(modalId === 'bookModal' && currentModalBookId) {
                 const book = appData.books.find(b => b.id === currentModalBookId);
                 if(book) { book.notes = document.getElementById('modalNotes').value; saveData(); }
