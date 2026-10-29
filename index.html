@@ -407,7 +407,7 @@
             <button class="modal-close" onclick="closeModal('metricsModal')">&times;</button>
             <h2 style="font-size: 22px; color: var(--primary); margin-bottom: 5px;">Métricas de Progreso</h2>
             <p style="font-size: 14px; color: var(--text-muted); font-style: italic;">
-                Línea <strong>sólida</strong> = tu progreso real. <strong>Punteadas</strong> = futuros posibles. <strong>Línea vertical + fecha</strong> = fin estimado del libro.
+                Línea <strong>sólida</strong> = tu progreso real. Punteadas = futuros posibles. La línea vertical con badge muestra cuándo terminarías.
             </p>
             
             <div id="metricsStatus" class="metrics-status">Cargando…</div>
@@ -444,7 +444,7 @@
                 <button onclick="jumpToFinish()" class="btn-reset-zoom">📅 Ir al final</button>
             </div>
             <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 10px;">
-                *Usa los botones ◀ ▶ o la barra para desplazarte · Rueda del ratón para acercar/alejar.
+                *El eje vertical se ajusta automáticamente al rango visible para que puedas ver cada subida y bajada.
             </p>
         </div>
     </div>
@@ -458,7 +458,7 @@
         let showWarningProjection = localStorage.getItem('showWarningProj') !== 'false';
 
         let chartViewStart = -1;
-        let chartViewSize = 18;
+        let chartViewSize = 12;  // Reducido de 18 → 12 (más ancho por día)
 
         let appData = {
             categories: ['Lecturas Actuales', 'Por Leer'],
@@ -1014,6 +1014,36 @@
         }
 
         // ============================================================
+        // RANGO Y DINÁMICO — solo datos visibles, sin targets
+        // ============================================================
+        function computeYRange(chartData, xMin, xMax) {
+            let minY = Infinity, maxY = -Infinity, hasData = false;
+            chartData.datasets.forEach(ds => {
+                const start = Math.max(0, Math.floor(xMin));
+                const end = Math.min(ds.data.length - 1, Math.ceil(xMax));
+                for (let i = start; i <= end; i++) {
+                    const v = ds.data[i];
+                    if (typeof v === 'number' && isFinite(v)) {
+                        hasData = true;
+                        if (v < minY) minY = v;
+                        if (v > maxY) maxY = v;
+                    }
+                }
+            });
+            if (!hasData) return { min: -3, max: 3 };
+            
+            // Rango mínimo de 3 unidades para que la línea tenga aire
+            const range = Math.max(maxY - minY, 3);
+            const mid = (maxY + minY) / 2;
+            const halfRange = range / 2 + 0.5;
+            
+            return {
+                min: Math.floor(mid - halfRange),
+                max: Math.ceil(mid + halfRange)
+            };
+        }
+
+        // ============================================================
         // NAVEGACIÓN
         // ============================================================
         function scrollChart(delta) {
@@ -1041,8 +1071,17 @@
             const maxStart = Math.max(0, maxIdx - chartViewSize + 1);
             chartViewStart = Math.max(0, Math.min(chartViewStart, maxStart));
             
-            progressChartInstance.options.scales.x.min = chartViewStart;
-            progressChartInstance.options.scales.x.max = Math.min(chartViewStart + chartViewSize - 1, maxIdx);
+            const xMin = chartViewStart;
+            const xMax = Math.min(chartViewStart + chartViewSize - 1, maxIdx);
+            
+            progressChartInstance.options.scales.x.min = xMin;
+            progressChartInstance.options.scales.x.max = xMax;
+            
+            // ← CLAVE: recalcular rango Y según lo visible
+            const yRange = computeYRange(progressChartInstance.data, xMin, xMax);
+            progressChartInstance.options.scales.y.min = yRange.min;
+            progressChartInstance.options.scales.y.max = yRange.max;
+            
             progressChartInstance.update('none');
             updateNavUI();
         }
@@ -1107,10 +1146,8 @@
             document.getElementById('metricsModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
             
-            // PRIMERO: actualizar los textos (no depende del chart)
             updateMetricsStatus();
             
-            // SEGUNDO: renderizar la gráfica (envuelto en try/catch por si algo falla)
             try {
                 renderMetricsChart();
             } catch (err) {
@@ -1119,7 +1156,7 @@
             
             setTimeout(() => {
                 if (progressChartInstance) {
-                    try { progressChartInstance.resize(); } catch(e) { console.error(e); }
+                    try { progressChartInstance.resize(); } catch(e) {}
                 }
                 updateNavUI();
             }, 50);
@@ -1153,7 +1190,6 @@
                 
                 el.innerHTML = `<strong>Hoy:</strong> ${parts.join(' · ')}`;
                 
-                // Info de fecha final
                 const finishRows = activeBooks.map(book => {
                     const stats = calculateStats(book);
                     if (book.currentPage >= book.totalPages) {
@@ -1174,36 +1210,12 @@
             }
         }
 
-        function applyDynamicY(chart) {
-            const xScale = chart.scales.x;
-            if (!xScale) return;
-            const { min, max } = xScale;
-            let minY = Infinity, maxY = -Infinity, hasData = false;
-            chart.data.datasets.forEach(ds => {
-                const start = Math.max(0, Math.floor(min));
-                const end = Math.min(ds.data.length - 1, Math.ceil(max));
-                for (let i = start; i <= end; i++) {
-                    const v = ds.data[i];
-                    if (typeof v === 'number' && isFinite(v)) {
-                        hasData = true;
-                        if (v < minY) minY = v;
-                        if (v > maxY) maxY = v;
-                    }
-                }
-            });
-            if (!hasData) return;
-            const range = Math.max(1, maxY - minY);
-            const pad = Math.max(0.5, range * 0.15);
-            chart.options.scales.y.min = minY - pad;
-            chart.options.scales.y.max = maxY + pad;
-        }
-
         function resetZoom() {
             if (!progressChartInstance) return;
             const todayIdx = progressChartInstance._todayIdx;
             if (todayIdx === undefined) return;
             
-            chartViewSize = 18;
+            chartViewSize = 12;
             chartViewStart = Math.max(0, todayIdx - Math.floor(chartViewSize / 2));
             applyChartView();
         }
@@ -1237,7 +1249,6 @@
             }
             if (activeBooks.length === 0) return;
             
-            // Fecha inicio
             let earliestDateStr = isoToday;
             activeBooks.forEach(book => {
                 const dates = [
@@ -1250,7 +1261,6 @@
                 }
             });
             
-            // Días de fin por libro
             const finishDaysList = activeBooks.map(book => {
                 if (book.dailyMins <= 0) return 0;
                 const remainingMins = Math.max(0, book.totalPages - book.currentPage) * book.minsPerPage;
@@ -1276,9 +1286,13 @@
             
             const todayIdx = timelineDates.indexOf(isoToday);
             
+            const maxIdx = timelineDates.length - 1;
+            const maxStart = Math.max(0, maxIdx - chartViewSize + 1);
+            
             if (chartViewStart < 0) {
                 chartViewStart = Math.max(0, todayIdx - Math.floor(chartViewSize / 2));
             }
+            chartViewStart = Math.max(0, Math.min(chartViewStart, maxStart));
             
             const labels = timelineDates.map(d => {
                 const p = d.split('-');
@@ -1336,9 +1350,9 @@
                 const color = brightColors[index % brightColors.length];
                 
                 const radii = timelineDates.map((_, i) => {
-                    if (i === todayIdx) return goalMetToday ? 11 : (book.dailySeconds > 0 ? 9 : 6);
-                    if (i < todayIdx && i >= startIdx) return 5;
-                    if (i === startIdx - 1) return 4;
+                    if (i === todayIdx) return goalMetToday ? 11 : (book.dailySeconds > 0 ? 9 : 7);
+                    if (i < todayIdx && i >= startIdx) return 6;
+                    if (i === startIdx - 1) return 5;
                     return 0;
                 });
                 
@@ -1414,7 +1428,6 @@
                 }
             });
             
-            // Marcas de fin (se pasan por opciones al plugin, NO como datasets)
             const finishes = [];
             bookMetadata.forEach((meta, i) => {
                 if (meta.book.currentPage >= meta.book.totalPages) return;
@@ -1433,29 +1446,10 @@
             
             const datasets = [...baseDatasets, ...projectionDatasets];
             
-            // Rango Y — incluir targets
-            let actualMax = 0, actualMin = 0, hasData = false;
-            datasets.forEach(ds => {
-                ds.data.forEach(v => {
-                    if (typeof v === 'number' && isFinite(v)) {
-                        hasData = true;
-                        if (v > actualMax) actualMax = v;
-                        if (v < actualMin) actualMin = v;
-                    }
-                });
-            });
-            bookTargets.forEach(t => { if (t > actualMax) actualMax = t; });
-            
-            let finalMin = actualMin;
-            let finalMax = actualMax;
-            if (finalMax - finalMin < 3) {
-                const mid = (finalMax + finalMin) / 2;
-                finalMin = mid - 1.5;
-                finalMax = mid + 1.5;
-            }
-            const pad = Math.max(1, (finalMax - finalMin) * 0.15);
-            const initialMinY = Math.floor(finalMin - pad);
-            const initialMaxY = Math.ceil(finalMax + pad);
+            // ← CLAVE: rango Y solo de los datos visibles, NO de bookTargets
+            const xMinInitial = chartViewStart;
+            const xMaxInitial = Math.min(chartViewStart + chartViewSize - 1, maxIdx);
+            const initialYRange = computeYRange({ datasets }, xMinInitial, xMaxInitial);
             
             const zeroLine = {
                 id: 'zeroLine',
@@ -1499,7 +1493,6 @@
                 }
             };
             
-            // Plugin lee las finishes desde chart.options.plugins.finishMarkers.finishes
             const finishMarkers = {
                 id: 'finishMarkers',
                 afterDatasetsDraw(chart) {
@@ -1511,7 +1504,6 @@
                     
                     ctx.save();
                     
-                    // Horizontales (targets)
                     finList.forEach(f => {
                         const y = scales.y.getPixelForValue(f.target);
                         if (y < chartArea.top + 2 || y > chartArea.bottom - 2) return;
@@ -1525,7 +1517,6 @@
                         ctx.stroke();
                     });
                     
-                    // Verticales con badge
                     finList.forEach((f, i) => {
                         const x = scales.x.getPixelForValue(f.idx);
                         if (x < chartArea.left || x > chartArea.right) return;
@@ -1578,9 +1569,6 @@
             
             const zoomEnabled = typeof ChartZoom !== 'undefined';
             
-            const xMinInitial = chartViewStart;
-            const xMaxInitial = Math.min(chartViewStart + chartViewSize - 1, timelineDates.length - 1);
-            
             progressChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: { labels, datasets },
@@ -1591,8 +1579,8 @@
                     interaction: { mode: 'index', intersect: false },
                     scales: {
                         y: {
-                            min: initialMinY,
-                            max: initialMaxY,
+                            min: initialYRange.min,
+                            max: initialYRange.max,
                             title: { display: true, text: 'Progreso (+1 día cumplido, −1 si no lees)', font: { size: 11 } },
                             grid: { color: 'rgba(150, 150, 150, 0.15)' },
                             ticks: { precision: 0, stepSize: 1 }
@@ -1610,9 +1598,7 @@
                             labels: { usePointStyle: true, boxWidth: 10, font: { size: 11 } }
                         },
                         tooltip: {
-                            filter: (item) => {
-                                return item.parsed.y !== null && item.parsed.y !== undefined;
-                            },
+                            filter: (item) => item.parsed.y !== null && item.parsed.y !== undefined,
                             callbacks: {
                                 title: (items) => {
                                     const idx = items[0].dataIndex;
@@ -1628,7 +1614,6 @@
                                     const idx = c.dataIndex;
                                     const book = c.dataset._book;
                                     
-                                    // Detectar si es proyección/warning por el sufijo del label
                                     const labelStr = c.dataset.label || '';
                                     const isProjection = labelStr.endsWith('📈');
                                     const isWarning = labelStr.endsWith('📉');
@@ -1642,7 +1627,7 @@
                                         return `📉 Si no lees: ${display > 0 ? '+' : ''}${display}`;
                                     }
                                     
-                                    const goalSecs = (book.dailyMins || 1) * 60;
+                                    const goalSecs = (book && book.dailyMins ? book.dailyMins : 1) * 60;
                                     let delta = '';
                                     
                                     if (idx === todayIdx && book) {
@@ -1679,7 +1664,10 @@
                                     onZoom: ({ chart }) => {
                                         chartViewStart = Math.round(chart.scales.x.min);
                                         chartViewSize = Math.round(chart.scales.x.max - chart.scales.x.min) + 1;
-                                        applyDynamicY(chart);
+                                        // Recalcular rango Y
+                                        const yRange = computeYRange(chart.data, chart.scales.x.min, chart.scales.x.max);
+                                        chart.options.scales.y.min = yRange.min;
+                                        chart.options.scales.y.max = yRange.max;
                                         updateNavUI();
                                     }
                                 },
@@ -1691,12 +1679,10 @@
                 plugins: [zeroLine, todayMarker, finishMarkers]
             });
             
-            // Datos extra para navegación
             progressChartInstance._timelineDates = timelineDates;
             progressChartInstance._todayIdx = todayIdx;
             progressChartInstance._bookFinishes = finishes;
             
-            // Asignar _book a cada dataset (para tooltips)
             baseDatasets.forEach((ds, i) => {
                 progressChartInstance.data.datasets[i]._book = activeBooks[i];
             });
