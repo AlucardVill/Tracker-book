@@ -34,7 +34,26 @@
 
         header { text-align: center; padding: 25px 0 15px 0; border-bottom: 2px solid var(--primary); margin-bottom: 20px; }
         h1 { color: var(--primary); font-size: 30px; margin-bottom: 5px; font-weight: normal; letter-spacing: 1px; }
-        header p { color: var(--text-muted); font-size: 15px; font-style: italic; margin-bottom: 15px; }
+        header p { color: var(--text-muted); font-size: 15px; font-style: italic; margin-bottom: 10px; }
+
+        .daily-summary {
+            display: inline-flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 4px 14px;
+            margin-top: 4px;
+            padding: 6px 14px;
+            background: #faf6ef;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 12.5px;
+            color: var(--text-main);
+            font-style: normal;
+        }
+        .summary-item { white-space: nowrap; }
+        .summary-item strong { color: var(--primary); font-weight: bold; }
+        .summary-item.done strong { color: var(--success); }
 
         .btn-schedule {
             background: var(--text-main); color: white; border: 1px solid var(--text-main); padding: 12px 20px; border-radius: 4px;
@@ -64,18 +83,58 @@
         .hour-btn.unselected { background: var(--bg-color); color: var(--text-muted); border: 1px solid var(--border-color); }
         .hour-btn.unselected:hover { border-color: var(--primary); color: var(--primary); }
 
+        .export-import-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 18px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border-color);
+        }
+        .export-import-row button {
+            flex: 1;
+            padding: 10px 12px;
+            font-family: var(--font-family);
+            font-size: 13px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-main);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+            touch-action: manipulation;
+        }
+        .export-import-row button:hover { border-color: var(--primary); color: var(--primary); }
+        .export-import-row button:active { transform: scale(0.97); }
+        .export-import-hint {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-style: italic;
+            text-align: center;
+            margin-top: 8px;
+        }
+
         .tabs-container { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; margin-bottom: 15px; scrollbar-width: none; }
         .tabs-container::-webkit-scrollbar { display: none; }
 
         .tab-btn {
             background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted);
             padding: 8px 16px; border-radius: 4px; font-size: 15px; cursor: pointer; font-family: var(--font-family);
-            white-space: nowrap; transition: all 0.2s; display: flex; align-items: center; gap: 8px;
+            white-space: nowrap; transition: transform 0.15s, box-shadow 0.15s, background 0.2s, color 0.2s, border-color 0.2s;
+            display: flex; align-items: center; gap: 8px;
             user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
             touch-action: manipulation;
+            position: relative;
         }
         .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
         .tab-btn-new { background: #eae5dc; border: 1px dashed var(--border-color); color: var(--text-main); }
+        .tab-btn.dragging {
+            opacity: 0.7;
+            transform: scale(1.08);
+            box-shadow: 0 6px 16px rgba(114, 47, 55, 0.45);
+            cursor: grabbing;
+            z-index: 100;
+            border-color: var(--primary);
+        }
         .tab-btn.long-pressing {
             animation: longPressPulse 0.6s ease-out;
         }
@@ -88,6 +147,48 @@
             width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;
             font-size: 12px; cursor: pointer;
         }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 12px;
+        }
+        .search-container input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: var(--font-family);
+            background: #faf9f7;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .search-container input:focus { border-color: var(--primary); background: white; }
+        .search-container::before {
+            content: '🔍';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        .search-clear {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 4px 8px;
+            display: none;
+        }
+        .search-clear.visible { display: block; }
+        .search-clear:hover { color: var(--primary); }
 
         .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 20px; margin-bottom: 20px; box-shadow: 2px 2px 8px rgba(0,0,0,0.04); }
         .card.inactive { opacity: 0.7; background: #faf9f7; }
@@ -108,7 +209,7 @@
         .form-group.full { grid-column: 1 / -1; }
 
         label { display: block; font-size: 12px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 5px; }
-        input[type="text"], input[type="number"], textarea { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 15px; outline: none; transition: border-color 0.2s; background: #faf9f7; font-family: var(--font-family); }
+        input[type="text"], input[type="number"], input[type="search"], textarea { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 15px; outline: none; transition: border-color 0.2s; background: #faf9f7; font-family: var(--font-family); }
         input:focus, textarea:focus { border-color: var(--primary); background: white; }
 
         .btn-submit { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 5px; font-family: var(--font-family); }
@@ -161,349 +262,113 @@
         .btn-reset-zoom { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 16px; border-radius: 4px; font-size: 13px; cursor: pointer; font-family: var(--font-family); transition: all 0.2s; }
         .btn-reset-zoom:hover { border-color: var(--primary); color: var(--primary); }
 
-        .metrics-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            margin-top: 10px;
-        }
-        .metrics-status {
-            flex: 1;
-            min-width: 0;
-            font-size: 13px;
-            color: var(--text-main);
-            padding: 10px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            line-height: 1.8;
-            text-align: left;
-        }
-        .hoy-title {
-            color: var(--text-muted);
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: block;
-            margin-bottom: 4px;
-        }
-        .book-row {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 3px 0;
-            font-size: 13px;
-            font-weight: normal;
-            text-transform: none;
-            letter-spacing: 0;
-            margin: 0;
-            color: var(--text-main);
-        }
-        .book-row input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            accent-color: var(--primary);
-            margin: 0;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-        .book-row.hidden-metric .legend-dot,
-        .book-row.hidden-metric .book-score {
-            opacity: 0.4;
-        }
-        .legend-dot {
-            display: inline-block;
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            border: 1px solid rgba(0,0,0,0.15);
-        }
-        .book-score {
-            min-width: 0;
-            transition: opacity 0.2s;
-        }
-
-        .hoy-pagination {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid var(--border-color);
-        }
-        .hoy-pagination button {
-            min-width: 34px;
-            height: 32px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-color);
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-family: var(--font-family);
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            touch-action: manipulation;
-            transition: all 0.15s;
-        }
-        .hoy-pagination button:active:not(:disabled) {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-        .hoy-pagination button:disabled {
-            opacity: 0.35;
-            cursor: not-allowed;
-        }
-        .hoy-pagination span {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-style: italic;
-            min-width: 42px;
-            text-align: center;
-        }
-
-        .proj-buttons {
-            display: flex;
-            gap: 6px;
-            flex-shrink: 0;
-        }
-        .proj-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 1.5px solid var(--border-color);
-            background: var(--bg-color);
-            cursor: pointer;
-            font-size: 18px;
-            line-height: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            opacity: 0.35;
-            transition: all 0.2s;
-            touch-action: manipulation;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        .proj-btn.active { opacity: 1; }
-        .proj-btn.positive.active {
-            background: #e8f5ec;
-            border-color: var(--success);
-        }
-        .proj-btn.warning.active {
-            background: #f0f0f0;
-            border-color: #888;
-        }
-        .proj-btn:active { transform: scale(0.92); }
-        .proj-btn-caption {
-            font-size: 9px;
-            color: var(--text-muted);
-            text-align: center;
-            margin-top: 2px;
-            font-style: italic;
-        }
-
+        .metrics-header { display: flex; align-items: flex-start; gap: 8px; margin-top: 10px; }
+        .metrics-status { flex: 1; min-width: 0; font-size: 13px; color: var(--text-main); padding: 10px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; line-height: 1.8; text-align: left; }
+        .hoy-title { color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px; }
+        
         /* ============================================================ */
-        /* FECHAS FINALES — Tarjetas claras con dot de color            */
+        /* BÚSQUEDA DENTRO DEL RECUADRO HOY                              */
         /* ============================================================ */
-        .metrics-finish-info {
-            font-size: 12px;
-            color: var(--text-main);
-            margin-top: 6px;
-            padding: 10px 12px;
-            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
-            border: 1px solid #b7e4c7;
-            border-radius: 4px;
-            line-height: 1.5;
-        }
-        .finish-header {
-            color: var(--success);
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: block;
+        .hoy-search-container {
+            position: relative;
             margin-bottom: 6px;
-            font-weight: bold;
+            margin-top: 2px;
         }
-        .finish-date-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 5px 0;
-            font-size: 13px;
-            border-top: 1px solid rgba(183, 228, 199, 0.5);
+        .hoy-search-container input {
+            width: 100%;
+            padding: 6px 26px 6px 24px;
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            font-size: 12px;
+            font-family: var(--font-family);
+            background: var(--bg-color);
+            outline: none;
+            transition: all 0.2s;
+            line-height: 1.4;
         }
+        .hoy-search-container input:focus {
+            border-color: var(--primary);
+            background: white;
+        }
+        .hoy-search-container input::placeholder {
+            color: var(--text-muted);
+            font-style: italic;
+            opacity: 0.7;
+        }
+        .hoy-search-container::before {
+            content: '🔍';
+            position: absolute;
+            left: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            pointer-events: none;
+            opacity: 0.55;
+        }
+        .hoy-search-clear {
+            position: absolute;
+            right: 2px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 2px 6px;
+            display: none;
+            line-height: 1;
+        }
+        .hoy-search-clear.visible { display: block; }
+        .hoy-search-clear:hover, .hoy-search-clear:active { color: var(--primary); }
+
+        .book-row { display: flex; align-items: center; gap: 6px; padding: 3px 0; font-size: 13px; font-weight: normal; text-transform: none; letter-spacing: 0; margin: 0; color: var(--text-main); }
+        .book-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--primary); margin: 0; cursor: pointer; flex-shrink: 0; }
+        .book-row.hidden-metric .legend-dot, .book-row.hidden-metric .book-score { opacity: 0.4; }
+        .legend-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.15); }
+        .book-score { min-width: 0; transition: opacity 0.2s; }
+
+        .hoy-pagination { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color); }
+        .hoy-pagination button { min-width: 34px; height: 32px; border: 1px solid var(--border-color); background: var(--bg-color); border-radius: 4px; cursor: pointer; font-size: 14px; font-family: var(--font-family); color: var(--text-main); display: flex; align-items: center; justify-content: center; padding: 0; touch-action: manipulation; transition: all 0.15s; }
+        .hoy-pagination button:active:not(:disabled) { background: var(--primary); color: white; border-color: var(--primary); }
+        .hoy-pagination button:disabled { opacity: 0.35; cursor: not-allowed; }
+        .hoy-pagination span { font-size: 12px; color: var(--text-muted); font-style: italic; min-width: 42px; text-align: center; }
+
+        .proj-buttons { display: flex; gap: 6px; flex-shrink: 0; }
+        .proj-btn { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--border-color); background: var(--bg-color); cursor: pointer; font-size: 18px; line-height: 1; display: flex; align-items: center; justify-content: center; padding: 0; opacity: 0.35; transition: all 0.2s; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+        .proj-btn.active { opacity: 1; }
+        .proj-btn.positive.active { background: #e8f5ec; border-color: var(--success); }
+        .proj-btn.warning.active { background: #f0f0f0; border-color: #888; }
+        .proj-btn:active { transform: scale(0.92); }
+        .proj-btn-caption { font-size: 9px; color: var(--text-muted); text-align: center; margin-top: 2px; font-style: italic; }
+
+        .metrics-finish-info { font-size: 12px; color: var(--text-main); margin-top: 6px; padding: 10px 12px; background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border: 1px solid #b7e4c7; border-radius: 4px; line-height: 1.5; }
+        .finish-header { color: var(--success); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; font-weight: bold; }
+        .finish-date-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 13px; border-top: 1px solid rgba(183, 228, 199, 0.5); }
         .finish-date-item:first-child { border-top: none; padding-top: 0; }
         .finish-date-item:last-child { padding-bottom: 0; }
-        .finish-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            border: 1px solid rgba(0,0,0,0.15);
-        }
-        .finish-book-name {
-            flex: 1;
-            min-width: 0;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            font-weight: bold;
-            color: var(--text-main);
-        }
-        .finish-date-text {
-            font-weight: bold;
-            color: var(--success);
-            white-space: nowrap;
-            font-size: 13px;
-        }
-        .finish-days {
-            color: var(--text-muted);
-            font-style: italic;
-            font-size: 12px;
-            white-space: nowrap;
-        }
+        .finish-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.15); }
+        .finish-book-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: bold; color: var(--text-main); }
+        .finish-date-text { font-weight: bold; color: var(--success); white-space: nowrap; font-size: 13px; }
+        .finish-days { color: var(--text-muted); font-style: italic; font-size: 12px; white-space: nowrap; }
 
-        .chart-empty-message {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: var(--text-muted);
-            font-style: italic;
-            font-size: 14px;
-            text-align: center;
-            padding: 0 20px;
-            pointer-events: none;
-            z-index: 2;
-        }
+        .chart-empty-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--text-muted); font-style: italic; font-size: 14px; text-align: center; padding: 0 20px; pointer-events: none; z-index: 2; }
 
-        .chart-nav {
-            display: grid;
-            grid-template-columns: 44px 44px 1fr 44px 44px;
-            gap: 6px;
-            align-items: center;
-            margin-top: 15px;
-            padding: 10px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-        }
-        .chart-nav button {
-            min-width: 44px;
-            min-height: 44px;
-            padding: 0;
-            font-size: 16px;
-            font-family: var(--font-family);
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            cursor: pointer;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.15s;
-            touch-action: manipulation;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        .chart-nav button:active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-            transform: scale(0.95);
-        }
-        .chart-nav button:disabled {
-            opacity: 0.35;
-            cursor: not-allowed;
-        }
-        .chart-nav-center {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            min-width: 0;
-        }
-        .chart-range-text {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-style: italic;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-        }
-        .chart-slider {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 100%;
-            height: 24px;
-            background: transparent;
-            cursor: pointer;
-            margin: 0;
-        }
-        .chart-slider::-webkit-slider-runnable-track {
-            height: 6px;
-            background: var(--border-color);
-            border-radius: 3px;
-        }
-        .chart-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 24px;
-            height: 24px;
-            background: var(--primary);
-            border-radius: 50%;
-            margin-top: -9px;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            border: 2px solid white;
-        }
-        .chart-slider::-moz-range-track {
-            height: 6px;
-            background: var(--border-color);
-            border-radius: 3px;
-        }
-        .chart-slider::-moz-range-thumb {
-            width: 24px;
-            height: 24px;
-            background: var(--primary);
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        .chart-slider:disabled {
-            opacity: 0.35;
-            cursor: not-allowed;
-        }
+        .chart-nav { display: grid; grid-template-columns: 44px 44px 1fr 44px 44px; gap: 6px; align-items: center; margin-top: 15px; padding: 10px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; }
+        .chart-nav button { min-width: 44px; min-height: 44px; padding: 0; font-size: 16px; font-family: var(--font-family); background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer; color: var(--text-main); display: flex; align-items: center; justify-content: center; transition: all 0.15s; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+        .chart-nav button:active { background: var(--primary); color: white; border-color: var(--primary); transform: scale(0.95); }
+        .chart-nav button:disabled { opacity: 0.35; cursor: not-allowed; }
+        .chart-nav-center { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+        .chart-range-text { font-size: 11px; color: var(--text-muted); font-style: italic; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        .chart-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 24px; background: transparent; cursor: pointer; margin: 0; }
+        .chart-slider::-webkit-slider-runnable-track { height: 6px; background: var(--border-color); border-radius: 3px; }
+        .chart-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; background: var(--primary); border-radius: 50%; margin-top: -9px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); border: 2px solid white; }
+        .chart-slider::-moz-range-track { height: 6px; background: var(--border-color); border-radius: 3px; }
+        .chart-slider::-moz-range-thumb { width: 24px; height: 24px; background: var(--primary); border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .chart-slider:disabled { opacity: 0.35; cursor: not-allowed; }
 
-        .btn-footer-row {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            margin-top: 12px;
-            flex-wrap: wrap;
-        }
-        .btn-footer-row button {
-            flex: 1;
-            min-width: 140px;
-            padding: 10px 14px;
-            font-size: 13px;
-            font-family: var(--font-family);
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.15s;
-            touch-action: manipulation;
-        }
+        .btn-footer-row { display: flex; gap: 8px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+        .btn-footer-row button { flex: 1; min-width: 140px; padding: 10px 14px; font-size: 13px; font-family: var(--font-family); border-radius: 4px; cursor: pointer; transition: all 0.15s; touch-action: manipulation; }
     </style>
 </head>
 <body>
@@ -512,21 +377,34 @@
         <header>
             <h1>Registro de Lectura</h1>
             <p>Planificación y seguimiento académico</p>
+            <div id="dailySummary" class="daily-summary" style="display: none;"></div>
         </header>
 
         <button onclick="generateSchedule()" class="btn-schedule">📅 Generar Horario de Hoy</button>
         <button onclick="openMetricsModal()" class="btn-metrics">📈 Gráfica de Rendimiento</button>
 
         <button onclick="toggleHoursPanel()" class="hours-dropdown-btn">
-            <span>⏱️ Configurar Horas Disponibles</span>
+            <span>⚙️ Configuración</span>
             <span id="hoursToggleIcon">▼</span>
         </button>
         <div id="hoursPanel" class="hours-panel">
             <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px; font-style: italic;">Marca las horas del día en las que sueles estar disponible para leer. El horario inteligente se ajustará automáticamente a estos bloques.</p>
             <div id="hoursGrid" class="hours-grid"></div>
+            
+            <div class="export-import-row">
+                <button onclick="exportData()" title="Descargar copia de seguridad">💾 Exportar</button>
+                <button onclick="importData()" title="Restaurar desde archivo">📁 Importar</button>
+                <input type="file" id="importFile" accept=".json,application/json" style="display: none" onchange="handleImportFile(event)">
+            </div>
+            <div class="export-import-hint">Guarda tus datos antes de limpiar el navegador</div>
         </div>
 
         <div class="tabs-container" id="tabsContainer"></div>
+
+        <div class="search-container">
+            <input type="search" id="bookSearch" placeholder="Buscar título..." oninput="onSearchInput()">
+            <button class="search-clear" id="searchClear" onclick="clearSearch()" aria-label="Limpiar búsqueda">×</button>
+        </div>
 
         <div class="card">
             <h2 class="card-title" style="color: var(--text-main); cursor: default; margin-bottom: 15px; font-size: 18px;">Agregar nuevo texto</h2>
@@ -594,7 +472,15 @@
             </p>
 
             <div class="metrics-header">
-                <div id="metricsStatus" class="metrics-status">Cargando…</div>
+                <div id="metricsStatus" class="metrics-status">
+                    <div class="hoy-search-container">
+                        <input type="search" id="hoySearch" placeholder="Buscar libro..." oninput="onHoySearchInput()" autocomplete="off">
+                        <button type="button" class="hoy-search-clear" id="hoySearchClear" onclick="clearHoySearch()" aria-label="Limpiar búsqueda">×</button>
+                    </div>
+                    <strong class="hoy-title">Hoy</strong>
+                    <div id="hoyBooksList"><em style="color: var(--text-muted); font-size: 12px;">Cargando…</em></div>
+                    <div id="hoyPagination"></div>
+                </div>
                 <div class="proj-buttons">
                     <div>
                         <button id="btnPosProj" class="proj-btn positive active" onclick="toggleProjBtn('positive')" title="Proyección si cumples (+1/día)">📈</button>
@@ -652,6 +538,9 @@
 
         let hoyPageIndex = 0;
         const HOY_PAGE_SIZE = 4;
+        
+        // NUEVO: búsqueda dentro del recuadro "Hoy"
+        let hoySearchTerm = '';
 
         let appData = {
             categories: ['Lecturas Actuales', 'Por Leer'],
@@ -727,6 +616,143 @@
 
         let currentModalBookId = null;
 
+        function updateDailySummary() {
+            const el = document.getElementById('dailySummary');
+            if (!el) return;
+            
+            const activeBooks = appData.books.filter(b => b.active);
+            
+            if (activeBooks.length === 0) {
+                el.style.display = 'none';
+                return;
+            }
+            
+            let totalSecs = 0;
+            let metCount = 0;
+            activeBooks.forEach(b => {
+                const secs = b.dailySeconds || 0;
+                totalSecs += secs;
+                if (secs >= b.dailyMins * 60) metCount++;
+            });
+            
+            const totalMins = Math.floor(totalSecs / 60);
+            const allMet = metCount === activeBooks.length;
+            
+            el.style.display = 'inline-flex';
+            el.innerHTML = `
+                <span class="summary-item">⏱️ <strong>${totalMins}</strong> min hoy</span>
+                <span class="summary-item ${allMet ? 'done' : ''}">🏆 <strong>${metCount}</strong>/${activeBooks.length} cumplidos</span>
+            `;
+        }
+
+        function onSearchInput() {
+            const clearBtn = document.getElementById('searchClear');
+            const val = document.getElementById('bookSearch').value;
+            if (clearBtn) clearBtn.classList.toggle('visible', val.length > 0);
+            renderBooks();
+        }
+
+        function clearSearch() {
+            document.getElementById('bookSearch').value = '';
+            document.getElementById('searchClear').classList.remove('visible');
+            renderBooks();
+        }
+
+        // ============================================================
+        // BÚSQUEDA DENTRO DEL RECUADRO "HOY"
+        // ============================================================
+        function onHoySearchInput() {
+            const input = document.getElementById('hoySearch');
+            const clearBtn = document.getElementById('hoySearchClear');
+            hoySearchTerm = (input.value || '').trim().toLowerCase();
+            if (clearBtn) clearBtn.classList.toggle('visible', hoySearchTerm.length > 0);
+            hoyPageIndex = 0;
+            updateMetricsStatus();
+        }
+
+        function clearHoySearch() {
+            const input = document.getElementById('hoySearch');
+            const clearBtn = document.getElementById('hoySearchClear');
+            if (input) input.value = '';
+            hoySearchTerm = '';
+            if (clearBtn) clearBtn.classList.remove('visible');
+            hoyPageIndex = 0;
+            updateMetricsStatus();
+        }
+
+        function exportData() {
+            try {
+                const dataStr = JSON.stringify(appData, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `reading-tracker-${getLocalISO()}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (err) {
+                alert('Error al exportar: ' + err.message);
+            }
+        }
+
+        function importData() {
+            document.getElementById('importFile').click();
+        }
+
+        function handleImportFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    
+                    if (!imported || typeof imported !== 'object') {
+                        throw new Error('El archivo no es un JSON válido');
+                    }
+                    if (!Array.isArray(imported.books)) {
+                        throw new Error('Falta el campo "books"');
+                    }
+                    if (!Array.isArray(imported.categories)) {
+                        throw new Error('Falta el campo "categories"');
+                    }
+                    
+                    const msg = `¿Importar ${imported.books.length} libro(s) y ${imported.categories.length} categoría(s)?\n\n⚠️ Esto REEMPLAZARÁ todos tus datos actuales.`;
+                    if (!confirm(msg)) {
+                        event.target.value = '';
+                        return;
+                    }
+                    
+                    imported.books.forEach(b => {
+                        if (b.metricVisible === undefined) b.metricVisible = true;
+                        if (b.dailyLog === undefined) b.dailyLog = [];
+                        if (b.dailySeconds === undefined) b.dailySeconds = 0;
+                        if (b.priority === undefined) b.priority = 50;
+                        if (b.active === undefined) b.active = true;
+                        if (b.notes === undefined) b.notes = "";
+                        if (b.checklists === undefined) b.checklists = [];
+                        if (b.history === undefined) b.history = [{ date: isoToday, page: b.currentPage || 0 }];
+                    });
+                    if (!imported.availableHours) imported.availableHours = [];
+                    if (!imported.categories.includes(imported.activeCategory) && imported.categories.length > 0) {
+                        imported.activeCategory = imported.categories[0];
+                    }
+                    imported.lastDate = currentDateStr;
+                    
+                    appData = imported;
+                    saveData();
+                    location.reload();
+                } catch (err) {
+                    alert('Error al importar: ' + err.message);
+                }
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
         function formatTime(minutes) {
             const h = Math.floor(minutes / 60);
             const m = Math.round(minutes % 60);
@@ -751,7 +777,6 @@
 
         function saveData() { localStorage.setItem('readingTrackerData', JSON.stringify(appData)); }
 
-        // Mapa de colores estable por libro (basado en todos los activos)
         function getBookColorMap() {
             const map = {};
             const allActive = appData.books.filter(b => b.active);
@@ -780,7 +805,6 @@
             book.metricVisible = checkboxEl.checked;
             saveData();
             
-            // Actualizar clase de la fila al instante
             const row = checkboxEl.closest('.book-row');
             if (row) {
                 row.classList.toggle('hidden-metric', !book.metricVisible);
@@ -792,7 +816,11 @@
 
         function changeHoyPage(delta) {
             const allActiveBooks = appData.books.filter(b => b.active);
-            const totalPages = Math.max(1, Math.ceil(allActiveBooks.length / HOY_PAGE_SIZE));
+            let filtered = allActiveBooks;
+            if (hoySearchTerm) {
+                filtered = allActiveBooks.filter(b => b.title.toLowerCase().includes(hoySearchTerm));
+            }
+            const totalPages = Math.max(1, Math.ceil(filtered.length / HOY_PAGE_SIZE));
             hoyPageIndex = Math.max(0, Math.min(hoyPageIndex + delta, totalPages - 1));
             updateMetricsStatus();
         }
@@ -830,15 +858,11 @@
             }
         }
 
-        // ============================================================
-        // RENOMBRAR CATEGORÍA (vía long-press)
-        // ============================================================
         function renameCategory(oldName) {
             const newName = prompt('Nuevo nombre para la categoría:', oldName);
-            if (newName === null) return;  // cancelado
+            if (newName === null) return;
             const trimmed = newName.trim();
-            if (!trimmed) return;          // vacío
-            if (trimmed === oldName) return;  // sin cambios
+            if (!trimmed || trimmed === oldName) return;
             if (appData.categories.includes(trimmed)) {
                 alert('Ya existe una categoría con ese nombre.');
                 return;
@@ -856,33 +880,121 @@
             saveData(); renderTabs(); renderBooks();
         }
 
-        // Long-press → renombrar. Tap corto → seleccionar (comportamiento normal)
-        function attachTabLongPress(el, cat) {
+        function attachTabPointer(el, cat) {
             let pressTimer = null;
+            let startX = 0, startY = 0;
+            let downTime = 0;
+            let isDragging = false;
+            let hasMoved = false;
+            let currentPointerId = null;
             
-            const startPress = (e) => {
+            const onDown = (e) => {
                 if (e.target.classList && e.target.classList.contains('tab-delete')) return;
+                
+                startX = e.clientX;
+                startY = e.clientY;
+                downTime = Date.now();
+                isDragging = false;
+                hasMoved = false;
+                currentPointerId = e.pointerId;
+                
                 el.classList.add('long-pressing');
+                
                 pressTimer = setTimeout(() => {
                     pressTimer = null;
+                    isDragging = true;
                     el.classList.remove('long-pressing');
+                    el.classList.add('dragging');
+                    
                     if (navigator.vibrate) { try { navigator.vibrate(30); } catch(err) {} }
-                    renameCategory(cat);
+                    if (currentPointerId !== null) {
+                        try { el.setPointerCapture(currentPointerId); } catch(err) {}
+                    }
                 }, 600);
             };
             
-            const cancelPress = () => {
-                if (pressTimer) {
-                    clearTimeout(pressTimer);
-                    pressTimer = null;
+            const onMove = (e) => {
+                if (!isDragging) {
+                    const dx = Math.abs(e.clientX - startX);
+                    const dy = Math.abs(e.clientY - startY);
+                    if (dx > 8 || dy > 8) {
+                        if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+                        el.classList.remove('long-pressing');
+                    }
+                    return;
                 }
-                el.classList.remove('long-pressing');
+                
+                hasMoved = true;
+                e.preventDefault();
+                
+                const point = document.elementFromPoint(e.clientX, e.clientY);
+                if (!point) return;
+                const targetTab = point.closest('.tab-btn');
+                if (!targetTab || targetTab === el) return;
+                if (targetTab.classList.contains('tab-btn-new')) return;
+                
+                const fromCat = el.dataset.cat;
+                const toCat = targetTab.dataset.cat;
+                if (!fromCat || !toCat) return;
+                
+                const fromIdx = appData.categories.indexOf(fromCat);
+                const toIdx = appData.categories.indexOf(toCat);
+                if (fromIdx < 0 || toIdx < 0 || fromIdx === toIdx) return;
+                
+                const [moved] = appData.categories.splice(fromIdx, 1);
+                appData.categories.splice(toIdx, 0, moved);
+                saveData();
+                renderTabs();
             };
             
-            el.addEventListener('pointerdown', startPress);
-            el.addEventListener('pointerup', cancelPress);
-            el.addEventListener('pointerleave', cancelPress);
-            el.addEventListener('pointercancel', cancelPress);
+            const onUp = (e) => {
+                if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+                el.classList.remove('long-pressing');
+                el.classList.remove('dragging');
+                
+                const elapsed = Date.now() - downTime;
+                
+                if (isDragging) {
+                    if (!hasMoved) {
+                        renameCategory(cat);
+                    }
+                    isDragging = false;
+                    hasMoved = false;
+                    currentPointerId = null;
+                    return;
+                }
+                
+                currentPointerId = null;
+                
+                if (elapsed < 600 && appData.categories.includes(cat)) {
+                    appData.activeCategory = cat;
+                    const searchEl = document.getElementById('bookSearch');
+                    if (searchEl) searchEl.value = '';
+                    const clearBtn = document.getElementById('searchClear');
+                    if (clearBtn) clearBtn.classList.remove('visible');
+                    
+                    saveData();
+                    renderTabs();
+                    renderBooks();
+                }
+            };
+            
+            const onCancel = () => {
+                if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+                el.classList.remove('long-pressing');
+                el.classList.remove('dragging');
+                isDragging = false;
+                hasMoved = false;
+                currentPointerId = null;
+            };
+            
+            el.addEventListener('pointerdown', onDown);
+            el.addEventListener('pointermove', onMove);
+            el.addEventListener('pointerup', onUp);
+            el.addEventListener('pointercancel', onCancel);
+            el.addEventListener('pointerleave', (e) => {
+                if (!isDragging) onCancel();
+            });
             el.addEventListener('contextmenu', (e) => e.preventDefault());
         }
 
@@ -894,6 +1006,7 @@
                 const btn = document.createElement('button');
                 const isActive = cat === appData.activeCategory;
                 btn.className = isActive ? 'tab-btn active' : 'tab-btn';
+                btn.dataset.cat = cat;
                 const tabText = `${cat} (${activeCount})`;
                 
                 if(isActive) {
@@ -901,16 +1014,8 @@
                 } else {
                     btn.innerText = tabText;
                 }
-                btn.onclick = (e) => {
-                    if(e.target.classList.contains('tab-delete')) return;
-                    if (!appData.categories.includes(cat)) return;  // renombrada o borrada
-                    appData.activeCategory = cat;
-                    saveData(); renderTabs(); renderBooks();
-                };
                 
-                // Long-press para renombrar
-                attachTabLongPress(btn, cat);
-                
+                attachTabPointer(btn, cat);
                 tabsContainer.appendChild(btn);
             });
             const addBtn = document.createElement('button');
@@ -941,10 +1046,25 @@
         function renderBooks() {
             const booksList = document.getElementById('booksList');
             booksList.innerHTML = '';
-            const filteredBooks = appData.books.filter(b => b.category === appData.activeCategory);
+            
+            const searchEl = document.getElementById('bookSearch');
+            const searchTerm = (searchEl ? searchEl.value : '').trim().toLowerCase();
+            
+            let filteredBooks = appData.books.filter(b => b.category === appData.activeCategory);
+            
+            if (searchTerm) {
+                filteredBooks = filteredBooks.filter(b => 
+                    b.title.toLowerCase().includes(searchTerm)
+                );
+            }
 
             if (filteredBooks.length === 0) {
-                booksList.innerHTML = '<div class="empty-state">El registro está vacío.</div>'; return;
+                if (searchTerm) {
+                    booksList.innerHTML = `<div class="empty-state">Sin resultados para "${searchEl.value}"</div>`;
+                } else {
+                    booksList.innerHTML = '<div class="empty-state">El registro está vacío.</div>';
+                }
+                return;
             }
 
             const sortedBooks = filteredBooks.slice().sort((a, b) => {
@@ -1054,6 +1174,8 @@
                 booksList.appendChild(card);
                 setTimeout(() => updateTimerUI(book.id), 0);
             });
+            
+            updateDailySummary();
         }
 
         document.getElementById('bookForm').addEventListener('submit', function(e) {
@@ -1069,6 +1191,10 @@
                 history: [{ date: isoToday, page: initPage }],
                 dailyLog: []
             });
+            
+            document.getElementById('bookSearch').value = '';
+            document.getElementById('searchClear').classList.remove('visible');
+            
             saveData(); renderTabs(); renderBooks(); this.reset(); document.getElementById('currentPage').value = 0;
         });
 
@@ -1137,6 +1263,7 @@
                 
                 btn.innerHTML = '▶️ Continuar'; btn.classList.remove('running');
                 saveData(); updateTimerUI(id);
+                updateDailySummary();
                 if (document.getElementById('metricsModal').style.display === 'flex') {
                     refreshMetricsChart();
                     updateMetricsStatus();
@@ -1174,6 +1301,8 @@
                 if (currentSecs >= targetSeconds) msg.style.display = 'block';
                 else msg.style.display = 'none';
             }
+            
+            updateDailySummary();
             
             if (document.getElementById('metricsModal').style.display === 'flex') {
                 updateMetricsStatus();
@@ -1304,9 +1433,6 @@
             document.body.style.overflow = 'hidden';
         }
 
-        // ============================================================
-        // RANGO Y DINÁMICO
-        // ============================================================
         function computeYRange(chartData, xMin, xMax) {
             let minY = Infinity, maxY = -Infinity, hasData = false;
             chartData.datasets.forEach(ds => {
@@ -1333,9 +1459,6 @@
             };
         }
 
-        // ============================================================
-        // NAVEGACIÓN
-        // ============================================================
         function scrollChart(delta) {
             if (!progressChartInstance) return;
             const dates = progressChartInstance._timelineDates;
@@ -1424,14 +1547,17 @@
             applyChartView();
         }
 
-        // ============================================================
-        // MODAL
-        // ============================================================
         function openMetricsModal() {
             document.getElementById('btnPosProj').classList.toggle('active', showPositiveProjection);
             document.getElementById('btnWarnProj').classList.toggle('active', showWarningProjection);
             chartViewStart = -1;
             hoyPageIndex = 0;
+            // Reset search on open
+            hoySearchTerm = '';
+            const hSearch = document.getElementById('hoySearch');
+            if (hSearch) hSearch.value = '';
+            const hClear = document.getElementById('hoySearchClear');
+            if (hClear) hClear.classList.remove('visible');
             
             document.getElementById('metricsModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
@@ -1453,33 +1579,52 @@
         }
 
         // ============================================================
-        // ESTADO "HOY:" + FECHAS FINALES
+        // ESTADO "HOY:" — con búsqueda, checkbox y paginación
         // ============================================================
         function updateMetricsStatus() {
             try {
                 const allActiveBooks = appData.books.filter(b => b.active);
-                const el = document.getElementById('metricsStatus');
+                const listEl = document.getElementById('hoyBooksList');
+                const pagEl = document.getElementById('hoyPagination');
                 const finishEl = document.getElementById('metricsFinishInfo');
-                if (!el || !finishEl) return;
+                if (!listEl || !pagEl || !finishEl) return;
                 
                 if (allActiveBooks.length === 0) {
-                    el.innerHTML = '<em>Sin lecturas activas</em>';
+                    listEl.innerHTML = '<em>Sin lecturas activas</em>';
+                    pagEl.innerHTML = '';
                     finishEl.innerHTML = '<em style="color: var(--text-muted)">—</em>';
-                    el.dataset.structureKey = 'empty';
+                    listEl.dataset.structureKey = 'empty';
                     return;
                 }
                 
-                const totalPages = Math.max(1, Math.ceil(allActiveBooks.length / HOY_PAGE_SIZE));
+                // Filtrar por búsqueda del recuadro Hoy
+                let filtered = allActiveBooks;
+                if (hoySearchTerm) {
+                    filtered = allActiveBooks.filter(b => b.title.toLowerCase().includes(hoySearchTerm));
+                }
+                
+                const colorMap = getBookColorMap();
+                
+                if (filtered.length === 0) {
+                    const rawTerm = document.getElementById('hoySearch') ? document.getElementById('hoySearch').value : '';
+                    listEl.innerHTML = `<em style="color: var(--text-muted); font-size: 12px;">Sin resultados para "${rawTerm}"</em>`;
+                    pagEl.innerHTML = '';
+                    listEl.dataset.structureKey = 'no-results';
+                    
+                    // Las fechas finales se siguen mostrando para todos los visibles
+                    renderFinishInfo(allActiveBooks, colorMap, finishEl);
+                    return;
+                }
+                
+                const totalPages = Math.max(1, Math.ceil(filtered.length / HOY_PAGE_SIZE));
                 if (hoyPageIndex >= totalPages) hoyPageIndex = totalPages - 1;
                 if (hoyPageIndex < 0) hoyPageIndex = 0;
                 
                 const start = hoyPageIndex * HOY_PAGE_SIZE;
-                const pageBooks = allActiveBooks.slice(start, start + HOY_PAGE_SIZE);
+                const pageBooks = filtered.slice(start, start + HOY_PAGE_SIZE);
                 
-                const structureKey = pageBooks.map(b => b.id).join(',') + '|' + hoyPageIndex + '|' + totalPages + '|' + allActiveBooks.length;
-                const needsRebuild = el.dataset.structureKey !== structureKey;
-                
-                const colorMap = getBookColorMap();
+                const structureKey = pageBooks.map(b => b.id).join(',') + '|' + hoyPageIndex + '|' + totalPages + '|' + filtered.length + '|' + hoySearchTerm;
+                const needsRebuild = listEl.dataset.structureKey !== structureKey;
                 
                 if (needsRebuild) {
                     const rows = pageBooks.map((book) => {
@@ -1493,21 +1638,24 @@
                         </div>`;
                     }).join('');
                     
-                    let paginationHtml = '';
+                    listEl.innerHTML = rows;
+                    listEl.dataset.structureKey = structureKey;
+                    
+                    // Paginación
                     if (totalPages > 1) {
-                        paginationHtml = `<div class="hoy-pagination">
+                        pagEl.innerHTML = `<div class="hoy-pagination">
                             <button onclick="changeHoyPage(-1)" ${hoyPageIndex === 0 ? 'disabled' : ''} aria-label="Anterior">◀</button>
                             <span>${hoyPageIndex + 1} / ${totalPages}</span>
                             <button onclick="changeHoyPage(1)" ${hoyPageIndex >= totalPages - 1 ? 'disabled' : ''} aria-label="Siguiente">▶</button>
                         </div>`;
+                    } else {
+                        pagEl.innerHTML = '';
                     }
-                    
-                    el.innerHTML = `<strong class="hoy-title">Hoy</strong>${rows}${paginationHtml}`;
-                    el.dataset.structureKey = structureKey;
                 }
                 
+                // Actualizar scores en cada fila
                 pageBooks.forEach((book) => {
-                    const scoreEl = el.querySelector(`.book-score[data-book-id="${book.id}"]`);
+                    const scoreEl = listEl.querySelector(`.book-score[data-book-id="${book.id}"]`);
                     if (!scoreEl) return;
                     const goalSecs = book.dailyMins * 60;
                     const secs = book.dailySeconds || 0;
@@ -1518,45 +1666,49 @@
                     scoreEl.innerHTML = `<strong>${book.title}</strong>: ${sign}${pts.toFixed(2)} (${pct}%)${check}`;
                 });
                 
-                // ============================================================
-                // FECHAS FINALES — solo libros visibles en la métrica
-                // ============================================================
-                const visibleBooks = allActiveBooks.filter(b => b.metricVisible !== false);
+                // Fechas finales — todos los visibles (no filtrados por búsqueda)
+                renderFinishInfo(allActiveBooks, colorMap, finishEl);
                 
-                if (visibleBooks.length === 0) {
-                    finishEl.innerHTML = `<strong class="finish-header">📅 Fechas finales estimadas</strong><div style="color: var(--text-muted); font-style: italic; font-size: 12px; padding: 4px 0;">Activa un libro con el check para ver su fecha</div>`;
-                } else {
-                    const finishRows = visibleBooks.map(book => {
-                        const color = colorMap[book.id] || BRIGHT_COLORS[0];
-                        const stats = calculateStats(book);
-                        
-                        if (book.currentPage >= book.totalPages) {
-                            return `<div class="finish-date-item">
-                                <span class="finish-dot" style="background: ${color}"></span>
-                                <span class="finish-book-name">${book.title}</span>
-                                <span class="finish-date-text">🏁 Terminado</span>
-                            </div>`;
-                        }
-                        
-                        const d = stats.finishDate;
-                        const dd = String(d.getDate()).padStart(2, '0');
-                        const mm = String(d.getMonth() + 1).padStart(2, '0');
-                        const yy = d.getFullYear();
-                        return `<div class="finish-date-item">
-                            <span class="finish-dot" style="background: ${color}"></span>
-                            <span class="finish-book-name">${book.title}</span>
-                            <span class="finish-date-text">${dd}/${mm}/${yy}</span>
-                            <span class="finish-days">· ${stats.daysRemaining}d</span>
-                        </div>`;
-                    }).join('');
-                    
-                    finishEl.innerHTML = `<strong class="finish-header">📅 Fechas finales estimadas</strong>${finishRows}`;
-                }
             } catch (err) {
                 console.error('Error en updateMetricsStatus:', err);
                 const finishEl = document.getElementById('metricsFinishInfo');
                 if (finishEl) finishEl.innerHTML = '<em style="color: var(--danger)">Error al calcular fechas</em>';
             }
+        }
+
+        function renderFinishInfo(allActiveBooks, colorMap, finishEl) {
+            const visibleBooks = allActiveBooks.filter(b => b.metricVisible !== false);
+            
+            if (visibleBooks.length === 0) {
+                finishEl.innerHTML = `<strong class="finish-header">📅 Fechas finales estimadas</strong><div style="color: var(--text-muted); font-style: italic; font-size: 12px; padding: 4px 0;">Activa un libro con el check para ver su fecha</div>`;
+                return;
+            }
+            
+            const finishRows = visibleBooks.map(book => {
+                const color = colorMap[book.id] || BRIGHT_COLORS[0];
+                const stats = calculateStats(book);
+                
+                if (book.currentPage >= book.totalPages) {
+                    return `<div class="finish-date-item">
+                        <span class="finish-dot" style="background: ${color}"></span>
+                        <span class="finish-book-name">${book.title}</span>
+                        <span class="finish-date-text">🏁 Terminado</span>
+                    </div>`;
+                }
+                
+                const d = stats.finishDate;
+                const dd = String(d.getDate()).padStart(2, '0');
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const yy = d.getFullYear();
+                return `<div class="finish-date-item">
+                    <span class="finish-dot" style="background: ${color}"></span>
+                    <span class="finish-book-name">${book.title}</span>
+                    <span class="finish-date-text">${dd}/${mm}/${yy}</span>
+                    <span class="finish-days">· ${stats.daysRemaining}d</span>
+                </div>`;
+            }).join('');
+            
+            finishEl.innerHTML = `<strong class="finish-header">📅 Fechas finales estimadas</strong>${finishRows}`;
         }
 
         function resetZoom() {
@@ -2101,6 +2253,7 @@
         document.getElementById('btnWarnProj').classList.toggle('active', showWarningProjection);
 
         renderHoursGrid(); renderTabs(); renderBooks();
+        updateDailySummary();
     </script>
 </body>
 </html>
