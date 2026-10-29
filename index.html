@@ -5,66 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light dark">
     <title>Mi Tracker de Lectura</title>
+    <!-- Se añade la fuente Inter para un look moderno -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2"></script>
     <style>
         :root {
             color-scheme: light dark;
             
-            /* TEMA ESMERALDA (MODO CLARO) */
-            --bg-color: #f9edf0;       /* Blush */
-            --text-main: #261311;      /* Espresso */
-            --text-muted: #8c7a76;     /* Espresso suavizado */
-            --primary: #1c3934;        /* Emerald */
-            --primary-rgb: 28, 57, 52;
-            --primary-hover: #112420;  /* Emerald oscuro */
-            --hover-bg: #e2e8e7;       /* Tono Emerald suave */
-            --card-bg: #ffffff;        /* Blanco */
-            --border-color: #e6c8b7;   /* Champagne */
-            --success: #c3955b;        /* Cognac */
-            --danger: #9b2226;
-            --font-family: "Times New Roman", Times, serif;
+            /* TEMA ESMERALDA REFINADO (MODO CLARO) */
+            --bg-color: #f4f7f6;       /* Gris verdoso muy claro */
+            --text-main: #1e293b;      /* Pizarra oscuro */
+            --text-muted: #64748b;     /* Pizarra medio */
+            --primary: #0f766e;        /* Verde esmeralda profundo */
+            --primary-rgb: 15, 118, 110;
+            --primary-hover: #115e59;  
+            --hover-bg: #e6f0ef;       
+            --card-bg: #ffffff;        
+            --border-color: #e2e8f0;   
+            --success: #d97706;        /* Ámbar para éxito */
+            --danger: #e11d48;
+            --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            
+            /* Variables de diseño estructural */
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.06);
+            --shadow-float: 0 12px 32px rgba(15, 118, 110, 0.2);
         }
 
-        /* MODO OSCURO (ESMERALDA) */
+        /* MODO OSCURO (ESMERALDA REFINADO) */
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg-color: #0d1b19;       /* Verde selva profundo */
-                --text-main: #f9edf0;      /* Blush */
-                --text-muted: #8ba39e;     /* Verde grisáceo */
-                --primary: #439075;        /* Emerald brillante */
-                --primary-rgb: 67, 144, 117;
-                --primary-hover: #5eb397;
-                --hover-bg: #1a2e2a;       /* Verde oscuro intermedio */
-                --card-bg: #132421;        /* Fondo de tarjetas */
-                --border-color: #23433c;   /* Borde verdoso */
-                --success: #d4a373;        /* Ámbar suave para éxito */
-                --danger: #ff7b72;
+                --bg-color: #0f172a;       
+                --text-main: #f8fafc;      
+                --text-muted: #94a3b8;     
+                --primary: #10b981;        
+                --primary-rgb: 16, 185, 129;
+                --primary-hover: #059669;
+                --hover-bg: #1e293b;       
+                --card-bg: #1e293b;        
+                --border-color: #334155;   
+                --success: #fbbf24;        
+                --danger: #fb7185;
+                --shadow-md: 0 8px 24px rgba(0,0,0,0.2);
+                --shadow-float: 0 12px 32px rgba(16, 185, 129, 0.15);
             }
         }
 
-        /* TEMA ÁMBAR (MODO CLARO) */
+        /* TEMA ÁMBAR REFINADO (MODO CLARO) */
         body[data-theme="amber"] {
-            --primary: #ba6a36;        /* Amber */
-            --primary-rgb: 186, 106, 54;
-            --primary-hover: #9c5424;  /* Amber oscuro */
-            --hover-bg: #f4e6dc;       /* Tono Amber suave */
-            --success: #1c3934;        /* Emerald para éxito */
+            --bg-color: #fdfaf6;
+            --primary: #c2410c;        
+            --primary-rgb: 194, 65, 12;
+            --primary-hover: #9a3412;  
+            --hover-bg: #ffedd5;       
+            --success: #0f766e;        
+            --shadow-float: 0 12px 32px rgba(194, 65, 12, 0.2);
         }
 
-        /* TEMA ÁMBAR (MODO OSCURO) */
+        /* TEMA ÁMBAR REFINADO (MODO OSCURO) */
         @media (prefers-color-scheme: dark) {
             body[data-theme="amber"] {
-                --bg-color: #1a1513;       /* Carbón oscuro */
-                --text-main: #f9edf0;
-                --text-muted: #a89b96;
-                --primary: #e08b4f;        /* Amber brillante */
-                --primary-rgb: 224, 139, 79;
-                --primary-hover: #f0a66b;
-                --hover-bg: #2b221e;       /* Fondo intermedio */
-                --card-bg: #241d1a;        /* Tarjetas carbón */
-                --border-color: #42322a;   /* Borde marrón oscuro */
-                --success: #439075;        /* Emerald para contraste */
+                --bg-color: #1a1514;       
+                --text-main: #fafaf9;
+                --text-muted: #a8a29e;
+                --primary: #fb923c;        
+                --primary-rgb: 251, 146, 60;
+                --primary-hover: #f97316;
+                --hover-bg: #292524;       
+                --card-bg: #292524;        
+                --border-color: #44403c;   
+                --success: #2dd4bf;        
+                --shadow-float: 0 12px 32px rgba(251, 146, 60, 0.15);
             }
         }
 
@@ -74,434 +91,280 @@
             font-family: var(--font-family);
             background-color: var(--bg-color); 
             color: var(--text-main); 
-            padding-bottom: 100px; 
+            padding-bottom: 120px; 
             line-height: 1.6;
             transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .container { max-width: 550px; margin: 0 auto; padding: 20px; }
+        .container { max-width: 650px; margin: 0 auto; padding: 24px 20px; }
 
-        header { text-align: center; padding: 25px 0 15px 0; border-bottom: 2px solid var(--primary); margin-bottom: 20px; transition: border-color 0.3s ease; }
-        h1 { color: var(--primary); font-size: 30px; margin-bottom: 5px; font-weight: normal; letter-spacing: 1px; transition: color 0.3s ease; }
-        header p { color: var(--text-muted); font-size: 15px; font-style: italic; margin-bottom: 10px; }
+        header { 
+            text-align: center; 
+            padding: 10px 0 30px 0; 
+            margin-bottom: 25px; 
+        }
+        h1 { 
+            color: var(--primary); 
+            font-size: 32px; 
+            margin-bottom: 8px; 
+            font-weight: 700; 
+            letter-spacing: -0.5px; 
+            transition: color 0.3s ease; 
+        }
+        header p { color: var(--text-muted); font-size: 15px; margin-bottom: 15px; }
 
         .daily-summary {
             display: inline-flex;
             flex-wrap: wrap;
             align-items: center;
             justify-content: center;
-            gap: 4px 14px;
-            margin-top: 4px;
-            padding: 6px 14px;
+            gap: 8px 16px;
+            padding: 10px 20px;
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 20px;
-            font-size: 12.5px;
+            border-radius: 99px;
+            font-size: 14px;
+            font-weight: 500;
             color: var(--text-main);
-            font-style: normal;
+            box-shadow: var(--shadow-sm);
         }
-        .summary-item { white-space: nowrap; }
-        .summary-item strong { color: var(--primary); font-weight: bold; }
+        .summary-item { white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+        .summary-item strong { color: var(--primary); font-weight: 700; font-size: 15px; }
         .summary-item.done strong { color: var(--success); }
 
-        .btn-schedule {
-            background: var(--text-main); color: var(--bg-color); border: 1px solid var(--text-main); padding: 12px 20px; border-radius: 4px;
-            font-size: 16px; cursor: pointer; width: 100%; display: flex; font-family: var(--font-family);
-            align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; margin-bottom: 10px;
-        }
-        .btn-schedule:hover { opacity: 0.8; }
-
-        .btn-metrics {
-            background: var(--bg-color); color: var(--primary); border: 1px solid var(--primary); padding: 12px 20px; border-radius: 4px;
-            font-size: 16px; cursor: pointer; width: 100%; display: flex; font-family: var(--font-family); font-weight: bold;
-            align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; margin-bottom: 10px;
-        }
-        .btn-metrics:hover { background: var(--hover-bg); }
-
-        .hours-dropdown-btn {
-            background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main);
-            padding: 10px 15px; border-radius: 4px; font-size: 15px; cursor: pointer; font-family: var(--font-family);
-            width: 100%; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s;
-            margin-bottom: 15px;
-        }
-        .hours-dropdown-btn:hover { background: var(--hover-bg); }
-        .hours-panel { background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 4px; margin-bottom: 20px; display: none; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
-        .hours-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(55px, 1fr)); gap: 8px; margin-top: 10px; }
-        .hour-btn { padding: 6px 0; border-radius: 4px; font-size: 13px; text-align: center; cursor: pointer; font-family: var(--font-family); transition: all 0.2s; }
-        .hour-btn.selected { background: var(--primary); color: var(--bg-color); border: 1px solid var(--primary); }
-        .hour-btn.unselected { background: var(--bg-color); color: var(--text-muted); border: 1px solid var(--border-color); }
-        .hour-btn.unselected:hover { border-color: var(--primary); color: var(--primary); }
-
-        .theme-toggle-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px dashed var(--border-color);
-        }
-        .theme-toggle-row span { font-size: 13px; color: var(--text-main); font-weight: bold; }
-        .btn-theme-toggle {
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 8px 14px;
-            border-radius: 4px;
+        .btn-schedule, .btn-metrics, .btn-submit, .btn-cancel {
             font-family: var(--font-family);
-            font-size: 13px;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 14px 24px;
+            border-radius: var(--radius-md);
             cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-theme-toggle:hover { border-color: var(--primary); color: var(--primary); }
-
-        .export-import-row {
-            display: flex;
-            gap: 8px;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid var(--border-color);
-        }
-        .export-import-row button {
-            flex: 1;
-            padding: 10px 12px;
-            font-family: var(--font-family);
-            font-size: 13px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-color);
-            color: var(--text-main);
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.15s;
-            touch-action: manipulation;
-        }
-        .export-import-row button:hover { border-color: var(--primary); color: var(--primary); }
-        .export-import-row button:active { transform: scale(0.97); }
-        .export-import-hint {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-style: italic;
-            text-align: center;
-            margin-top: 8px;
-        }
-
-        .tabs-container { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; margin-bottom: 15px; scrollbar-width: none; }
-        .tabs-container::-webkit-scrollbar { display: none; }
-
-        .tab-btn {
-            background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted);
-            padding: 8px 16px; border-radius: 4px; font-size: 15px; cursor: pointer; font-family: var(--font-family);
-            white-space: nowrap; transition: transform 0.15s, box-shadow 0.15s, background 0.2s, color 0.2s, border-color 0.2s;
-            display: flex; align-items: center; gap: 8px;
-            user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
-            touch-action: pan-y;
-            position: relative;
-        }
-        .tab-btn.active { background: var(--primary); color: var(--bg-color); border-color: var(--primary); }
-        .tab-btn-new { background: var(--hover-bg); border: 1px dashed var(--border-color); color: var(--text-main); }
-        
-        .tab-btn.dragging {
-            opacity: 0.9;
-            transform: scale(1.05);
-            box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.45);
-            z-index: 1000;
-            position: relative;
-            pointer-events: none;
-        }
-        
-        .tab-btn.long-pressing {
-            animation: longPressPulse 0.5s ease-out;
-        }
-        @keyframes longPressPulse {
-            0% { box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.55); }
-            100% { box-shadow: 0 0 0 8px rgba(var(--primary-rgb), 0); }
-        }
-        .tab-delete {
-            background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%;
-            width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;
-            font-size: 12px; cursor: pointer;
-        }
-        .tab-btn.active .tab-delete { color: var(--bg-color); }
-
-        .search-container {
-            position: relative;
-            margin-bottom: 12px;
-        }
-        .search-container input {
             width: 100%;
-            padding: 10px 14px 10px 38px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 14px;
-            font-family: var(--font-family);
-            background: var(--card-bg);
-            outline: none;
-            transition: all 0.2s;
-            color: var(--text-main);
-        }
-        .search-container input:focus { border-color: var(--primary); }
-        .search-container.search-active input { border-color: var(--primary); }
-        .search-container::before {
-            content: '🔍';
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 14px;
-            pointer-events: none;
-            opacity: 0.6;
-        }
-        .search-clear {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: transparent;
-            border: none;
-            font-size: 16px;
-            cursor: pointer;
-            color: var(--text-muted);
-            padding: 4px 8px;
-            display: none;
-        }
-        .search-clear.visible { display: block; }
-        .search-clear:hover { color: var(--primary); }
-
-        .search-results-header {
-            padding: 10px 14px;
-            background: var(--hover-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 13px;
-            color: var(--text-main);
-            margin-bottom: 15px;
-            text-align: center;
-            font-style: italic;
-        }
-        .search-results-header strong { color: var(--primary); }
-
-        .card-category-badge {
-            display: inline-block;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            background: var(--hover-bg);
-            color: var(--primary);
-            padding: 2px 7px;
-            border-radius: 3px;
-            border: 1px solid var(--border-color);
-            font-weight: bold;
-            margin-top: 5px;
-            font-style: normal;
-        }
-
-        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 20px; margin-bottom: 20px; box-shadow: 2px 2px 8px rgba(0,0,0,0.04); position: relative; }
-        .card.inactive { opacity: 0.7; }
-        
-        .card-header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; gap: 10px; }
-        .card-header-info { flex: 1; min-width: 0; }
-        .card-title { 
-            font-size: 20px; color: var(--primary); font-weight: bold; cursor: pointer; 
-            display: inline-block; transition: color 0.2s; margin: 0; line-height: 1.3;
-        }
-        .card-title:hover { color: var(--primary-hover); text-decoration: underline; }
-        
-        .card-actions { position: relative; flex-shrink: 0; }
-        .menu-btn { 
-            background: none; border: none; font-size: 24px; font-weight: bold; 
-            color: var(--text-muted); cursor: pointer; opacity: 0.6; padding: 0 8px; 
-            line-height: 1; transition: opacity 0.2s;
-        }
-        .menu-btn:hover { opacity: 1; color: var(--primary); }
-        
-        .card-dropdown {
-            position: absolute; top: 100%; right: 0;
-            background: var(--card-bg); border: 1px solid var(--border-color);
-            border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            display: none; flex-direction: column; z-index: 50; min-width: 120px;
-            overflow: hidden;
-        }
-        .card-dropdown.active { display: flex; }
-        .card-dropdown button {
-            background: none; border: none; padding: 10px 15px; text-align: left;
-            font-family: var(--font-family); font-size: 14px; color: var(--text-main);
-            cursor: pointer; transition: background 0.2s;
-        }
-        .card-dropdown button:hover { background: var(--hover-bg); }
-        .card-dropdown button.danger { color: var(--danger); }
-        .card-dropdown button:first-child { border-bottom: 1px solid var(--border-color); }
-
-        .card-controls { display: flex; flex-direction: column; gap: 10px; background: var(--bg-color); padding: 12px; border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 15px; text-align: center; }
-        .status-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; font-size: 14px; }
-        .status-toggle input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary); }
-        .priority-control { display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .priority-control label { font-size: 14px; margin: 0; text-transform: none; }
-        .priority-control input[type="range"] { width: 120px; accent-color: var(--primary); cursor: pointer; }
-        
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        .form-group.full { grid-column: 1 / -1; }
-
-        label { display: block; font-size: 12px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 5px; }
-        input[type="text"], input[type="number"], input[type="search"], textarea { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 15px; outline: none; transition: border-color 0.2s; background: var(--bg-color); font-family: var(--font-family); color: var(--text-main); }
-        input:focus, textarea:focus { border-color: var(--primary); }
-
-        .btn-submit { width: 100%; background: var(--primary); color: var(--bg-color); border: none; padding: 12px; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 5px; font-family: var(--font-family); font-weight: bold; }
-        .btn-cancel { background: var(--text-muted); color: var(--bg-color); border: none; padding: 12px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 5px; font-family: var(--font-family); }
-
-        .icon-btn { background: none; border: none; cursor: pointer; font-size: 16px; opacity: 0.6; transition: opacity 0.2s; }
-        .icon-btn:hover { opacity: 1; }
-
-        .edit-section { background: var(--bg-color); border: 1px dashed var(--border-color); padding: 15px; border-radius: 4px; margin-bottom: 20px; }
-        
-        .progress-header { display: flex; justify-content: space-between; font-size: 14px; color: var(--text-muted); margin-bottom: 6px; }
-        .progress-track { background: var(--border-color); border-radius: 2px; height: 8px; width: 100%; margin-bottom: 20px; overflow: hidden; }
-        .progress-fill { background: var(--primary); height: 100%; transition: width 0.4s ease, background-color 0.3s ease; }
-
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--bg-color); padding: 15px; border-radius: 4px; border: 1px solid var(--border-color); margin-bottom: 15px; }
-        .stat-item.full { grid-column: 1 / -1; }
-        .stat-label { font-size: 10px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 4px; letter-spacing: 0.5px; }
-        .stat-value { font-size: 16px; color: var(--text-main); }
-        .stat-value.highlight { color: var(--primary); font-weight: bold; }
-        .stat-value.success { color: var(--success); font-style: italic; }
-
-        .update-section { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
-        .update-label { font-size: 15px; color: var(--text-main); }
-        .update-section input { width: 80px; padding: 6px; text-align: center; }
-        .btn-update { background: var(--text-main); color: var(--bg-color); border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 14px; font-family: var(--font-family); font-weight: bold; }
-        
-        .daily-timer { border: 1px solid var(--border-color); border-radius: 4px; padding: 15px; background: var(--card-bg); text-align: center; }
-        .timer-display { font-size: 24px; color: var(--primary); margin: 10px 0; font-variant-numeric: tabular-nums; transition: color 0.3s ease; }
-        .btn-timer { background: var(--success); color: var(--bg-color); border: none; padding: 10px 20px; border-radius: 4px; font-size: 15px; cursor: pointer; font-family: var(--font-family); display: inline-flex; align-items: center; gap: 8px; transition: background-color 0.3s ease; font-weight: bold; }
-        .btn-timer.running { background: var(--primary); }
-        
-        .meta-pages-display {
-            margin-top: 12px;
-            padding: 10px;
-            background: var(--hover-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 13px;
-            line-height: 1.6;
-            transition: background-color 0.3s ease;
-        }
-        .meta-pages-display strong {
-            color: var(--primary);
-            font-size: 18px;
-        }
-        .meta-pages-success strong { color: var(--success); }
-
-        .empty-state { text-align: center; color: var(--text-muted); padding: 30px 0; font-size: 16px; font-style: italic; }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
-        .modal-content { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 25px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .modal-close { position: absolute; top: 15px; right: 15px; background: var(--bg-color); border: 1px solid var(--border-color); width: 30px; height: 30px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-main); }
-        
-        .checklist-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; background: var(--bg-color); padding: 10px; border-radius: 4px; border: 1px solid var(--border-color); }
-        .checklist-item input[type="checkbox"] { margin-top: 4px; width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary); }
-        .checklist-text { flex: 1; font-size: 15px; word-break: break-word; }
-        .checklist-text.done { text-decoration: line-through; color: var(--text-muted); }
-
-        .schedule-item { padding: 12px; border-left: 4px solid var(--primary); background: var(--bg-color); margin-bottom: 10px; border-radius: 0 4px 4px 0; display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--border-color); border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
-        .schedule-time { font-weight: bold; color: var(--primary); font-size: 15px; }
-        .schedule-title { color: var(--text-main); font-size: 18px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
-        .schedule-category { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background: var(--hover-bg); color: var(--primary); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--border-color); }
-        .schedule-meta { font-size: 13px; color: var(--text-muted); font-style: italic; }
-        
-        .chart-container { position: relative; height: 320px; width: 100%; margin-top: 10px; }
-        .btn-reset-zoom { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 16px; border-radius: 4px; font-size: 13px; cursor: pointer; font-family: var(--font-family); transition: all 0.2s; }
-        .btn-reset-zoom:hover { border-color: var(--primary); color: var(--primary); }
-
-        .metrics-header { display: flex; align-items: flex-start; gap: 8px; margin-top: 10px; }
-        .metrics-status { flex: 1; min-width: 0; font-size: 13px; color: var(--text-main); padding: 10px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 4px; line-height: 1.8; text-align: left; }
-        .hoy-title { color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px; }
-        
-        .hoy-search-container { position: relative; margin-bottom: 6px; margin-top: 2px; }
-        .hoy-search-container input { width: 100%; padding: 6px 26px 6px 24px; border: 1px solid var(--border-color); border-radius: 3px; font-size: 12px; font-family: var(--font-family); background: var(--bg-color); outline: none; transition: all 0.2s; line-height: 1.4; color: var(--text-main); }
-        .hoy-search-container input:focus { border-color: var(--primary); }
-        .hoy-search-container input::placeholder { color: var(--text-muted); font-style: italic; opacity: 0.7; }
-        .hoy-search-container::before { content: '🔍'; position: absolute; left: 6px; top: 50%; transform: translateY(-50%); font-size: 10px; pointer-events: none; opacity: 0.55; }
-        .hoy-search-clear { position: absolute; right: 2px; top: 50%; transform: translateY(-50%); background: transparent; border: none; font-size: 14px; cursor: pointer; color: var(--text-muted); padding: 2px 6px; display: none; line-height: 1; }
-        .hoy-search-clear.visible { display: block; }
-        .hoy-search-clear:hover, .hoy-search-clear:active { color: var(--primary); }
-
-        .book-row { display: flex; align-items: center; gap: 6px; padding: 3px 0; font-size: 13px; font-weight: normal; text-transform: none; letter-spacing: 0; margin: 0; color: var(--text-main); }
-        .book-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--primary); margin: 0; cursor: pointer; flex-shrink: 0; }
-        .book-row.hidden-metric .legend-dot, .book-row.hidden-metric .book-score { opacity: 0.4; }
-        .legend-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.15); }
-        .book-score { min-width: 0; transition: opacity 0.2s; }
-
-        .hoy-pagination { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color); }
-        .hoy-pagination button { min-width: 34px; height: 32px; border: 1px solid var(--border-color); background: var(--bg-color); border-radius: 4px; cursor: pointer; font-size: 14px; font-family: var(--font-family); color: var(--text-main); display: flex; align-items: center; justify-content: center; padding: 0; touch-action: manipulation; transition: all 0.15s; }
-        .hoy-pagination button:active:not(:disabled) { background: var(--primary); color: var(--bg-color); border-color: var(--primary); }
-        .hoy-pagination button:disabled { opacity: 0.35; cursor: not-allowed; }
-        .hoy-pagination span { font-size: 12px; color: var(--text-muted); font-style: italic; min-width: 42px; text-align: center; }
-
-        .proj-buttons { display: flex; gap: 6px; flex-shrink: 0; }
-        .proj-btn { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--border-color); background: var(--bg-color); cursor: pointer; font-size: 18px; line-height: 1; display: flex; align-items: center; justify-content: center; padding: 0; opacity: 0.35; transition: all 0.2s; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
-        .proj-btn.active { opacity: 1; }
-        .proj-btn.positive.active { background: #e8f5ec; border-color: var(--success); }
-        .proj-btn.warning.active { background: #f0f0f0; border-color: #888; }
-        .proj-btn:active { transform: scale(0.92); }
-        .proj-btn-caption { font-size: 9px; color: var(--text-muted); text-align: center; margin-top: 2px; font-style: italic; }
-
-        .metrics-finish-info { font-size: 12px; color: var(--text-main); margin-top: 6px; padding: 10px 12px; background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 4px; line-height: 1.5; }
-        .finish-header { color: var(--success); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; font-weight: bold; }
-        .finish-date-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 13px; border-top: 1px solid var(--border-color); }
-        .finish-date-item:first-child { border-top: none; padding-top: 0; }
-        .finish-date-item:last-child { padding-bottom: 0; }
-        .finish-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.15); }
-        .finish-book-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: bold; color: var(--text-main); }
-        .finish-date-text { font-weight: bold; color: var(--success); white-space: nowrap; font-size: 13px; }
-        .finish-days { color: var(--text-muted); font-style: italic; font-size: 12px; white-space: nowrap; }
-
-        .chart-empty-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--text-muted); font-style: italic; font-size: 14px; text-align: center; padding: 0 20px; pointer-events: none; z-index: 2; }
-
-        .chart-nav { display: grid; grid-template-columns: 44px 44px 1fr 44px 44px; gap: 6px; align-items: center; margin-top: 15px; padding: 10px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 4px; }
-        .chart-nav button { min-width: 44px; min-height: 44px; padding: 0; font-size: 16px; font-family: var(--font-family); background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer; color: var(--text-main); display: flex; align-items: center; justify-content: center; transition: all 0.15s; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
-        .chart-nav button:active { background: var(--primary); color: var(--bg-color); border-color: var(--primary); transform: scale(0.95); }
-        .chart-nav button:disabled { opacity: 0.35; cursor: not-allowed; }
-        .chart-nav-center { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
-        .chart-range-text { font-size: 11px; color: var(--text-muted); font-style: italic; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-        .chart-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 24px; background: transparent; cursor: pointer; margin: 0; }
-        .chart-slider::-webkit-slider-runnable-track { height: 6px; background: var(--border-color); border-radius: 3px; }
-        .chart-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; background: var(--primary); border-radius: 50%; margin-top: -9px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); border: 2px solid white; }
-        .chart-slider::-moz-range-track { height: 6px; background: var(--border-color); border-radius: 3px; }
-        .chart-slider::-moz-range-thumb { width: 24px; height: 24px; background: var(--primary); border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .chart-slider:disabled { opacity: 0.35; cursor: not-allowed; }
-
-        .btn-footer-row { display: flex; gap: 8px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
-        .btn-footer-row button { flex: 1; min-width: 140px; padding: 10px 14px; font-size: 13px; font-family: var(--font-family); border-radius: 4px; cursor: pointer; transition: all 0.15s; touch-action: manipulation; }
-
-        .fab-add {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: var(--bg-color);
-            border: none;
-            font-size: 34px;
-            font-weight: 300;
-            line-height: 1;
-            cursor: pointer;
-            box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.45);
-            z-index: 900;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s, background-color 0.3s ease;
-            touch-action: manipulation;
-            user-select: none;
-            -webkit-user-select: none;
-            padding-bottom: 3px;
+            gap: 10px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            margin-bottom: 12px;
         }
-        .fab-add:hover { transform: scale(1.06); box-shadow: 0 6px 20px rgba(var(--primary-rgb), 0.55); }
-        .fab-add:active { transform: scale(0.94); }
-        .fab-add.hidden { opacity: 0; pointer-events: none; transform: scale(0.8); }
+        .btn-schedule { background: var(--primary); color: #ffffff; box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.2); }
+        .btn-schedule:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.3); }
+        .btn-schedule:active { transform: translateY(0); }
 
-        .add-book-modal-title { font-size: 22px; color: var(--primary); margin-bottom: 5px; }
-        .add-book-modal-subtitle { font-size: 14px; color: var(--text-muted); font-style: italic; margin-bottom: 20px; }
+        .btn-metrics { background: var(--card-bg); color: var(--primary); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
+        .btn-metrics:hover { background: var(--hover-bg); border-color: var(--primary); }
+
+        .hours-dropdown-btn {
+            background: transparent; border: none; color: var(--text-muted);
+            padding: 10px; border-radius: var(--radius-md); font-size: 14px; cursor: pointer; font-family: var(--font-family); font-weight: 600;
+            width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s;
+            margin-bottom: 15px;
+        }
+        .hours-dropdown-btn:hover { color: var(--primary); background: var(--hover-bg); }
+        
+        .hours-panel { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-lg); margin-bottom: 25px; display: none; box-shadow: var(--shadow-md); }
+        .hours-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 8px; margin-top: 15px; }
+        .hour-btn { padding: 8px 0; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; text-align: center; cursor: pointer; font-family: var(--font-family); transition: all 0.2s; }
+        .hour-btn.selected { background: var(--primary); color: #ffffff; border: 1px solid var(--primary); }
+        .hour-btn.unselected { background: var(--bg-color); color: var(--text-muted); border: 1px solid var(--border-color); }
+        .hour-btn.unselected:hover { border-color: var(--primary); color: var(--primary); }
+
+        .theme-toggle-row { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color); }
+        .theme-toggle-row span { font-size: 14px; color: var(--text-main); font-weight: 600; }
+        .btn-theme-toggle { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 16px; border-radius: var(--radius-sm); font-family: var(--font-family); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .btn-theme-toggle:hover { border-color: var(--primary); color: var(--primary); background: var(--hover-bg); }
+
+        .export-import-row { display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color); }
+        .export-import-row button { flex: 1; padding: 10px 12px; font-family: var(--font-family); font-size: 14px; font-weight: 500; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-main); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s; }
+        .export-import-row button:hover { border-color: var(--primary); color: var(--primary); background: var(--hover-bg); }
+        
+        .export-import-hint { font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 12px; }
+
+        .tabs-container { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 20px; margin-bottom: 10px; scrollbar-width: none; }
+        .tabs-container::-webkit-scrollbar { display: none; }
+
+        .tab-btn {
+            background: transparent; border: 1px solid transparent; color: var(--text-muted);
+            padding: 10px 20px; border-radius: 99px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: var(--font-family);
+            white-space: nowrap; transition: all 0.2s ease;
+            display: flex; align-items: center; gap: 8px;
+            user-select: none; -webkit-user-select: none;
+        }
+        .tab-btn:hover:not(.active) { background: var(--hover-bg); color: var(--text-main); }
+        .tab-btn.active { background: var(--text-main); color: var(--bg-color); box-shadow: var(--shadow-sm); }
+        .tab-btn-new { border: 1px dashed var(--border-color); color: var(--text-main); }
+        .tab-btn-new:hover { border-color: var(--primary); color: var(--primary); background: transparent; }
+        
+        .tab-btn.dragging { opacity: 0.9; transform: scale(1.05); box-shadow: var(--shadow-md); z-index: 1000; position: relative; pointer-events: none; }
+        .tab-delete { background: rgba(255,255,255,0.15); border: none; color: inherit; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; transition: background 0.2s; }
+        .tab-delete:hover { background: rgba(255,0,0,0.5); color: white; }
+
+        .search-container { position: relative; margin-bottom: 20px; }
+        .search-container input {
+            width: 100%; padding: 14px 16px 14px 44px;
+            border: 1px solid transparent; border-radius: var(--radius-lg);
+            font-size: 15px; font-family: var(--font-family);
+            background: var(--card-bg); outline: none; transition: all 0.3s ease;
+            color: var(--text-main); box-shadow: var(--shadow-sm);
+        }
+        .search-container input:focus, .search-container.search-active input { 
+            border-color: var(--primary); box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.1); 
+        }
+        .search-container::before { content: '🔍'; position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 16px; opacity: 0.5; }
+        
+        .search-clear { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); padding: 4px 8px; display: none; }
+        .search-clear.visible { display: block; }
+        .search-clear:hover { color: var(--primary); }
+
+        .search-results-header { padding: 12px 16px; background: var(--primary); border-radius: var(--radius-md); font-size: 14px; color: #fff; margin-bottom: 20px; text-align: center; font-weight: 500; box-shadow: var(--shadow-sm); }
+        .search-results-header strong { font-weight: 700; }
+
+        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-md); position: relative; transition: opacity 0.3s, transform 0.2s; }
+        .card.inactive { opacity: 0.6; filter: grayscale(50%); }
+        
+        .card-header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; gap: 12px; }
+        .card-header-info { flex: 1; min-width: 0; }
+        .card-title { font-size: 22px; color: var(--text-main); font-weight: 700; cursor: pointer; display: inline-block; margin: 0; line-height: 1.3; letter-spacing: -0.3px; transition: color 0.2s; }
+        .card-title:hover { color: var(--primary); }
+        
+        .card-category-badge { display: inline-block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background: var(--hover-bg); color: var(--primary); padding: 4px 10px; border-radius: 99px; font-weight: 600; margin-top: 8px; }
+
+        .card-actions { position: relative; flex-shrink: 0; }
+        .menu-btn { background: none; border: none; font-size: 24px; font-weight: bold; color: var(--text-muted); cursor: pointer; padding: 0 8px; transition: color 0.2s; }
+        .menu-btn:hover { color: var(--primary); }
+        
+        .card-dropdown { position: absolute; top: 100%; right: 0; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius-sm); box-shadow: var(--shadow-md); display: none; flex-direction: column; z-index: 50; min-width: 140px; overflow: hidden; padding: 4px 0; }
+        .card-dropdown.active { display: flex; animation: dropIn 0.2s ease; }
+        @keyframes dropIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        .card-dropdown button { background: none; border: none; padding: 12px 16px; text-align: left; font-family: var(--font-family); font-size: 14px; font-weight: 500; color: var(--text-main); cursor: pointer; transition: background 0.2s; }
+        .card-dropdown button:hover { background: var(--hover-bg); color: var(--primary); }
+        .card-dropdown button.danger:hover { background: #fff1f2; color: var(--danger); }
+
+        .card-controls { display: flex; flex-wrap: wrap; gap: 15px; background: var(--bg-color); padding: 16px; border-radius: var(--radius-md); margin-bottom: 20px; align-items: center; justify-content: space-between; }
+        .status-toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; font-weight: 500; }
+        .status-toggle input { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary); }
+        .priority-control { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; }
+        .priority-control input[type="range"] { width: 100px; accent-color: var(--primary); cursor: pointer; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+        .form-group.full { grid-column: 1 / -1; }
+
+        label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+        input[type="text"], input[type="number"], input[type="search"], textarea { 
+            width: 100%; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); 
+            font-size: 15px; outline: none; transition: all 0.2s; background: var(--bg-color); 
+            font-family: var(--font-family); color: var(--text-main); 
+        }
+        input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1); background: var(--card-bg); }
+
+        .btn-submit { background: var(--primary); color: #ffffff; }
+        .btn-submit:hover { background: var(--primary-hover); }
+        .btn-cancel { background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color); }
+        .btn-cancel:hover { background: var(--hover-bg); }
+
+        .icon-btn { background: none; border: none; cursor: pointer; font-size: 18px; color: var(--text-muted); transition: color 0.2s, transform 0.2s; }
+        .icon-btn:hover { color: var(--primary); transform: scale(1.1); }
+
+        .edit-section { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-md); margin-bottom: 20px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+        
+        .progress-header { display: flex; justify-content: space-between; font-size: 14px; font-weight: 500; color: var(--text-main); margin-bottom: 8px; }
+        .progress-track { background: var(--border-color); border-radius: 99px; height: 10px; width: 100%; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { background: var(--primary); height: 100%; border-radius: 99px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: var(--bg-color); padding: 20px; border-radius: var(--radius-md); margin-bottom: 20px; }
+        .stat-item { display: flex; flex-direction: column; gap: 4px; }
+        .stat-item.full { grid-column: 1 / -1; border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 4px; }
+        .stat-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-value { font-size: 18px; font-weight: 700; color: var(--text-main); }
+        .stat-value.highlight { color: var(--primary); }
+        .stat-value.success { color: var(--success); }
+
+        .update-section { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; background: var(--hover-bg); padding: 16px; border-radius: var(--radius-md); }
+        .update-label { font-size: 14px; font-weight: 600; color: var(--text-main); flex: 1; }
+        .update-section input { width: 90px; text-align: center; font-weight: 700; background: var(--card-bg); }
+        .btn-update { background: var(--text-main); color: var(--bg-color); border: none; padding: 10px 16px; border-radius: var(--radius-sm); cursor: pointer; font-size: 14px; font-weight: 600; transition: background 0.2s; }
+        .btn-update:hover { background: var(--primary); color: #fff; }
+        
+        .daily-timer { border-radius: var(--radius-md); padding: 20px; background: var(--bg-color); text-align: center; }
+        .timer-display { font-size: 32px; font-weight: 700; color: var(--text-main); margin: 10px 0; font-variant-numeric: tabular-nums; transition: color 0.3s ease; }
+        .btn-timer { background: var(--success); color: #fff; border: none; padding: 12px 24px; border-radius: 99px; font-size: 15px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.2); }
+        .btn-timer:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.3); }
+        .btn-timer.running { background: var(--primary); }
+        
+        .meta-pages-display { margin-top: 16px; padding: 12px; background: var(--card-bg); border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; }
+        .meta-pages-display strong { color: var(--primary); font-size: 18px; font-weight: 700; }
+        .meta-pages-success strong { color: var(--success); }
+
+        .empty-state { text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 16px; font-weight: 500; background: var(--card-bg); border-radius: var(--radius-lg); border: 1px dashed var(--border-color); }
+
+        /* Estilos de Modales Glassmorphism */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; opacity: 0; animation: fadeInModal 0.2s forwards; }
+        @keyframes fadeInModal { to { opacity: 1; } }
+        
+        .modal-content { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius-lg); width: 100%; max-width: 550px; max-height: 90vh; overflow-y: auto; padding: 30px; position: relative; box-shadow: var(--shadow-float); transform: scale(0.95); animation: scaleUp 0.2s forwards cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes scaleUp { to { transform: scale(1); } }
+        
+        .modal-close { position: absolute; top: 20px; right: 20px; background: var(--hover-bg); border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-main); transition: all 0.2s; }
+        .modal-close:hover { background: var(--text-main); color: var(--bg-color); transform: rotate(90deg); }
+        
+        .checklist-item { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; background: var(--bg-color); padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid transparent; transition: border-color 0.2s; }
+        .checklist-item:hover { border-color: var(--border-color); }
+        .checklist-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary); }
+        .checklist-text { flex: 1; font-size: 15px; font-weight: 500; }
+        .checklist-text.done { text-decoration: line-through; color: var(--text-muted); }
+
+        .schedule-item { padding: 16px; border-left: 4px solid var(--primary); background: var(--bg-color); margin-bottom: 12px; border-radius: 0 var(--radius-md) var(--radius-md) 0; display: flex; flex-direction: column; gap: 8px; box-shadow: var(--shadow-sm); }
+        .schedule-time { font-weight: 700; color: var(--primary); font-size: 16px; }
+        .schedule-title { font-weight: 600; font-size: 18px; display: flex; align-items: center; gap: 10px; }
+        .schedule-meta { font-size: 14px; color: var(--text-muted); }
+        
+        .chart-container { position: relative; height: 320px; width: 100%; margin-top: 20px; }
+        .btn-reset-zoom { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main); padding: 10px 16px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-reset-zoom:hover { background: var(--hover-bg); border-color: var(--primary); color: var(--primary); }
+
+        .metrics-header { display: flex; align-items: flex-start; gap: 12px; margin-top: 15px; }
+        .metrics-status { flex: 1; font-size: 14px; color: var(--text-main); padding: 16px; background: var(--bg-color); border-radius: var(--radius-md); }
+        
+        .book-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 14px; font-weight: 500; color: var(--text-main); }
+        .book-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+        .legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+        .proj-buttons { display: flex; gap: 8px; }
+        .proj-btn { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-color); cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; opacity: 0.5; transition: all 0.2s; }
+        .proj-btn.active { opacity: 1; transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+        .proj-btn.positive.active { background: #d1fae5; border-color: #10b981; }
+        .proj-btn.warning.active { background: #fee2e2; border-color: #f43f5e; }
+
+        .metrics-finish-info { font-size: 13px; font-weight: 500; margin-top: 15px; padding: 16px; background: var(--hover-bg); border-radius: var(--radius-md); }
+        .finish-header { color: var(--primary); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; margin-bottom: 10px; display: block; }
+        .finish-date-item { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+        .finish-date-text { font-weight: 700; color: var(--text-main); }
+        .finish-days { color: var(--text-muted); font-size: 12px; }
+
+        .chart-nav { display: grid; grid-template-columns: 44px 44px 1fr 44px 44px; gap: 8px; align-items: center; margin-top: 20px; padding: 12px; background: var(--bg-color); border-radius: var(--radius-md); }
+        .chart-nav button { height: 44px; border-radius: var(--radius-sm); font-size: 16px; background: var(--card-bg); border: 1px solid var(--border-color); cursor: pointer; transition: all 0.2s; }
+        .chart-nav button:hover:not(:disabled) { background: var(--hover-bg); color: var(--primary); border-color: var(--primary); }
+        .chart-nav button:disabled { opacity: 0.4; cursor: not-allowed; }
+        
+        .chart-slider { -webkit-appearance: none; width: 100%; height: 6px; background: var(--border-color); border-radius: 99px; outline: none; margin-top: 10px; }
+        .chart-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: var(--primary); border-radius: 50%; cursor: pointer; box-shadow: var(--shadow-sm); border: 2px solid #fff; }
+
+        .fab-add {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 64px; height: 64px; border-radius: 50%;
+            background: var(--primary); color: #fff;
+            border: none; font-size: 32px; font-weight: 400;
+            cursor: pointer; box-shadow: var(--shadow-float); z-index: 900;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .fab-add:hover { transform: scale(1.08) translateY(-4px); background: var(--primary-hover); }
+        .fab-add.hidden { opacity: 0; transform: scale(0) translateY(20px); pointer-events: none; }
+
+        .add-book-modal-title { font-size: 24px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+        .add-book-modal-subtitle { font-size: 14px; font-weight: 500; color: var(--primary); margin-bottom: 24px; }
     </style>
 </head>
 <body>
@@ -521,7 +384,7 @@
             <span id="hoursToggleIcon">▼</span>
         </button>
         <div id="hoursPanel" class="hours-panel">
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px; font-style: italic;">Marca las horas del día en las que sueles estar disponible para leer. El horario inteligente se ajustará automáticamente a estos bloques.</p>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 10px; font-weight: 500;">Marca las horas del día en las que sueles estar disponible para leer. El horario inteligente se ajustará automáticamente.</p>
             <div id="hoursGrid" class="hours-grid"></div>
             
             <div class="theme-toggle-row">
@@ -586,12 +449,12 @@
     <div id="bookModal" class="modal-overlay">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('bookModal')">&times;</button>
-            <h2 id="modalTitle" class="card-title" style="margin-bottom: 5px; color: var(--text-main); cursor: default; font-size: 22px;"></h2>
-            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px; font-style: italic;">Espacio de trabajo y apuntes</p>
+            <h2 id="modalTitle" class="card-title" style="margin-bottom: 8px; color: var(--text-main); cursor: default; font-size: 24px;"></h2>
+            <p style="font-size: 14px; color: var(--primary); font-weight: 500; margin-bottom: 24px;">Espacio de trabajo y apuntes</p>
             <label>Notas Libres (Se guardan al cerrar)</label>
             <textarea id="modalNotes" rows="6" placeholder="Escribe tus resúmenes, citas o ideas clave..."></textarea>
-            <label style="margin-top: 20px;">Lista de tareas / Capítulos</label>
-            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <label style="margin-top: 24px;">Lista de tareas / Capítulos</label>
+            <div style="display: flex; gap: 12px; margin-bottom: 20px;">
                 <input type="text" id="newChecklistInput" placeholder="Ej: Leer introducción...">
                 <button onclick="addChecklist()" class="btn-update">Añadir</button>
             </div>
@@ -602,38 +465,36 @@
     <div id="scheduleModal" class="modal-overlay">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('scheduleModal')">&times;</button>
-            <h2 style="font-size: 22px; color: var(--primary); margin-bottom: 5px;">Itinerario de Lectura</h2>
-            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px; font-style: italic;">Calculado dinámicamente según prioridad, tiempo restante y tus horas marcadas como disponibles.</p>
+            <h2 style="font-size: 24px; color: var(--text-main); margin-bottom: 8px;">Itinerario de Lectura</h2>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">Calculado dinámicamente según prioridad, tiempo restante y tus horas marcadas como disponibles.</p>
             <div id="scheduleContent"></div>
         </div>
     </div>
 
     <div id="metricsModal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-content" style="max-width: 750px;">
             <button class="modal-close" onclick="closeModal('metricsModal')">&times;</button>
-            <h2 style="font-size: 22px; color: var(--primary); margin-bottom: 5px;">Métricas de Progreso</h2>
-            <p style="font-size: 14px; color: var(--text-muted); font-style: italic;">
+            <h2 style="font-size: 24px; color: var(--text-main); margin-bottom: 8px;">Métricas de Progreso</h2>
+            <p style="font-size: 14px; color: var(--text-muted); font-weight: 500;">
                 Cada línea sube según las páginas leídas vs la meta diaria. Las líneas <strong>punteadas</strong> son proyecciones.
             </p>
 
             <div class="metrics-header">
                 <div id="metricsStatus" class="metrics-status">
-                    <div class="hoy-search-container">
-                        <input type="search" id="hoySearch" placeholder="Buscar libro..." oninput="onHoySearchInput()" autocomplete="off">
-                        <button type="button" class="hoy-search-clear" id="hoySearchClear" onclick="clearHoySearch()" aria-label="Limpiar búsqueda">×</button>
+                    <div class="search-container" style="margin-bottom: 12px;">
+                        <input type="search" id="hoySearch" placeholder="Buscar libro..." oninput="onHoySearchInput()" autocomplete="off" style="padding: 10px 14px 10px 36px; border-radius: var(--radius-sm);">
+                        <button type="button" class="search-clear" id="hoySearchClear" onclick="clearHoySearch()">×</button>
                     </div>
-                    <strong class="hoy-title">Hoy</strong>
-                    <div id="hoyBooksList"><em style="color: var(--text-muted); font-size: 12px;">Cargando…</em></div>
-                    <div id="hoyPagination"></div>
+                    <strong style="color: var(--primary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">Hoy</strong>
+                    <div id="hoyBooksList"><em style="color: var(--text-muted); font-size: 14px;">Cargando…</em></div>
+                    <div id="hoyPagination" style="margin-top: 12px; display: flex; justify-content: center; gap: 10px;"></div>
                 </div>
                 <div class="proj-buttons">
                     <div>
                         <button id="btnPosProj" class="proj-btn positive active" onclick="toggleProjBtn('positive')" title="Proyección si cumples (+1/día)">📈</button>
-                        <div class="proj-btn-caption">+1</div>
                     </div>
                     <div>
                         <button id="btnWarnProj" class="proj-btn warning active" onclick="toggleProjBtn('warning')" title="Proyección si no lees (−1/día)">📉</button>
-                        <div class="proj-btn-caption">−1</div>
                     </div>
                 </div>
             </div>
@@ -642,32 +503,30 @@
 
             <div class="chart-container">
                 <canvas id="progressChart"></canvas>
-                <div id="chartEmptyMessage" class="chart-empty-message" style="display: none;">
-                    Activa al menos un libro con el check<br>para verlo en la gráfica
+                <div id="chartEmptyMessage" class="chart-empty-message" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--text-muted); font-weight: 500;">
+                    Activa al menos un libro para verlo en la gráfica
                 </div>
             </div>
 
             <div class="chart-nav">
                 <button onclick="scrollChart(-7)" title="7 días atrás">⏪</button>
                 <button onclick="scrollChart(-1)" title="Día anterior">◀</button>
-                <div class="chart-nav-center">
-                    <div id="chartRangeText" class="chart-range-text">—</div>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0;">
+                    <div id="chartRangeText" style="font-size: 12px; font-weight: 600; color: var(--text-main);">—</div>
                     <input type="range" id="chartSlider" class="chart-slider" min="0" max="0" value="0" step="1" oninput="onSliderChange(this.value)">
                 </div>
                 <button onclick="scrollChart(1)" title="Día siguiente">▶</button>
                 <button onclick="scrollChart(7)" title="7 días adelante">⏩</button>
             </div>
 
-            <div class="btn-footer-row">
+            <div style="display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap;">
                 <button onclick="resetZoom()" class="btn-reset-zoom">🎯 Centrar en HOY</button>
                 <button onclick="jumpToFinish()" class="btn-reset-zoom">📅 Ir al final</button>
             </div>
-            <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 10px;">
-                *El eje vertical se ajusta automáticamente al rango visible.
-            </p>
         </div>
     </div>
 
+    <!-- SCRIPT INTACTO (Sin modificaciones en la lógica JavaScript original) -->
     <script>
         let progressChartInstance = null; 
 
@@ -692,9 +551,6 @@
         };
         let activeTimers = {}; 
 
-        // ============================================================
-        // SISTEMA DE TEMAS Y GRÁFICA
-        // ============================================================
         function applyTheme(theme) {
             const btn = document.getElementById('themeToggleBtn');
             if (theme === 'amber') {
@@ -704,7 +560,7 @@
                 document.body.removeAttribute('data-theme');
                 if (btn) btn.innerText = '🌿 Esmeralda';
             }
-            updateChartColors(); // Actualiza los colores del gráfico al cambiar de tema
+            updateChartColors(); 
         }
 
         function toggleTheme() {
@@ -714,34 +570,31 @@
             applyTheme(newTheme);
         }
 
-        // Configura Chart.js para respetar el modo claro/oscuro
         function updateChartColors() {
             const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             
-            Chart.defaults.color = isDark ? '#f9edf0' : '#5c5c5c';
-            Chart.defaults.borderColor = isDark ? 'rgba(249, 237, 240, 0.1)' : 'rgba(150, 150, 150, 0.15)';
+            Chart.defaults.color = isDark ? '#94a3b8' : '#64748b';
+            Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
+            Chart.defaults.borderColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
             
-            Chart.defaults.plugins.tooltip.backgroundColor = isDark ? 'rgba(19, 36, 33, 0.95)' : 'rgba(255, 255, 255, 0.95)';
-            Chart.defaults.plugins.tooltip.titleColor = isDark ? '#f9edf0' : '#1a1a1a';
-            Chart.defaults.plugins.tooltip.bodyColor = isDark ? '#f9edf0' : '#1a1a1a';
-            Chart.defaults.plugins.tooltip.borderColor = isDark ? 'rgba(249, 237, 240, 0.2)' : 'rgba(0, 0, 0, 0.1)';
+            Chart.defaults.plugins.tooltip.backgroundColor = isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)';
+            Chart.defaults.plugins.tooltip.titleColor = isDark ? '#f8fafc' : '#1e293b';
+            Chart.defaults.plugins.tooltip.bodyColor = isDark ? '#e2e8f0' : '#475569';
+            Chart.defaults.plugins.tooltip.borderColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
             Chart.defaults.plugins.tooltip.borderWidth = 1;
+            Chart.defaults.plugins.tooltip.padding = 12;
+            Chart.defaults.plugins.tooltip.cornerRadius = 8;
         }
 
-        // Escuchar cambios en el sistema operativo
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
             updateChartColors();
             if (progressChartInstance) renderMetricsChart();
         });
 
-        // Inicialización
         const savedTheme = localStorage.getItem('appTheme') || 'emerald';
         applyTheme(savedTheme);
         updateChartColors();
 
-        // ============================================================
-        // HELPERS PARA PÁGINAS
-        // ============================================================
         function getLocalISO(d = new Date()) {
             return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
         }
@@ -1368,9 +1221,9 @@
 
             if (filteredBooks.length === 0) {
                 if (isGlobalSearch) {
-                    booksList.innerHTML = `<div class="empty-state">Sin resultados para "${searchEl.value}"<br><span style="font-size: 13px; color: var(--text-muted); font-style: normal;">🔍 Busqué en todas las categorías</span></div>`;
+                    booksList.innerHTML = `<div class="empty-state">Sin resultados para "${searchEl.value}"<br><span style="font-size: 14px; color: var(--text-muted); font-style: normal; display:inline-block; margin-top:10px;">🔍 Busqué en todas las categorías</span></div>`;
                 } else {
-                    booksList.innerHTML = '<div class="empty-state">El registro está vacío.</div>';
+                    booksList.innerHTML = '<div class="empty-state">El registro está vacío.<br><span style="font-size: 14px; margin-top: 10px; display:inline-block;">Pulsa el botón <strong>+</strong> para empezar.</span></div>';
                 }
                 return;
             }
@@ -1423,7 +1276,7 @@
                             ${book.active ? 'Lectura Activa' : 'Lectura Inactiva'}
                         </label>
                         <div class="priority-control">
-                            <label>Prioridad: <span id="val-pri-${book.id}">${book.priority}%</span></label>
+                            <label style="margin:0;">Prioridad: <span id="val-pri-${book.id}" style="color:var(--primary); font-weight:700;">${book.priority}%</span></label>
                             <input type="range" min="0" max="100" value="${book.priority}" 
                                 oninput="document.getElementById('val-pri-${book.id}').innerText = this.value + '%'"
                                 onchange="updatePriority(${book.id}, this.value)">
@@ -1467,33 +1320,33 @@
                         <div class="update-section">
                             <span class="update-label">Página alcanzada:</span>
                             <input type="number" id="update-page-${book.id}" value="${book.currentPage}">
-                            <button onclick="updatePage(${book.id})" class="btn-update">Actualizar Progreso</button>
+                            <button onclick="updatePage(${book.id})" class="btn-update">Actualizar</button>
                         </div>
 
                         <div class="daily-timer">
-                            <label style="margin-bottom: 0;">Cronómetro de Sesión Diaria</label>
+                            <label style="margin-bottom: 0; color: var(--text-main);">Cronómetro de Sesión Diaria</label>
                             <div id="timer-display-${book.id}" class="timer-display">00:00 / ${book.dailyMins}:00</div>
-                            <div class="progress-track" style="height: 6px; margin: 10px 0;">
+                            <div class="progress-track" style="height: 8px; margin: 15px 0;">
                                 <div id="timer-fill-${book.id}" class="progress-fill" style="width: 0%; background: var(--success);"></div>
                             </div>
-                            <div style="display: flex; justify-content: center; gap: 15px; align-items: center; margin-top: 12px;">
+                            <div style="display: flex; justify-content: center; gap: 15px; align-items: center; margin-top: 15px;">
                                 <button id="btn-timer-${book.id}" onclick="toggleTimer(${book.id})" class="btn-timer ${isTimerRunning ? 'running' : ''}">
                                     ${btnTimerText}
                                 </button>
-                                <button onclick="editTimer(${book.id})" class="icon-btn" style="font-size: 18px;" title="Ingresar tiempo manualmente">✏️</button>
-                                <button onclick="resetTimer(${book.id})" class="icon-btn" style="font-size: 18px;" title="Reiniciar a cero">🔄</button>
+                                <button onclick="editTimer(${book.id})" class="icon-btn" title="Ingresar tiempo manualmente">✏️</button>
+                                <button onclick="resetTimer(${book.id})" class="icon-btn" title="Reiniciar a cero">🔄</button>
                             </div>
                             
                             <div class="meta-pages-display ${isMetaMet ? 'meta-pages-success' : ''}">
                                 <div>Meta páginas: <strong>${paginasHoy}</strong>/${metaPaginas}</div>
                             </div>
                             
-                            <p id="timer-msg-${book.id}" style="color: var(--success); font-style: italic; font-weight: bold; margin-top: 10px; display: none;">
+                            <p id="timer-msg-${book.id}" style="color: var(--success); font-weight: 600; margin-top: 15px; display: none;">
                                 ¡Objetivo de lectura diario alcanzado! 🏆
                             </p>
                         </div>
 
-                        <div class="stats-grid" style="margin-top: 15px;">
+                        <div class="stats-grid">
                             <div class="stat-item"><span class="stat-label">Tiempo Leído</span><span class="stat-value">${formatTime(stats.readMins)}</span></div>
                             <div class="stat-item"><span class="stat-label">Restante</span><span class="stat-value">${formatTime(stats.remainingMins)}</span></div>
                             <div class="stat-item"><span class="stat-label">Duración Total</span><span class="stat-value">${formatTime(stats.totalMins)}</span></div>
@@ -1754,7 +1607,7 @@
                     const startTime = virtTime.toLocaleTimeString([], formatTimeOpts);
                     virtTime.setMinutes(virtTime.getMinutes() + minsLeftToSchedule);
                     const endTime = virtTime.toLocaleTimeString([], formatTimeOpts);
-                    scheduleHTML += `<div class="schedule-item"><span class="schedule-time">${startTime} - ${endTime}</span><span class="schedule-title"><span class="schedule-category">${book.category}</span>${book.title}</span><span class="schedule-meta">Prioridad: ${book.priority}% | Duración: ${minsLeftToSchedule} min (Meta: ${book.dailyMins} min)</span></div>`;
+                    scheduleHTML += `<div class="schedule-item"><span class="schedule-time">${startTime} - ${endTime}</span><span class="schedule-title"><span class="card-category-badge" style="margin-top:0;">${book.category}</span> ${book.title}</span><span class="schedule-meta">Prioridad: ${book.priority}% | Duración: ${minsLeftToSchedule} min (Meta: ${book.dailyMins} min)</span></div>`;
                 } else {
                     let partCount = 1;
                     while (minsLeftToSchedule > 0) {
@@ -1768,7 +1621,7 @@
                         if (minsLeftToSchedule > blockMins || partCount > 1) {
                             titleDisplay += ` (Parte ${partCount})`; partCount++;
                         }
-                        scheduleHTML += `<div class="schedule-item"><span class="schedule-time">${startTime} - ${endTime}</span><span class="schedule-title"><span class="schedule-category">${book.category}</span>${titleDisplay}</span><span class="schedule-meta">Prioridad: ${book.priority}% | Duración: ${blockMins} min</span></div>`;
+                        scheduleHTML += `<div class="schedule-item"><span class="schedule-time">${startTime} - ${endTime}</span><span class="schedule-title"><span class="card-category-badge" style="margin-top:0;">${book.category}</span> ${titleDisplay}</span><span class="schedule-meta">Prioridad: ${book.priority}% | Duración: ${blockMins} min</span></div>`;
                         minsLeftToSchedule -= blockMins;
                     }
                 }
@@ -1926,7 +1779,7 @@
                 
                 if (filtered.length === 0) {
                     const rawTerm = document.getElementById('hoySearch') ? document.getElementById('hoySearch').value : '';
-                    listEl.innerHTML = `<em style="color: var(--text-muted); font-size: 12px;">Sin resultados para "${rawTerm}"</em>`;
+                    listEl.innerHTML = `<em style="color: var(--text-muted); font-size: 14px;">Sin resultados para "${rawTerm}"</em>`;
                     pagEl.innerHTML = '';
                     listEl.dataset.structureKey = 'no-results';
                     renderFinishInfo(allActiveBooks, colorMap, finishEl);
@@ -1957,11 +1810,9 @@
                     listEl.dataset.structureKey = structureKey;
                     
                     if (totalPages > 1) {
-                        pagEl.innerHTML = `<div class="hoy-pagination">
-                            <button onclick="changeHoyPage(-1)" ${hoyPageIndex === 0 ? 'disabled' : ''} aria-label="Anterior">◀</button>
-                            <span>${hoyPageIndex + 1} / ${totalPages}</span>
-                            <button onclick="changeHoyPage(1)" ${hoyPageIndex >= totalPages - 1 ? 'disabled' : ''} aria-label="Siguiente">▶</button>
-                        </div>`;
+                        pagEl.innerHTML = `<button onclick="changeHoyPage(-1)" ${hoyPageIndex === 0 ? 'disabled' : ''} style="padding: 4px 10px; border-radius:4px; border:1px solid var(--border-color); background:var(--card-bg); cursor:pointer;">◀</button>
+                            <span style="font-size:13px; font-weight:600;">${hoyPageIndex + 1} / ${totalPages}</span>
+                            <button onclick="changeHoyPage(1)" ${hoyPageIndex >= totalPages - 1 ? 'disabled' : ''} style="padding: 4px 10px; border-radius:4px; border:1px solid var(--border-color); background:var(--card-bg); cursor:pointer;">▶</button>`;
                     } else {
                         pagEl.innerHTML = '';
                     }
@@ -1992,7 +1843,7 @@
             const visibleBooks = allActiveBooks.filter(b => b.metricVisible !== false);
             
             if (visibleBooks.length === 0) {
-                finishEl.innerHTML = `<strong class="finish-header">📅 Fechas finales estimadas</strong><div style="color: var(--text-muted); font-style: italic; font-size: 12px; padding: 4px 0;">Activa un libro con el check para ver su fecha</div>`;
+                finishEl.innerHTML = `<strong class="finish-header">📅 Fechas finales estimadas</strong><div style="color: var(--text-muted); font-weight: 500; font-size: 13px; padding: 4px 0;">Activa un libro para ver su proyección</div>`;
                 return;
             }
             
@@ -2001,7 +1852,7 @@
                 const stats = calculateStats(book);
                 
                 if (book.currentPage >= book.totalPages) {
-                    return `<div class="finish-date-item"><span class="finish-dot" style="background: ${color}"></span><span class="finish-book-name">${book.title}</span><span class="finish-date-text">🏁 Terminado</span></div>`;
+                    return `<div class="finish-date-item"><span class="legend-dot" style="background: ${color}"></span><span style="flex:1; font-weight:700;">${book.title}</span><span class="finish-date-text">🏁 Terminado</span></div>`;
                 }
                 
                 const d = stats.finishDate;
@@ -2009,8 +1860,8 @@
                 const mm = String(d.getMonth() + 1).padStart(2, '0');
                 const yy = d.getFullYear();
                 return `<div class="finish-date-item">
-                    <span class="finish-dot" style="background: ${color}"></span>
-                    <span class="finish-book-name">${book.title}</span>
+                    <span class="legend-dot" style="background: ${color}"></span>
+                    <span style="flex:1; font-weight:600;">${book.title}</span>
                     <span class="finish-date-text">${dd}/${mm}/${yy}</span>
                     <span class="finish-days">· ${stats.daysRemaining}d</span>
                 </div>`;
@@ -2160,7 +2011,7 @@
                     backgroundColor: color + '25',
                     borderWidth: 3,
                     pointRadius: radii,
-                    pointBackgroundColor: timelineDates.map((_, i) => i === todayIdx && goalMetToday ? '#2d6a4f' : color),
+                    pointBackgroundColor: timelineDates.map((_, i) => i === todayIdx && goalMetToday ? '#10b981' : color),
                     pointBorderColor: '#ffffff',
                     pointBorderWidth: 2,
                     pointHoverRadius: 8,
@@ -2203,7 +2054,7 @@
                     projectionDatasets.push({
                         label: `${meta.book.title} 📉`,
                         data: warnData,
-                        borderColor: 'rgba(150, 150, 150, 0.7)',
+                        borderColor: 'rgba(150, 150, 150, 0.5)',
                         backgroundColor: 'transparent',
                         borderWidth: 2,
                         borderDash: [5, 5],
@@ -2239,8 +2090,8 @@
                     const y = scales.y.getPixelForValue(0);
                     if (y < chartArea.top || y > chartArea.bottom) return;
                     ctx.save();
-                    const isDark = document.body.getAttribute('data-theme') === 'amber' ? false : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-                    ctx.strokeStyle = isDark ? 'rgba(249, 237, 240, 0.2)' : 'rgba(114, 47, 55, 0.35)';
+                    const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)';
                     ctx.lineWidth = 1.5;
                     ctx.setLineDash([6, 4]);
                     ctx.beginPath();
@@ -2260,15 +2111,15 @@
                     if (x < chartArea.left || x > chartArea.right) return;
                     ctx.save();
                     const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                    ctx.strokeStyle = isDark ? 'rgba(249, 237, 240, 0.3)' : 'rgba(114, 47, 55, 0.3)';
+                    ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)';
                     ctx.lineWidth = 1.5;
                     ctx.setLineDash([3, 3]);
                     ctx.beginPath();
                     ctx.moveTo(x, chartArea.top);
                     ctx.lineTo(x, chartArea.bottom);
                     ctx.stroke();
-                    ctx.fillStyle = isDark ? 'rgba(249, 237, 240, 0.85)' : 'rgba(114, 47, 55, 0.85)';
-                    ctx.font = 'bold italic 11px "Times New Roman", serif';
+                    ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)';
+                    ctx.font = 'bold 11px "Inter", sans-serif';
                     ctx.textAlign = 'center';
                     ctx.fillText('HOY', x, chartArea.top + 12);
                     ctx.restore();
@@ -2310,32 +2161,34 @@
                         const dateLabel = `📅 ${p[2]}/${p[1]}`;
                         const targetLabel = `🎯 +${f.target}d`;
                         ctx.setLineDash([]);
-                        ctx.font = 'bold 10px "Times New Roman", serif';
+                        ctx.font = 'bold 11px "Inter", sans-serif';
                         const dateW = ctx.measureText(dateLabel).width;
-                        ctx.font = 'italic 9px "Times New Roman", serif';
+                        ctx.font = '500 10px "Inter", sans-serif';
                         const targetW = ctx.measureText(targetLabel).width;
-                        const boxW = Math.max(dateW, targetW) + 10;
-                        const boxH = 30;
+                        const boxW = Math.max(dateW, targetW) + 12;
+                        const boxH = 34;
                         const bx = Math.max(chartArea.left + 2, Math.min(x - boxW / 2, chartArea.right - boxW - 2));
-                        const by = chartArea.top + 28 + (i % 3) * 34;
+                        const by = chartArea.top + 28 + (i % 3) * 38;
                         
-                        ctx.fillStyle = isDark ? 'rgba(19, 36, 33, 0.95)' : 'rgba(255, 255, 255, 0.95)';
+                        ctx.fillStyle = isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)';
                         ctx.strokeStyle = f.color;
                         ctx.lineWidth = 1.5;
+                        
+                        // Rounded rect
                         ctx.beginPath();
-                        ctx.rect(bx, by, boxW, boxH);
+                        ctx.roundRect(bx, by, boxW, boxH, 6);
                         ctx.fill();
                         ctx.stroke();
                         
                         ctx.fillStyle = f.color;
-                        ctx.font = 'bold 10px "Times New Roman", serif';
+                        ctx.font = 'bold 11px "Inter", sans-serif';
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
-                        ctx.fillText(dateLabel, bx + boxW / 2, by + 9);
+                        ctx.fillText(dateLabel, bx + boxW / 2, by + 10);
                         
-                        ctx.font = 'italic 9px "Times New Roman", serif';
-                        ctx.fillStyle = f.color + 'cc';
-                        ctx.fillText(targetLabel, bx + boxW / 2, by + 21);
+                        ctx.font = '500 10px "Inter", sans-serif';
+                        ctx.fillStyle = f.color + 'dd';
+                        ctx.fillText(targetLabel, bx + boxW / 2, by + 24);
                     });
                     ctx.restore();
                 }
@@ -2355,7 +2208,7 @@
                         y: {
                             min: initialYRange.min,
                             max: initialYRange.max,
-                            title: { display: true, text: 'Progreso (páginas leídas vs meta)', font: { size: 11 } },
+                            title: { display: true, text: 'Progreso (páginas leídas vs meta)', font: { size: 12, weight: '500' } },
                             grid: { color: Chart.defaults.borderColor },
                             ticks: { precision: 0, stepSize: 1 }
                         },
@@ -2363,7 +2216,7 @@
                             min: xMinInitial,
                             max: xMaxInitial,
                             grid: { display: false },
-                            ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 8, font: { size: 10 } }
+                            ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 8, font: { size: 11 } }
                         }
                     },
                     plugins: {
@@ -2478,7 +2331,7 @@
                 const div = document.createElement('div'); div.className = 'checklist-item';
                 div.innerHTML = `<input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleCheck(${index})">
                     <span class="checklist-text ${item.done ? 'done' : ''}">${item.text}</span>
-                    <button onclick="deleteCheck(${index})" class="icon-btn" style="color: var(--danger); font-size: 16px;">&times;</button>`;
+                    <button onclick="deleteCheck(${index})" class="icon-btn" style="color: var(--danger); font-size: 20px; line-height: 1;">&times;</button>`;
                 container.appendChild(div);
             });
         }
