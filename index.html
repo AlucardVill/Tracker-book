@@ -164,6 +164,7 @@
             transition: all 0.2s;
         }
         .search-container input:focus { border-color: var(--primary); background: white; }
+        .search-container.search-active input { border-color: var(--primary); background: white; }
         .search-container::before {
             content: '🔍';
             position: absolute;
@@ -190,13 +191,48 @@
         .search-clear.visible { display: block; }
         .search-clear:hover { color: var(--primary); }
 
+        /* ============================================ */
+        /* HEADER DE BÚSQUEDA GLOBAL                     */
+        /* ============================================ */
+        .search-results-header {
+            padding: 10px 14px;
+            background: #f4eee1;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 13px;
+            color: var(--text-main);
+            margin-bottom: 15px;
+            text-align: center;
+            font-style: italic;
+        }
+        .search-results-header strong { color: var(--primary); }
+
+        /* ============================================ */
+        /* BADGE DE CATEGORÍA (solo en modo búsqueda)    */
+        /* ============================================ */
+        .card-category-badge {
+            display: inline-block;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #eae5dc;
+            color: var(--primary);
+            padding: 2px 7px;
+            border-radius: 3px;
+            border: 1px solid var(--border-color);
+            font-weight: bold;
+            margin-top: 5px;
+            font-style: normal;
+        }
+
         .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 20px; margin-bottom: 20px; box-shadow: 2px 2px 8px rgba(0,0,0,0.04); }
         .card.inactive { opacity: 0.7; background: #faf9f7; }
         
-        .card-header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .card-header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; gap: 10px; }
+        .card-header-info { flex: 1; min-width: 0; }
         .card-title { font-size: 20px; color: var(--primary); font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: color 0.2s; margin: 0; }
         .card-title:hover { color: var(--primary-hover); text-decoration: underline; }
-        .card-actions { display: flex; gap: 12px; }
+        .card-actions { display: flex; gap: 12px; flex-shrink: 0; }
         
         .card-controls { display: flex; flex-direction: column; gap: 10px; background: var(--bg-color); padding: 12px; border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 15px; text-align: center; }
         .status-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; font-size: 14px; }
@@ -266,9 +302,6 @@
         .metrics-status { flex: 1; min-width: 0; font-size: 13px; color: var(--text-main); padding: 10px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; line-height: 1.8; text-align: left; }
         .hoy-title { color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px; }
         
-        /* ============================================================ */
-        /* BÚSQUEDA DENTRO DEL RECUADRO HOY                              */
-        /* ============================================================ */
         .hoy-search-container {
             position: relative;
             margin-bottom: 6px;
@@ -401,8 +434,8 @@
 
         <div class="tabs-container" id="tabsContainer"></div>
 
-        <div class="search-container">
-            <input type="search" id="bookSearch" placeholder="Buscar título..." oninput="onSearchInput()">
+        <div class="search-container" id="searchContainer">
+            <input type="search" id="bookSearch" placeholder="Buscar en todas las categorías..." oninput="onSearchInput()">
             <button class="search-clear" id="searchClear" onclick="clearSearch()" aria-label="Limpiar búsqueda">×</button>
         </div>
 
@@ -538,8 +571,6 @@
 
         let hoyPageIndex = 0;
         const HOY_PAGE_SIZE = 4;
-        
-        // NUEVO: búsqueda dentro del recuadro "Hoy"
         let hoySearchTerm = '';
 
         let appData = {
@@ -647,20 +678,20 @@
 
         function onSearchInput() {
             const clearBtn = document.getElementById('searchClear');
+            const container = document.getElementById('searchContainer');
             const val = document.getElementById('bookSearch').value;
             if (clearBtn) clearBtn.classList.toggle('visible', val.length > 0);
+            if (container) container.classList.toggle('search-active', val.length > 0);
             renderBooks();
         }
 
         function clearSearch() {
             document.getElementById('bookSearch').value = '';
             document.getElementById('searchClear').classList.remove('visible');
+            document.getElementById('searchContainer').classList.remove('search-active');
             renderBooks();
         }
 
-        // ============================================================
-        // BÚSQUEDA DENTRO DEL RECUADRO "HOY"
-        // ============================================================
         function onHoySearchInput() {
             const input = document.getElementById('hoySearch');
             const clearBtn = document.getElementById('hoySearchClear');
@@ -968,10 +999,13 @@
                 
                 if (elapsed < 600 && appData.categories.includes(cat)) {
                     appData.activeCategory = cat;
+                    // Al cambiar de categoría, limpiar búsqueda para volver a la vista normal
                     const searchEl = document.getElementById('bookSearch');
                     if (searchEl) searchEl.value = '';
                     const clearBtn = document.getElementById('searchClear');
                     if (clearBtn) clearBtn.classList.remove('visible');
+                    const searchContainer = document.getElementById('searchContainer');
+                    if (searchContainer) searchContainer.classList.remove('search-active');
                     
                     saveData();
                     renderTabs();
@@ -1043,28 +1077,48 @@
             }
         }
 
+        // ============================================================
+        // LIBROS — Búsqueda global en TODAS las categorías
+        // ============================================================
         function renderBooks() {
             const booksList = document.getElementById('booksList');
             booksList.innerHTML = '';
             
             const searchEl = document.getElementById('bookSearch');
             const searchTerm = (searchEl ? searchEl.value : '').trim().toLowerCase();
+            const isGlobalSearch = searchTerm.length > 0;
             
-            let filteredBooks = appData.books.filter(b => b.category === appData.activeCategory);
+            let filteredBooks;
             
-            if (searchTerm) {
-                filteredBooks = filteredBooks.filter(b => 
+            if (isGlobalSearch) {
+                // Búsqueda global: todas las categorías
+                filteredBooks = appData.books.filter(b => 
                     b.title.toLowerCase().includes(searchTerm)
                 );
+            } else {
+                // Vista normal: solo categoría activa
+                filteredBooks = appData.books.filter(b => b.category === appData.activeCategory);
             }
 
             if (filteredBooks.length === 0) {
-                if (searchTerm) {
-                    booksList.innerHTML = `<div class="empty-state">Sin resultados para "${searchEl.value}"</div>`;
+                if (isGlobalSearch) {
+                    booksList.innerHTML = `<div class="empty-state">
+                        Sin resultados para "${searchEl.value}"<br>
+                        <span style="font-size: 13px; color: var(--text-muted); font-style: normal;">🔍 Busqué en todas las categorías</span>
+                    </div>`;
                 } else {
                     booksList.innerHTML = '<div class="empty-state">El registro está vacío.</div>';
                 }
                 return;
+            }
+
+            // Header informativo si estamos en búsqueda global
+            if (isGlobalSearch) {
+                const header = document.createElement('div');
+                header.className = 'search-results-header';
+                const catCount = new Set(filteredBooks.map(b => b.category)).size;
+                header.innerHTML = `🔍 <strong>${filteredBooks.length}</strong> resultado${filteredBooks.length !== 1 ? 's' : ''} en <strong>${catCount}</strong> categoría${catCount !== 1 ? 's' : ''}`;
+                booksList.appendChild(header);
             }
 
             const sortedBooks = filteredBooks.slice().sort((a, b) => {
@@ -1082,9 +1136,12 @@
 
                 card.innerHTML = `
                     <div class="card-header-top">
-                        <h3 class="card-title" onclick="openNotesModal(${book.id})" title="Abrir espacio de notas">
-                            ${book.title} <span style="font-size: 16px;">📝</span>
-                        </h3>
+                        <div class="card-header-info">
+                            <h3 class="card-title" onclick="openNotesModal(${book.id})" title="Abrir espacio de notas">
+                                ${book.title} <span style="font-size: 16px;">📝</span>
+                            </h3>
+                            ${isGlobalSearch ? `<div class="card-category-badge">📁 ${book.category}</div>` : ''}
+                        </div>
                         <div class="card-actions">
                             <button onclick="toggleEdit(${book.id})" class="icon-btn" title="Editar">✏️</button>
                             <button onclick="deleteBook(${book.id})" class="icon-btn" title="Eliminar">🗑️</button>
@@ -1194,6 +1251,7 @@
             
             document.getElementById('bookSearch').value = '';
             document.getElementById('searchClear').classList.remove('visible');
+            document.getElementById('searchContainer').classList.remove('search-active');
             
             saveData(); renderTabs(); renderBooks(); this.reset(); document.getElementById('currentPage').value = 0;
         });
@@ -1552,7 +1610,6 @@
             document.getElementById('btnWarnProj').classList.toggle('active', showWarningProjection);
             chartViewStart = -1;
             hoyPageIndex = 0;
-            // Reset search on open
             hoySearchTerm = '';
             const hSearch = document.getElementById('hoySearch');
             if (hSearch) hSearch.value = '';
@@ -1578,9 +1635,6 @@
             }, 50);
         }
 
-        // ============================================================
-        // ESTADO "HOY:" — con búsqueda, checkbox y paginación
-        // ============================================================
         function updateMetricsStatus() {
             try {
                 const allActiveBooks = appData.books.filter(b => b.active);
@@ -1597,7 +1651,6 @@
                     return;
                 }
                 
-                // Filtrar por búsqueda del recuadro Hoy
                 let filtered = allActiveBooks;
                 if (hoySearchTerm) {
                     filtered = allActiveBooks.filter(b => b.title.toLowerCase().includes(hoySearchTerm));
@@ -1610,8 +1663,6 @@
                     listEl.innerHTML = `<em style="color: var(--text-muted); font-size: 12px;">Sin resultados para "${rawTerm}"</em>`;
                     pagEl.innerHTML = '';
                     listEl.dataset.structureKey = 'no-results';
-                    
-                    // Las fechas finales se siguen mostrando para todos los visibles
                     renderFinishInfo(allActiveBooks, colorMap, finishEl);
                     return;
                 }
@@ -1641,7 +1692,6 @@
                     listEl.innerHTML = rows;
                     listEl.dataset.structureKey = structureKey;
                     
-                    // Paginación
                     if (totalPages > 1) {
                         pagEl.innerHTML = `<div class="hoy-pagination">
                             <button onclick="changeHoyPage(-1)" ${hoyPageIndex === 0 ? 'disabled' : ''} aria-label="Anterior">◀</button>
@@ -1653,7 +1703,6 @@
                     }
                 }
                 
-                // Actualizar scores en cada fila
                 pageBooks.forEach((book) => {
                     const scoreEl = listEl.querySelector(`.book-score[data-book-id="${book.id}"]`);
                     if (!scoreEl) return;
@@ -1666,7 +1715,6 @@
                     scoreEl.innerHTML = `<strong>${book.title}</strong>: ${sign}${pts.toFixed(2)} (${pct}%)${check}`;
                 });
                 
-                // Fechas finales — todos los visibles (no filtrados por búsqueda)
                 renderFinishInfo(allActiveBooks, colorMap, finishEl);
                 
             } catch (err) {
