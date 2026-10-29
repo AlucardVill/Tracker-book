@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Tracker de Lectura</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg-color: #fdfbf7;
@@ -41,6 +42,13 @@
         }
         .btn-schedule:hover { background: #333; }
 
+        .btn-metrics {
+            background: var(--bg-color); color: var(--primary); border: 1px solid var(--primary); padding: 12px 20px; border-radius: 4px;
+            font-size: 16px; cursor: pointer; width: 100%; display: flex; font-family: var(--font-family); font-weight: bold;
+            align-items: center; justify-content: center; gap: 8px; transition: background 0.2s; margin-bottom: 10px;
+        }
+        .btn-metrics:hover { background: #f4eee1; }
+
         .hours-dropdown-btn {
             background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main);
             padding: 10px 15px; border-radius: 4px; font-size: 15px; cursor: pointer; font-family: var(--font-family);
@@ -48,10 +56,7 @@
             margin-bottom: 15px;
         }
         .hours-dropdown-btn:hover { background: #eae5dc; }
-        .hours-panel {
-            background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 4px;
-            margin-bottom: 20px; display: none; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-        }
+        .hours-panel { background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 4px; margin-bottom: 20px; display: none; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
         .hours-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(55px, 1fr)); gap: 8px; margin-top: 10px; }
         .hour-btn { padding: 6px 0; border-radius: 4px; font-size: 13px; text-align: center; cursor: pointer; font-family: var(--font-family); transition: all 0.2s; }
         .hour-btn.selected { background: var(--primary); color: white; border: 1px solid var(--primary); }
@@ -141,6 +146,8 @@
         .schedule-title { color: var(--text-main); font-size: 18px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
         .schedule-category { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background: #eae5dc; color: var(--primary); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--border-color); }
         .schedule-meta { font-size: 13px; color: var(--text-muted); font-style: italic; }
+        
+        .chart-container { position: relative; height: 350px; width: 100%; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -152,6 +159,7 @@
         </header>
 
         <button onclick="generateSchedule()" class="btn-schedule">📅 Generar Horario de Hoy</button>
+        <button onclick="openMetricsModal()" class="btn-metrics">📈 Gráfica de Rendimiento</button>
 
         <button onclick="toggleHoursPanel()" class="hours-dropdown-btn">
             <span>⏱️ Configurar Horas Disponibles</span>
@@ -196,6 +204,7 @@
         <div id="booksList"></div>
     </div>
 
+    <!-- Modales -->
     <div id="bookModal" class="modal-overlay">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('bookModal')">&times;</button>
@@ -223,7 +232,26 @@
         </div>
     </div>
 
+    <div id="metricsModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 650px;">
+            <button class="modal-close" onclick="closeModal('metricsModal')">&times;</button>
+            <h2 style="font-size: 22px; color: var(--primary); margin-bottom: 5px;">Índice de Rendimiento de Lectura</h2>
+            <p style="font-size: 14px; color: var(--text-muted); font-style: italic;">Las líneas suben al cumplir o superar tu meta diaria, y bajan si no lees o lees por debajo del objetivo.</p>
+            
+            <div class="chart-container">
+                <canvas id="progressChart"></canvas>
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 15px;">
+                *El historial refleja la evolución diaria de tus lecturas activas.
+            </p>
+        </div>
+    </div>
+
     <script>
+        Chart.defaults.font.family = '"Times New Roman", Times, serif';
+        Chart.defaults.color = '#5c5c5c';
+        let progressChartInstance = null; 
+
         let appData = {
             categories: ['Lecturas Actuales', 'Por Leer'],
             activeCategory: 'Lecturas Actuales',
@@ -235,6 +263,7 @@
 
         const savedData = localStorage.getItem('readingTrackerData');
         const currentDateStr = new Date().toDateString();
+        const isoToday = new Date().toISOString().split('T')[0]; 
 
         if (savedData) {
             appData = JSON.parse(savedData);
@@ -246,11 +275,20 @@
                 if(b.active === undefined) b.active = true;
                 if(b.priority === undefined) b.priority = 50;
                 if(b.dailySeconds === undefined) b.dailySeconds = 0;
+                
+                if(b.history === undefined) {
+                    b.history = [{ date: isoToday, page: b.currentPage }];
+                }
             });
 
-            // Reinicio automático diario
             if (appData.lastDate !== currentDateStr) {
-                appData.books.forEach(b => b.dailySeconds = 0);
+                appData.books.forEach(b => {
+                    b.dailySeconds = 0;
+                    const todayEntry = b.history.find(h => h.date === isoToday);
+                    if(!todayEntry) {
+                        b.history.push({ date: isoToday, page: b.currentPage });
+                    }
+                });
                 appData.lastDate = currentDateStr;
                 saveData();
             }
@@ -484,11 +522,14 @@
 
         document.getElementById('bookForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            const initPage = parseInt(document.getElementById('currentPage').value) || 0;
+            
             appData.books.push({
                 id: Date.now(), title: document.getElementById('title').value, category: appData.activeCategory,
                 totalPages: parseInt(document.getElementById('totalPages').value), minsPerPage: parseFloat(document.getElementById('minsPerPage').value),
-                dailyMins: parseInt(document.getElementById('dailyMins').value), currentPage: parseInt(document.getElementById('currentPage').value),
-                notes: "", checklists: [], active: true, priority: 50, dailySeconds: 0
+                dailyMins: parseInt(document.getElementById('dailyMins').value), currentPage: initPage,
+                notes: "", checklists: [], active: true, priority: 50, dailySeconds: 0,
+                history: [{ date: isoToday, page: initPage }] 
             });
             saveData(); renderTabs(); renderBooks(); this.reset(); document.getElementById('currentPage').value = 0;
         });
@@ -496,7 +537,20 @@
         function updatePage(id) {
             const newPage = parseInt(document.getElementById(`update-page-${id}`).value);
             const book = appData.books.find(b => b.id === id);
-            if (book) { book.currentPage = Math.max(0, Math.min(newPage, book.totalPages)); saveData(); renderBooks(); }
+            if (book) { 
+                book.currentPage = Math.max(0, Math.min(newPage, book.totalPages)); 
+                
+                if(!book.history) book.history = [];
+                const existingIndex = book.history.findIndex(h => h.date === isoToday);
+                if (existingIndex >= 0) {
+                    book.history[existingIndex].page = book.currentPage; 
+                } else {
+                    book.history.push({ date: isoToday, page: book.currentPage }); 
+                }
+                
+                saveData(); renderBooks(); 
+                if(document.getElementById('metricsModal').style.display === 'flex') renderMetricsChart();
+            }
         }
 
         function deleteBook(id) {
@@ -534,7 +588,6 @@
             if(book) { book.priority = parseInt(value); saveData(); }
         }
 
-        // --- Temporizador basado en Timestamp (Soporta Segundo Plano) ---
         function toggleTimer(id) {
             const book = appData.books.find(b => b.id === id);
             const btn = document.getElementById(`btn-timer-${id}`);
@@ -565,7 +618,6 @@
         function updateTimerUI(id) {
             const book = appData.books.find(b => b.id === id);
             if (!book) return;
-            
             const targetSeconds = book.dailyMins * 60;
             const currentSecs = book.dailySeconds || 0;
             const m = Math.floor(currentSecs / 60).toString().padStart(2, '0');
@@ -573,11 +625,9 @@
             
             const display = document.getElementById(`timer-display-${id}`);
             if (display) display.innerText = `${m}:${s} / ${book.dailyMins}:00`;
-            
             const percent = Math.min((currentSecs / targetSeconds) * 100, 100);
             const fill = document.getElementById(`timer-fill-${id}`);
             if (fill) fill.style.width = `${percent}%`;
-            
             const msg = document.getElementById(`timer-msg-${id}`);
             if (msg) {
                 if (currentSecs >= targetSeconds) msg.style.display = 'block';
@@ -698,6 +748,133 @@
             document.getElementById('scheduleContent').innerHTML = scheduleHTML;
             document.getElementById('scheduleModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
+        }
+
+        // --- Gráfica de Índice de Cumplimiento (Sube al cumplir meta, baja al incumplir) ---
+        function openMetricsModal() {
+            document.getElementById('metricsModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            renderMetricsChart();
+        }
+
+        function renderMetricsChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            const activeBooks = appData.books.filter(b => b.active);
+            
+            if (activeBooks.length === 0) {
+                if(progressChartInstance) progressChartInstance.destroy();
+                return;
+            }
+
+            // Construir línea de tiempo continua de fechas
+            let allDates = new Set();
+            activeBooks.forEach(book => { if(book.history) book.history.forEach(h => allDates.add(h.date)); });
+            allDates.add(isoToday);
+            
+            let sortedDatesArray = Array.from(allDates).sort();
+            let continuousDates = [];
+            
+            if (sortedDatesArray.length > 0) {
+                let firstDate = new Date(sortedDatesArray[0]);
+                let lastDate = new Date(sortedDatesArray[sortedDatesArray.length - 1]);
+                let curr = new Date(firstDate.getTime());
+                
+                curr.setMinutes(curr.getMinutes() + curr.getTimezoneOffset());
+                lastDate.setMinutes(lastDate.getMinutes() + lastDate.getTimezoneOffset());
+
+                while(curr <= lastDate) {
+                    continuousDates.push(curr.toISOString().split('T')[0]);
+                    curr.setDate(curr.getDate() + 1);
+                }
+            } else {
+                continuousDates = [isoToday];
+            }
+
+            const colors = ['#722f37', '#2d6a4f', '#1d3557', '#d4a373', '#e07a5f', '#3d405b'];
+
+            const datasets = activeBooks.map((book, index) => {
+                let dataPoints = [];
+                let performanceIndex = 0; // Inicia en cero
+                let lastKnownPage = null;
+                
+                // Meta diaria calculada en páginas
+                let dailyGoalPages = book.dailyMins / book.minsPerPage;
+
+                continuousDates.forEach(date => {
+                    let entry = book.history ? book.history.find(h => h.date === date) : null;
+                    
+                    if (lastKnownPage === null) {
+                        // Primer punto de referencia
+                        if (entry) lastKnownPage = entry.page;
+                        dataPoints.push(performanceIndex); 
+                    } else {
+                        let pagesReadToday = 0;
+                        if (entry) {
+                            pagesReadToday = Math.max(0, entry.page - lastKnownPage);
+                            lastKnownPage = entry.page;
+                        }
+                        
+                        // Si ya terminó la obra, la línea se congela en su punto máximo
+                        if (lastKnownPage >= book.totalPages) {
+                            dataPoints.push(performanceIndex);
+                        } else {
+                            // Cálculo del estímulo visual:
+                            // Si lee exactamente la meta, incrementa en +dailyGoalPages (sube).
+                            // Si lee 0 páginas, decrementa en -dailyGoalPages (baja).
+                            let netChange = (2 * pagesReadToday) - dailyGoalPages;
+                            performanceIndex += netChange;
+                            dataPoints.push(performanceIndex);
+                        }
+                    }
+                });
+
+                return {
+                    label: book.title,
+                    data: dataPoints,
+                    borderColor: colors[index % colors.length],
+                    backgroundColor: colors[index % colors.length],
+                    borderWidth: 2,
+                    tension: 0.1, 
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                };
+            });
+
+            if(progressChartInstance) progressChartInstance.destroy();
+
+            progressChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: continuousDates.map(d => {
+                        const split = d.split('-');
+                        return `${split[2]}/${split[1]}`; 
+                    }),
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            title: { display: true, text: 'Puntos de Cumplimiento', font: { family: '"Times New Roman", serif', size: 14 } },
+                            grid: { color: (context) => context.tick.value === 0 ? '#1a1a1a' : '#eae5dc' } 
+                        },
+                        x: { title: { display: true, text: 'Fechas', font: { family: '"Times New Roman", serif', size: 14 } } }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { family: '"Times New Roman", serif', size: 12 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) { 
+                                    let val = context.parsed.y;
+                                    let prefix = val > 0 ? '+' : '';
+                                    return `${context.dataset.label}: ${prefix}${val.toFixed(1)} pts.`; 
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         function closeModal(modalId) {
