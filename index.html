@@ -86,10 +86,12 @@
             background: var(--bg-gradient); 
             background-attachment: fixed;
             color: var(--text-main); 
-            padding-bottom: 80px; /* Reducido */
+            padding-bottom: 80px;
             line-height: 1.5;
             transition: background 0.3s ease, color 0.3s ease;
-            overflow-x: hidden; /* Evita scroll horizontal por el swipe */
+            overflow-x: hidden; /* Evita scroll horizontal */
+            overscroll-behavior-x: none; /* Evita que el navegador intercepte el swipe */
+            touch-action: pan-y; /* Permite scroll vertical nativo, delega horizontal a JS */
         }
 
         .container { max-width: 480px; margin: 0 auto; padding: 15px; }
@@ -739,49 +741,44 @@
         updateChartColors();
 
         // ============================================================
-        // FUNCIÓN SWIPE (Deslizar entre categorías)
+        // FUNCIÓN SWIPE GLOBAL MEJORADA
         // ============================================================
         let touchStartX = 0;
         let touchStartY = 0;
-        let isSwiping = false;
 
-        document.querySelector('.container').addEventListener('touchstart', e => {
+        document.body.addEventListener('touchstart', e => {
             // Ignorar si hay un modal abierto
             if (document.querySelector('.modal-overlay[style*="display: flex"]')) return;
-            // Ignorar si toca un input, slider, textarea, botón o la barra de pestañas
+            
+            // Ignorar si toca inputs, textareas, sliders o botones interactivos
             if (e.target.closest('.tabs-container') || 
+                e.target.closest('.chart-nav') ||
+                e.target.closest('.search-container') ||
                 ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(e.target.tagName) || 
                 e.target.type === 'range') {
                 return;
             }
 
-            touchStartX = e.changedTouches[0].screenX;
-            touchStartY = e.changedTouches[0].screenY;
-            isSwiping = false;
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
         }, {passive: true});
 
-        document.querySelector('.container').addEventListener('touchmove', e => {
+        document.body.addEventListener('touchend', e => {
             if (touchStartX === 0) return;
-            const currentX = e.changedTouches[0].screenX;
-            const currentY = e.changedTouches[0].screenY;
             
-            // Si el movimiento horizontal es mayor que el vertical, es un swipe
-            if (Math.abs(currentX - touchStartX) > Math.abs(currentY - touchStartY)) {
-                if (Math.abs(currentX - touchStartX) > 20) {
-                    isSwiping = true;
-                }
-            }
-        }, {passive: true});
-
-        document.querySelector('.container').addEventListener('touchend', e => {
-            if (touchStartX === 0 || !isSwiping) {
+            // Ignorar si el modal se abrió durante el toque
+            if (document.querySelector('.modal-overlay[style*="display: flex"]')) {
                 touchStartX = 0;
                 return;
             }
-            const touchEndX = e.changedTouches[0].screenX;
+
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
             const deltaX = touchEndX - touchStartX;
+            const deltaY = touchEndY - touchStartY;
             
-            if (Math.abs(deltaX) > 60) {
+            // Verificar que sea un swipe horizontal (movimiento X > 70px, movimiento Y < 50px)
+            if (Math.abs(deltaX) > 70 && Math.abs(deltaY) < 50) {
                 if (deltaX > 0) {
                     changeCategoryBySwipe(-1); // Swipe derecha -> anterior
                 } else {
@@ -789,7 +786,7 @@
                 }
             }
             touchStartX = 0;
-            isSwiping = false;
+            touchStartY = 0;
         }, {passive: true});
 
         function changeCategoryBySwipe(direction) {
@@ -803,6 +800,7 @@
             if (newIndex !== currentIndex) {
                 appData.activeCategory = appData.categories[newIndex];
                 
+                // Limpiar búsqueda al cambiar con swipe
                 const searchEl = document.getElementById('bookSearch');
                 if (searchEl) searchEl.value = '';
                 const clearBtn = document.getElementById('searchClear');
