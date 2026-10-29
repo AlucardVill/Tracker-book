@@ -153,7 +153,7 @@
         .btn-reset-zoom:hover { border-color: var(--primary); color: var(--primary); }
 
         /* ============================================================ */
-        /* HEADER COMPACTO: estado + toggles de proyección en una fila  */
+        /* HEADER COMPACTO: estado + toggles de proyección              */
         /* ============================================================ */
         .metrics-header {
             display: flex;
@@ -173,15 +173,94 @@
             line-height: 1.8;
             text-align: left;
         }
+        .hoy-title {
+            color: var(--text-muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .book-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 0;
+            font-size: 13px;
+            font-weight: normal;
+            text-transform: none;
+            letter-spacing: 0;
+            margin: 0;
+            color: var(--text-main);
+        }
+        .book-row input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary);
+            margin: 0;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .book-row.hidden-metric .legend-dot,
+        .book-row.hidden-metric .book-score {
+            opacity: 0.4;
+        }
         .legend-dot {
             display: inline-block;
             width: 9px;
             height: 9px;
             border-radius: 50%;
-            margin-right: 5px;
-            vertical-align: middle;
+            flex-shrink: 0;
             border: 1px solid rgba(0,0,0,0.15);
         }
+        .book-score {
+            min-width: 0;
+            transition: opacity 0.2s;
+        }
+
+        .hoy-pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-color);
+        }
+        .hoy-pagination button {
+            min-width: 34px;
+            height: 32px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: var(--font-family);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            touch-action: manipulation;
+            transition: all 0.15s;
+        }
+        .hoy-pagination button:active:not(:disabled) {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .hoy-pagination button:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+        .hoy-pagination span {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-style: italic;
+            min-width: 42px;
+            text-align: center;
+        }
+
         .proj-buttons {
             display: flex;
             gap: 6px;
@@ -206,9 +285,7 @@
             user-select: none;
             -webkit-user-select: none;
         }
-        .proj-btn.active {
-            opacity: 1;
-        }
+        .proj-btn.active { opacity: 1; }
         .proj-btn.positive.active {
             background: #e8f5ec;
             border-color: var(--success);
@@ -217,9 +294,7 @@
             background: #f0f0f0;
             border-color: #888;
         }
-        .proj-btn:active {
-            transform: scale(0.92);
-        }
+        .proj-btn:active { transform: scale(0.92); }
         .proj-btn-caption {
             font-size: 9px;
             color: var(--text-muted);
@@ -242,6 +317,21 @@
         .metrics-finish-info .finish-row {
             display: block;
             font-style: italic;
+            transition: opacity 0.2s;
+        }
+
+        .chart-empty-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--text-muted);
+            font-style: italic;
+            font-size: 14px;
+            text-align: center;
+            padding: 0 20px;
+            pointer-events: none;
+            z-index: 2;
         }
 
         .chart-nav {
@@ -450,10 +540,9 @@
             <button class="modal-close" onclick="closeModal('metricsModal')">&times;</button>
             <h2 style="font-size: 22px; color: var(--primary); margin-bottom: 5px;">Métricas de Progreso</h2>
             <p style="font-size: 14px; color: var(--text-muted); font-style: italic;">
-                Cada libro tiene su color. Las líneas <strong>punteadas</strong> son proyecciones: actívalas o desactívalas con los botones <strong>📈</strong> / <strong>📉</strong>.
+                Marca con el check los libros que quieras ver en la gráfica. Las líneas <strong>punteadas</strong> son proyecciones.
             </p>
 
-            <!-- Header compacto: estado + toggles -->
             <div class="metrics-header">
                 <div id="metricsStatus" class="metrics-status">Cargando…</div>
                 <div class="proj-buttons">
@@ -472,6 +561,9 @@
 
             <div class="chart-container">
                 <canvas id="progressChart"></canvas>
+                <div id="chartEmptyMessage" class="chart-empty-message" style="display: none;">
+                    Activa al menos un libro con el check<br>para verlo en la gráfica
+                </div>
             </div>
 
             <div class="chart-nav">
@@ -490,7 +582,7 @@
                 <button onclick="jumpToFinish()" class="btn-reset-zoom">📅 Ir al final</button>
             </div>
             <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 10px;">
-                *El eje vertical se ajusta automáticamente al rango visible para que puedas ver cada subida y bajada.
+                *El eje vertical se ajusta automáticamente al rango visible.
             </p>
         </div>
     </div>
@@ -500,7 +592,6 @@
         Chart.defaults.color = '#5c5c5c';
         let progressChartInstance = null; 
 
-        // Paleta de colores por libro (usada en gráfica y leyenda compacta)
         const BRIGHT_COLORS = ['#e63946', '#00b4d8', '#2a9d8f', '#ffb703', '#9b5de5', '#f72585', '#06d6a0', '#ef476f'];
 
         let showPositiveProjection = localStorage.getItem('showPositiveProj') !== 'false';
@@ -508,6 +599,10 @@
 
         let chartViewStart = -1;
         let chartViewSize = 12;
+
+        // Paginación del recuadro "Hoy"
+        let hoyPageIndex = 0;
+        const HOY_PAGE_SIZE = 4;
 
         let appData = {
             categories: ['Lecturas Actuales', 'Por Leer'],
@@ -537,6 +632,8 @@
                 if(b.priority === undefined) b.priority = 50;
                 if(b.dailySeconds === undefined) b.dailySeconds = 0;
                 if(b.dailyLog === undefined) b.dailyLog = [];
+                // NUEVO: visibilidad en métrica (default true)
+                if(b.metricVisible === undefined) b.metricVisible = true;
                 
                 if(b.history === undefined) {
                     b.history = [{ date: isoToday, page: b.currentPage }];
@@ -606,7 +703,6 @@
 
         function saveData() { localStorage.setItem('readingTrackerData', JSON.stringify(appData)); }
 
-        // Reemplaza al antiguo toggleProjection(checkbox)
         function toggleProjBtn(type) {
             if (type === 'positive') {
                 showPositiveProjection = !showPositiveProjection;
@@ -618,6 +714,24 @@
                 document.getElementById('btnWarnProj').classList.toggle('active', showWarningProjection);
             }
             refreshMetricsChart();
+        }
+
+        // NUEVO: toggle de visibilidad de un libro en la métrica
+        function toggleBookVisibility(bookId, checkboxEl) {
+            const book = appData.books.find(b => b.id === bookId);
+            if (!book) return;
+            book.metricVisible = checkboxEl.checked;
+            saveData();
+            updateMetricsStatus();
+            try { renderMetricsChart(); } catch(e) { console.error(e); }
+        }
+
+        // NUEVO: paginación del recuadro "Hoy"
+        function changeHoyPage(delta) {
+            const allActiveBooks = appData.books.filter(b => b.active);
+            const totalPages = Math.max(1, Math.ceil(allActiveBooks.length / HOY_PAGE_SIZE));
+            hoyPageIndex = Math.max(0, Math.min(hoyPageIndex + delta, totalPages - 1));
+            updateMetricsStatus();
         }
 
         function toggleHoursPanel() {
@@ -827,6 +941,7 @@
                 totalPages: parseInt(document.getElementById('totalPages').value), minsPerPage: parseFloat(document.getElementById('minsPerPage').value),
                 dailyMins: parseInt(document.getElementById('dailyMins').value), currentPage: initPage,
                 notes: "", checklists: [], active: true, priority: 50, dailySeconds: 0,
+                metricVisible: true,
                 history: [{ date: isoToday, page: initPage }],
                 dailyLog: []
             });
@@ -1175,7 +1290,7 @@
             if (!progressChartInstance) return;
             const finishes = progressChartInstance._bookFinishes || [];
             if (finishes.length === 0) {
-                alert('No hay fechas finales por mostrar (los libros están terminados o no hay activos).');
+                alert('No hay fechas finales por mostrar (los libros están terminados, desactivados o no hay activos).');
                 return;
             }
             const maxFinishIdx = Math.max(...finishes.map(f => f.idx));
@@ -1186,12 +1301,13 @@
         }
 
         // ============================================================
-        // GRÁFICA
+        // MODAL
         // ============================================================
         function openMetricsModal() {
             document.getElementById('btnPosProj').classList.toggle('active', showPositiveProjection);
             document.getElementById('btnWarnProj').classList.toggle('active', showWarningProjection);
             chartViewStart = -1;
+            hoyPageIndex = 0;
             
             document.getElementById('metricsModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
@@ -1213,44 +1329,86 @@
         }
 
         // ============================================================
-        // ESTADO "HOY:" — Con puntitos de color integrados
+        // ESTADO "HOY:" CON CHECKBOXES Y PAGINACIÓN
         // ============================================================
         function updateMetricsStatus() {
             try {
-                const activeBooks = appData.books.filter(b => b.active);
+                const allActiveBooks = appData.books.filter(b => b.active);
                 const el = document.getElementById('metricsStatus');
                 const finishEl = document.getElementById('metricsFinishInfo');
                 if (!el || !finishEl) return;
                 
-                if (activeBooks.length === 0) {
+                if (allActiveBooks.length === 0) {
                     el.innerHTML = '<em>Sin lecturas activas</em>';
                     finishEl.innerHTML = '<em>—</em>';
+                    el.dataset.structureKey = 'empty';
                     return;
                 }
                 
-                const parts = activeBooks.map((book, index) => {
+                // Paginación
+                const totalPages = Math.max(1, Math.ceil(allActiveBooks.length / HOY_PAGE_SIZE));
+                if (hoyPageIndex >= totalPages) hoyPageIndex = totalPages - 1;
+                if (hoyPageIndex < 0) hoyPageIndex = 0;
+                
+                const start = hoyPageIndex * HOY_PAGE_SIZE;
+                const pageBooks = allActiveBooks.slice(start, start + HOY_PAGE_SIZE);
+                
+                // Detectar si hay que reconstruir el HTML o solo actualizar valores
+                const structureKey = pageBooks.map(b => b.id).join(',') + '|' + hoyPageIndex + '|' + totalPages + '|' + allActiveBooks.length;
+                const needsRebuild = el.dataset.structureKey !== structureKey;
+                
+                if (needsRebuild) {
+                    const rows = pageBooks.map((book) => {
+                        const globalIndex = allActiveBooks.indexOf(book);
+                        const color = BRIGHT_COLORS[globalIndex % BRIGHT_COLORS.length];
+                        const isVisible = book.metricVisible !== false;
+                        
+                        return `<div class="book-row ${isVisible ? '' : 'hidden-metric'}" data-book-id="${book.id}">
+                            <input type="checkbox" ${isVisible ? 'checked' : ''} onchange="toggleBookVisibility(${book.id}, this)">
+                            <span class="legend-dot" style="background: ${color}"></span>
+                            <span class="book-score" data-book-id="${book.id}"></span>
+                        </div>`;
+                    }).join('');
+                    
+                    let paginationHtml = '';
+                    if (totalPages > 1) {
+                        paginationHtml = `<div class="hoy-pagination">
+                            <button onclick="changeHoyPage(-1)" ${hoyPageIndex === 0 ? 'disabled' : ''} aria-label="Anterior">◀</button>
+                            <span>${hoyPageIndex + 1} / ${totalPages}</span>
+                            <button onclick="changeHoyPage(1)" ${hoyPageIndex >= totalPages - 1 ? 'disabled' : ''} aria-label="Siguiente">▶</button>
+                        </div>`;
+                    }
+                    
+                    el.innerHTML = `<strong class="hoy-title">Hoy</strong>${rows}${paginationHtml}`;
+                    el.dataset.structureKey = structureKey;
+                }
+                
+                // Actualizar valores de score en cada row (siempre)
+                pageBooks.forEach((book) => {
+                    const scoreEl = el.querySelector(`.book-score[data-book-id="${book.id}"]`);
+                    if (!scoreEl) return;
                     const goalSecs = book.dailyMins * 60;
                     const secs = book.dailySeconds || 0;
                     const pts = secs === 0 ? -1 : secs / goalSecs;
                     const pct = goalSecs > 0 ? Math.round((secs / goalSecs) * 100) : 0;
                     const sign = pts >= 0 ? '+' : '';
                     const check = secs >= goalSecs ? ' ✅' : '';
-                    const color = BRIGHT_COLORS[index % BRIGHT_COLORS.length];
-                    return `<span class="legend-dot" style="background: ${color}"></span><strong>${book.title}</strong>: ${sign}${pts.toFixed(2)} (${pct}%)${check}`;
+                    scoreEl.innerHTML = `<strong>${book.title}</strong>: ${sign}${pts.toFixed(2)} (${pct}%)${check}`;
                 });
                 
-                el.innerHTML = `<strong style="color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Hoy</strong><br>${parts.join('<br>')}`;
-                
-                const finishRows = activeBooks.map(book => {
+                // Info de fechas finales — todas, pero atenuando las desactivadas
+                const finishRows = allActiveBooks.map(book => {
+                    const isVisible = book.metricVisible !== false;
+                    const opacity = isVisible ? '1' : '0.4';
                     const stats = calculateStats(book);
                     if (book.currentPage >= book.totalPages) {
-                        return `<span class="finish-row">🏁 <strong>${book.title}</strong>: terminado</span>`;
+                        return `<span class="finish-row" style="opacity: ${opacity};">🏁 <strong>${book.title}</strong>: terminado</span>`;
                     }
                     const d = stats.finishDate;
                     const dd = String(d.getDate()).padStart(2, '0');
                     const mm = String(d.getMonth() + 1).padStart(2, '0');
                     const yy = d.getFullYear();
-                    return `<span class="finish-row">📅 <strong>${book.title}</strong>: ${dd}/${mm}/${yy} · en ${stats.daysRemaining} días</span>`;
+                    return `<span class="finish-row" style="opacity: ${opacity};">📅 <strong>${book.title}</strong>: ${dd}/${mm}/${yy} · en ${stats.daysRemaining} días</span>`;
                 }).join('');
                 
                 finishEl.innerHTML = `<strong style="color: var(--success)">Fechas finales estimadas</strong>${finishRows}`;
@@ -1292,13 +1450,29 @@
 
         function renderMetricsChart() {
             const ctx = document.getElementById('progressChart').getContext('2d');
-            const activeBooks = appData.books.filter(b => b.active);
+            const emptyMsg = document.getElementById('chartEmptyMessage');
+            
+            // Libros activos (todos, para colores estables) y visibles (para el chart)
+            const allActiveBooks = appData.books.filter(b => b.active);
+            const activeBooks = allActiveBooks.filter(b => b.metricVisible !== false);
             
             if (progressChartInstance) { 
                 try { progressChartInstance.destroy(); } catch(e) {}
                 progressChartInstance = null; 
             }
-            if (activeBooks.length === 0) return;
+            
+            if (activeBooks.length === 0) {
+                if (emptyMsg) emptyMsg.style.display = 'block';
+                return;
+            } else {
+                if (emptyMsg) emptyMsg.style.display = 'none';
+            }
+            
+            // Mapa de colores estable (por id de libro)
+            const colorMap = {};
+            allActiveBooks.forEach((b, i) => {
+                colorMap[b.id] = BRIGHT_COLORS[i % BRIGHT_COLORS.length];
+            });
             
             let earliestDateStr = isoToday;
             activeBooks.forEach(book => {
@@ -1396,7 +1570,7 @@
                     dataPoints.push(cumScore);
                 });
                 
-                const color = BRIGHT_COLORS[index % BRIGHT_COLORS.length];
+                const color = colorMap[book.id];
                 
                 const radii = timelineDates.map((_, i) => {
                     if (i === todayIdx) return goalMetToday ? 11 : (book.dailySeconds > 0 ? 9 : 7);
@@ -1428,7 +1602,6 @@
                 });
             });
             
-            // Proyecciones
             const projectionDatasets = [];
             
             bookMetadata.forEach(meta => {
@@ -1641,7 +1814,6 @@
                         }
                     },
                     plugins: {
-                        // ✅ ELIMINADA la leyenda de Chart.js (era redundante con la fila "Hoy:")
                         legend: { display: false },
                         tooltip: {
                             filter: (item) => item.parsed.y !== null && item.parsed.y !== undefined,
@@ -1790,7 +1962,6 @@
             if (e.key === 'Enter') { e.preventDefault(); addChecklist(); }
         });
 
-        // Sincronizar botones con estado guardado
         document.getElementById('btnPosProj').classList.toggle('active', showPositiveProjection);
         document.getElementById('btnWarnProj').classList.toggle('active', showWarningProjection);
 
