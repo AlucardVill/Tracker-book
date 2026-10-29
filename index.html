@@ -41,7 +41,7 @@
             flex-wrap: wrap;
             align-items: center;
             justify-content: center;
-            gap: 4px 14px;
+            gap: 4px 12px;
             margin-top: 4px;
             padding: 6px 14px;
             background: #faf6ef;
@@ -135,9 +135,7 @@
             z-index: 100;
             border-color: var(--primary);
         }
-        .tab-btn.long-pressing {
-            animation: longPressPulse 0.6s ease-out;
-        }
+        .tab-btn.long-pressing { animation: longPressPulse 0.6s ease-out; }
         @keyframes longPressPulse {
             0% { box-shadow: 0 0 0 0 rgba(114, 47, 55, 0.55); }
             100% { box-shadow: 0 0 0 8px rgba(114, 47, 55, 0); }
@@ -235,12 +233,26 @@
         .priority-control label { font-size: 14px; margin: 0; text-transform: none; }
         .priority-control input[type="range"] { width: 120px; accent-color: var(--primary); cursor: pointer; }
         
+        .adaptive-badge {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 4px 10px;
+            font-size: 11px;
+            background: #fff8e8;
+            border: 1px solid #f0dca8;
+            color: #8a6d1a;
+            border-radius: 3px;
+            font-style: normal;
+            line-height: 1.5;
+        }
+        .adaptive-badge strong { color: #6b540f; }
+
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         .form-group.full { grid-column: 1 / -1; }
 
         label { display: block; font-size: 12px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 5px; }
-        input[type="text"], input[type="number"], input[type="search"], textarea { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 15px; outline: none; transition: border-color 0.2s; background: #faf9f7; font-family: var(--font-family); }
-        input:focus, textarea:focus { border-color: var(--primary); background: white; }
+        input[type="text"], input[type="number"], input[type="search"], textarea, select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 15px; outline: none; transition: border-color 0.2s; background: #faf9f7; font-family: var(--font-family); }
+        input:focus, textarea:focus, select:focus { border-color: var(--primary); background: white; }
 
         .btn-submit { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 5px; font-family: var(--font-family); }
         .btn-cancel { background: var(--text-muted); color: white; border: none; padding: 12px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 5px; font-family: var(--font-family); }
@@ -268,8 +280,96 @@
         
         .daily-timer { border: 1px solid var(--border-color); border-radius: 4px; padding: 15px; background: #ffffff; text-align: center; }
         .timer-display { font-size: 24px; color: var(--primary); margin: 10px 0; font-variant-numeric: tabular-nums; }
+        .timer-buttons-row {
+            display: flex; justify-content: center; gap: 10px; align-items: center; margin-top: 12px;
+            flex-wrap: wrap;
+        }
         .btn-timer { background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 4px; font-size: 15px; cursor: pointer; font-family: var(--font-family); display: inline-flex; align-items: center; gap: 8px; }
         .btn-timer.running { background: #d97706; }
+        
+        .adaptive-toggle-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1.5px solid var(--border-color);
+            background: var(--bg-color);
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            opacity: 0.35;
+            transition: all 0.2s;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+            flex-shrink: 0;
+        }
+        .adaptive-toggle-btn.active {
+            opacity: 1;
+            background: #fff8e8;
+            border-color: #d4a500;
+        }
+        .adaptive-toggle-btn:active { transform: scale(0.92); }
+        
+        .meta-pages-display {
+            margin-top: 12px;
+            padding: 10px;
+            background: #faf9f7;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .meta-pages-display strong {
+            color: var(--primary);
+            font-size: 18px;
+        }
+        .meta-pages-display .incognita {
+            color: var(--text-muted);
+            font-style: italic;
+            opacity: 0.8;
+        }
+        .meta-pages-hint {
+            display: block;
+            margin-top: 4px;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        .meta-pages-success strong { color: var(--success); }
+
+        /* Toggle velocidad de proyección */
+        .projection-source-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 6px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .proj-source-btn {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-family: var(--font-family);
+            cursor: pointer;
+            transition: all 0.15s;
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+        .proj-source-btn.active {
+            opacity: 1;
+            background: #fff8e8;
+            border-color: #d4a500;
+            color: #6b540f;
+            font-weight: bold;
+        }
+        .proj-source-btn:hover { opacity: 0.85; }
+        .proj-source-btn:active { transform: scale(0.95); }
 
         .empty-state { text-align: center; color: var(--text-muted); padding: 30px 0; font-size: 16px; font-style: italic; }
 
@@ -296,49 +396,12 @@
         .metrics-status { flex: 1; min-width: 0; font-size: 13px; color: var(--text-main); padding: 10px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; line-height: 1.8; text-align: left; }
         .hoy-title { color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px; }
         
-        .hoy-search-container {
-            position: relative;
-            margin-bottom: 6px;
-            margin-top: 2px;
-        }
-        .hoy-search-container input {
-            width: 100%;
-            padding: 6px 26px 6px 24px;
-            border: 1px solid var(--border-color);
-            border-radius: 3px;
-            font-size: 12px;
-            font-family: var(--font-family);
-            background: var(--bg-color);
-            outline: none;
-            transition: all 0.2s;
-            line-height: 1.4;
-        }
+        .hoy-search-container { position: relative; margin-bottom: 6px; margin-top: 2px; }
+        .hoy-search-container input { width: 100%; padding: 6px 26px 6px 24px; border: 1px solid var(--border-color); border-radius: 3px; font-size: 12px; font-family: var(--font-family); background: var(--bg-color); outline: none; transition: all 0.2s; line-height: 1.4; }
         .hoy-search-container input:focus { border-color: var(--primary); background: white; }
         .hoy-search-container input::placeholder { color: var(--text-muted); font-style: italic; opacity: 0.7; }
-        .hoy-search-container::before {
-            content: '🔍';
-            position: absolute;
-            left: 6px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 10px;
-            pointer-events: none;
-            opacity: 0.55;
-        }
-        .hoy-search-clear {
-            position: absolute;
-            right: 2px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: transparent;
-            border: none;
-            font-size: 14px;
-            cursor: pointer;
-            color: var(--text-muted);
-            padding: 2px 6px;
-            display: none;
-            line-height: 1;
-        }
+        .hoy-search-container::before { content: '🔍'; position: absolute; left: 6px; top: 50%; transform: translateY(-50%); font-size: 10px; pointer-events: none; opacity: 0.55; }
+        .hoy-search-clear { position: absolute; right: 2px; top: 50%; transform: translateY(-50%); background: transparent; border: none; font-size: 14px; cursor: pointer; color: var(--text-muted); padding: 2px 6px; display: none; line-height: 1; }
         .hoy-search-clear.visible { display: block; }
         .hoy-search-clear:hover, .hoy-search-clear:active { color: var(--primary); }
 
@@ -371,6 +434,7 @@
         .finish-book-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: bold; color: var(--text-main); }
         .finish-date-text { font-weight: bold; color: var(--success); white-space: nowrap; font-size: 13px; }
         .finish-days { color: var(--text-muted); font-style: italic; font-size: 12px; white-space: nowrap; }
+        .finish-source-icon { font-size: 11px; opacity: 0.75; margin-left: 3px; }
 
         .chart-empty-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--text-muted); font-style: italic; font-size: 14px; text-align: center; padding: 0 20px; pointer-events: none; z-index: 2; }
 
@@ -390,9 +454,6 @@
         .btn-footer-row { display: flex; gap: 8px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
         .btn-footer-row button { flex: 1; min-width: 140px; padding: 10px 14px; font-size: 13px; font-family: var(--font-family); border-radius: 4px; cursor: pointer; transition: all 0.15s; touch-action: manipulation; }
 
-        /* ============================================================ */
-        /* BOTÓN FLOTANTE (FAB) PARA AGREGAR LIBRO                       */
-        /* ============================================================ */
         .fab-add {
             position: fixed;
             bottom: 24px;
@@ -418,31 +479,12 @@
             -webkit-user-select: none;
             padding-bottom: 3px;
         }
-        .fab-add:hover {
-            transform: scale(1.06);
-            box-shadow: 0 6px 20px rgba(114, 47, 55, 0.55);
-        }
-        .fab-add:active {
-            transform: scale(0.94);
-        }
-        .fab-add.hidden {
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(0.8);
-        }
+        .fab-add:hover { transform: scale(1.06); box-shadow: 0 6px 20px rgba(114, 47, 55, 0.55); }
+        .fab-add:active { transform: scale(0.94); }
+        .fab-add.hidden { opacity: 0; pointer-events: none; transform: scale(0.8); }
 
-        /* Modal del formulario añadir libro */
-        .add-book-modal-title {
-            font-size: 22px;
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-        .add-book-modal-subtitle {
-            font-size: 14px;
-            color: var(--text-muted);
-            font-style: italic;
-            margin-bottom: 20px;
-        }
+        .add-book-modal-title { font-size: 22px; color: var(--primary); margin-bottom: 5px; }
+        .add-book-modal-subtitle { font-size: 14px; color: var(--text-muted); font-style: italic; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -483,10 +525,8 @@
         <div id="booksList"></div>
     </div>
 
-    <!-- FAB Agregar libro -->
     <button id="fabAdd" class="fab-add" onclick="openAddBookModal()" aria-label="Agregar nuevo libro" title="Agregar nuevo libro">+</button>
 
-    <!-- Modal Agregar Libro -->
     <div id="addBookModal" class="modal-overlay">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('addBookModal')">&times;</button>
@@ -551,7 +591,7 @@
             <button class="modal-close" onclick="closeModal('metricsModal')">&times;</button>
             <h2 style="font-size: 22px; color: var(--primary); margin-bottom: 5px;">Métricas de Progreso</h2>
             <p style="font-size: 14px; color: var(--text-muted); font-style: italic;">
-                Marca con el check los libros que quieras ver en la gráfica. Las líneas <strong>punteadas</strong> son proyecciones.
+                Cada línea sube según las páginas leídas vs la meta diaria. Las líneas <strong>punteadas</strong> son proyecciones.
             </p>
 
             <div class="metrics-header">
@@ -641,20 +681,114 @@
         let isoToday = getLocalISO();
 
         // ============================================================
-        // FAB VISIBILITY
+        // HELPERS — VELOCIDAD, META Y PROYECCIÓN
         // ============================================================
-        function updateFabVisibility() {
-            const fab = document.getElementById('fabAdd');
-            if (!fab) return;
-            const anyOpen = ['bookModal', 'scheduleModal', 'metricsModal', 'addBookModal'].some(id => {
-                const el = document.getElementById(id);
-                return el && el.style.display === 'flex';
+        
+        // Velocidad efectiva para la META y SCORE (adaptativa si está activa)
+        function getEffectiveMinsPerPage(book) {
+            if (!book.adaptiveSpeed) return book.minsPerPage;
+            
+            const logs = (book.pageTimingLog || []).slice(-20).filter(l => 
+                l.seconds > 0 && 
+                l.endPage > l.startPage && 
+                l.endPage <= (book.totalPages || 999999)
+            );
+            
+            if (logs.length === 0) return book.minsPerPage;
+            
+            let totalSecs = 0, totalPages = 0;
+            logs.forEach(l => {
+                totalSecs += l.seconds;
+                totalPages += (l.endPage - l.startPage);
             });
-            fab.classList.toggle('hidden', anyOpen);
+            
+            if (totalPages <= 0) return book.minsPerPage;
+            const result = totalSecs / totalPages / 60;
+            return Math.max(0.1, Math.min(10, result));
+        }
+
+        // Velocidad para PROYECCIÓN de fecha (respeta projectionSource)
+        function getProjectionMinsPerPage(book) {
+            if (!book.adaptiveSpeed) return book.minsPerPage;
+            const source = book.projectionSource || 'auto';
+            if (source === 'manual') return book.minsPerPage;
+            // 'adaptive' o 'auto'
+            return getEffectiveMinsPerPage(book);
+        }
+
+        function getProjectionSourceLabel(book) {
+            if (!book.adaptiveSpeed) return '';
+            const source = book.projectionSource || 'auto';
+            if (source === 'manual') return '📝';
+            return '📊';
+        }
+
+        function hasAdaptiveData(book) {
+            return (book.pageTimingLog || []).some(l => l.seconds > 0 && l.endPage > l.startPage);
+        }
+
+        // Meta diaria en PÁGINAS (basada en velocidad efectiva)
+        function getMetaPaginas(book) {
+            if (!book.dailyMins || book.dailyMins <= 0) return 1;
+            const effMins = getEffectiveMinsPerPage(book);
+            if (!effMins || effMins <= 0) return 1;
+            return Math.max(1, Math.round(book.dailyMins / effMins));
+        }
+
+        function getPaginasLeidasHoy(book) {
+            if (!book.pagesLog) return 0;
+            const todayEntry = book.pagesLog.find(l => l.date === isoToday);
+            return todayEntry ? (todayEntry.pages || 0) : 0;
+        }
+
+        function getScoreForDate(book, date) {
+            if (!book.pagesLog) return null;
+            const entry = book.pagesLog.find(l => l.date === date);
+            
+            if (date === isoToday) {
+                const leidas = entry ? (entry.pages || 0) : 0;
+                if (leidas === 0) return 0;
+                const meta = getMetaPaginas(book);
+                return leidas / meta;
+            }
+            
+            if (!entry) return -1;
+            const pages = entry.pages || 0;
+            if (pages === 0) return -1;
+            const metaDelDia = entry.metaPages || getMetaPaginas(book);
+            return pages / metaDelDia;
+        }
+
+        // Cambiar el origen de velocidad para proyección (toggle de la tarjeta)
+        function cycleProjectionSource(bookId) {
+            const book = appData.books.find(b => b.id === bookId);
+            if (!book) return;
+            const current = book.projectionSource || 'auto';
+            book.projectionSource = (current === 'manual') ? 'adaptive' : 'manual';
+            saveData();
+            renderBooks();
+            if (document.getElementById('metricsModal').style.display === 'flex') {
+                refreshMetricsChart();
+                updateMetricsStatus();
+            }
+            if (navigator.vibrate) { try { navigator.vibrate(15); } catch(e) {} }
+        }
+
+        // Set directo desde los pills
+        function setProjectionSource(bookId, source) {
+            const book = appData.books.find(b => b.id === bookId);
+            if (!book) return;
+            book.projectionSource = source;
+            saveData();
+            renderBooks();
+            if (document.getElementById('metricsModal').style.display === 'flex') {
+                refreshMetricsChart();
+                updateMetricsStatus();
+            }
         }
 
         // ============================================================
-        // ROLLOVER DE DÍA
+        // ROLLOVER
         // ============================================================
         function performDayRollover() {
             const nowDateStr = new Date().toDateString();
@@ -664,25 +798,33 @@
             const lastDate = new Date(appData.lastDate);
             const todayDate = new Date(nowDateStr);
             const daysDiff = Math.max(1, Math.round((todayDate - lastDate) / 86400000));
+            const lastISO = getLocalISO(lastDate);
             
             appData.books.forEach(b => {
-                const goalSecs = b.dailyMins * 60;
+                if (b.pagesLog) {
+                    const lastEntry = b.pagesLog.find(l => l.date === lastISO);
+                    if (lastEntry && lastEntry.metaPages === undefined) {
+                        lastEntry.metaPages = b.adaptiveSpeed 
+                            ? getMetaPaginas(b)
+                            : Math.max(1, Math.round(b.dailyMins / b.minsPerPage));
+                    }
+                }
                 
                 if (b.active) {
-                    const lastISO = getLocalISO(lastDate);
-                    const idx = b.dailyLog.findIndex(l => l.date === lastISO);
-                    const entry = { date: lastISO, seconds: b.dailySeconds || 0, met: (b.dailySeconds || 0) >= goalSecs };
-                    if (idx >= 0) b.dailyLog[idx] = entry;
-                    else b.dailyLog.push(entry);
-                    
                     for (let i = 1; i < daysDiff; i++) {
                         const md = new Date(lastDate);
                         md.setDate(md.getDate() + i);
                         const mISO = getLocalISO(md);
-                        const idx2 = b.dailyLog.findIndex(l => l.date === mISO);
-                        const entry2 = { date: mISO, seconds: 0, met: false };
-                        if (idx2 >= 0) b.dailyLog[idx2] = entry2;
-                        else b.dailyLog.push(entry2);
+                        if (!b.pagesLog) b.pagesLog = [];
+                        if (!b.pagesLog.find(l => l.date === mISO)) {
+                            b.pagesLog.push({
+                                date: mISO,
+                                pages: 0,
+                                metaPages: b.adaptiveSpeed 
+                                    ? getMetaPaginas(b)
+                                    : Math.max(1, Math.round(b.dailyMins / b.minsPerPage))
+                            });
+                        }
                     }
                 }
                 
@@ -716,6 +858,10 @@
                 if(b.dailySeconds === undefined) b.dailySeconds = 0;
                 if(b.dailyLog === undefined) b.dailyLog = [];
                 if(b.metricVisible === undefined) b.metricVisible = true;
+                if(b.adaptiveSpeed === undefined) b.adaptiveSpeed = false;
+                if(b.pageTimingLog === undefined) b.pageTimingLog = [];
+                if(b.pagesLog === undefined) b.pagesLog = [];
+                if(b.projectionSource === undefined) b.projectionSource = 'auto';
                 
                 if(b.history === undefined) {
                     b.history = [{ date: isoToday, page: b.currentPage }];
@@ -729,23 +875,33 @@
 
         let currentModalBookId = null;
 
+        function updateFabVisibility() {
+            const fab = document.getElementById('fabAdd');
+            if (!fab) return;
+            const anyOpen = ['bookModal', 'scheduleModal', 'metricsModal', 'addBookModal'].some(id => {
+                const el = document.getElementById(id);
+                return el && el.style.display === 'flex';
+            });
+            fab.classList.toggle('hidden', anyOpen);
+        }
+
         function updateDailySummary() {
             const el = document.getElementById('dailySummary');
             if (!el) return;
             
             const activeBooks = appData.books.filter(b => b.active);
-            
             if (activeBooks.length === 0) {
                 el.style.display = 'none';
                 return;
             }
             
             let totalSecs = 0;
+            let totalPages = 0;
             let metCount = 0;
             activeBooks.forEach(b => {
-                const secs = b.dailySeconds || 0;
-                totalSecs += secs;
-                if (secs >= b.dailyMins * 60) metCount++;
+                totalSecs += (b.dailySeconds || 0);
+                totalPages += getPaginasLeidasHoy(b);
+                if (getPaginasLeidasHoy(b) >= getMetaPaginas(b)) metCount++;
             });
             
             const totalMins = Math.floor(totalSecs / 60);
@@ -753,8 +909,9 @@
             
             el.style.display = 'inline-flex';
             el.innerHTML = `
-                <span class="summary-item">⏱️ <strong>${totalMins}</strong> min hoy</span>
-                <span class="summary-item ${allMet ? 'done' : ''}">🏆 <strong>${metCount}</strong>/${activeBooks.length} cumplidos</span>
+                <span class="summary-item">⏱️ <strong>${totalMins}</strong> min</span>
+                <span class="summary-item">📖 <strong>${totalPages}</strong> pág</span>
+                <span class="summary-item ${allMet ? 'done' : ''}">🏆 <strong>${metCount}</strong>/${activeBooks.length}</span>
             `;
         }
 
@@ -823,15 +980,9 @@
                 try {
                     const imported = JSON.parse(e.target.result);
                     
-                    if (!imported || typeof imported !== 'object') {
-                        throw new Error('El archivo no es un JSON válido');
-                    }
-                    if (!Array.isArray(imported.books)) {
-                        throw new Error('Falta el campo "books"');
-                    }
-                    if (!Array.isArray(imported.categories)) {
-                        throw new Error('Falta el campo "categories"');
-                    }
+                    if (!imported || typeof imported !== 'object') throw new Error('El archivo no es un JSON válido');
+                    if (!Array.isArray(imported.books)) throw new Error('Falta el campo "books"');
+                    if (!Array.isArray(imported.categories)) throw new Error('Falta el campo "categories"');
                     
                     const msg = `¿Importar ${imported.books.length} libro(s) y ${imported.categories.length} categoría(s)?\n\n⚠️ Esto REEMPLAZARÁ todos tus datos actuales.`;
                     if (!confirm(msg)) {
@@ -847,6 +998,10 @@
                         if (b.active === undefined) b.active = true;
                         if (b.notes === undefined) b.notes = "";
                         if (b.checklists === undefined) b.checklists = [];
+                        if (b.adaptiveSpeed === undefined) b.adaptiveSpeed = false;
+                        if (b.pageTimingLog === undefined) b.pageTimingLog = [];
+                        if (b.pagesLog === undefined) b.pagesLog = [];
+                        if (b.projectionSource === undefined) b.projectionSource = 'auto';
                         if (b.history === undefined) b.history = [{ date: isoToday, page: b.currentPage || 0 }];
                     });
                     if (!imported.availableHours) imported.availableHours = [];
@@ -874,18 +1029,32 @@
             return `${m} min`;
         }
 
+        // ⭐ calculateStats usa PROJ para fechas/tiempo restante, EFF para meta
         function calculateStats(book) {
-            const totalMins = book.totalPages * book.minsPerPage;
-            const readMins = book.currentPage * book.minsPerPage;
+            const effMins = getEffectiveMinsPerPage(book);
+            const projMins = getProjectionMinsPerPage(book);
+            
+            // Uso projMins para tiempo restante y fecha (proyección)
+            const totalMins = book.totalPages * projMins;
+            const readMins = book.currentPage * projMins;
             const remainingPages = book.totalPages - book.currentPage;
-            const remainingMins = remainingPages * book.minsPerPage;
-            const daysRemaining = book.dailyMins > 0 ? Math.ceil(remainingMins / book.dailyMins) : 0;
+            const remainingMins = remainingPages * projMins;
+            
+            // Meta (basada en velocidad efectiva, para el score)
+            const metaPaginas = getMetaPaginas(book);
+            
+            // Días restantes según la PROYECCIÓN
+            const daysRemaining = book.dailyMins > 0 && projMins > 0 
+                ? Math.ceil((remainingPages * projMins) / book.dailyMins) 
+                : 0;
+            
             const percent = Math.min(((book.currentPage / book.totalPages) * 100), 100).toFixed(1);
             const finishDate = new Date();
             finishDate.setDate(finishDate.getDate() + daysRemaining);
             const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
             const dateStr = finishDate.toLocaleDateString('es-ES', dateOptions);
-            return { totalMins, readMins, remainingMins, daysRemaining, percent, dateStr, finishDate };
+            
+            return { totalMins, readMins, remainingMins, remainingPages, daysRemaining, percent, dateStr, finishDate, effMins, projMins, metaPaginas };
         }
 
         function saveData() { localStorage.setItem('readingTrackerData', JSON.stringify(appData)); }
@@ -919,20 +1088,25 @@
             saveData();
             
             const row = checkboxEl.closest('.book-row');
-            if (row) {
-                row.classList.toggle('hidden-metric', !book.metricVisible);
-            }
+            if (row) row.classList.toggle('hidden-metric', !book.metricVisible);
             
             updateMetricsStatus();
             try { renderMetricsChart(); } catch(e) { console.error(e); }
         }
 
+        function toggleAdaptiveSpeed(bookId) {
+            const book = appData.books.find(b => b.id === bookId);
+            if (!book) return;
+            book.adaptiveSpeed = !book.adaptiveSpeed;
+            saveData();
+            renderBooks();
+            if (navigator.vibrate) { try { navigator.vibrate(20); } catch(e) {} }
+        }
+
         function changeHoyPage(delta) {
             const allActiveBooks = appData.books.filter(b => b.active);
             let filtered = allActiveBooks;
-            if (hoySearchTerm) {
-                filtered = allActiveBooks.filter(b => b.title.toLowerCase().includes(hoySearchTerm));
-            }
+            if (hoySearchTerm) filtered = allActiveBooks.filter(b => b.title.toLowerCase().includes(hoySearchTerm));
             const totalPages = Math.max(1, Math.ceil(filtered.length / HOY_PAGE_SIZE));
             hoyPageIndex = Math.max(0, Math.min(hoyPageIndex + delta, totalPages - 1));
             updateMetricsStatus();
@@ -976,18 +1150,13 @@
             if (newName === null) return;
             const trimmed = newName.trim();
             if (!trimmed || trimmed === oldName) return;
-            if (appData.categories.includes(trimmed)) {
-                alert('Ya existe una categoría con ese nombre.');
-                return;
-            }
+            if (appData.categories.includes(trimmed)) { alert('Ya existe una categoría con ese nombre.'); return; }
             
             const idx = appData.categories.indexOf(oldName);
             if (idx < 0) return;
             
             appData.categories[idx] = trimmed;
-            appData.books.forEach(b => {
-                if (b.category === oldName) b.category = trimmed;
-            });
+            appData.books.forEach(b => { if (b.category === oldName) b.category = trimmed; });
             if (appData.activeCategory === oldName) appData.activeCategory = trimmed;
             
             saveData(); renderTabs(); renderBooks();
@@ -1003,14 +1172,10 @@
             
             const onDown = (e) => {
                 if (e.target.classList && e.target.classList.contains('tab-delete')) return;
-                
-                startX = e.clientX;
-                startY = e.clientY;
+                startX = e.clientX; startY = e.clientY;
                 downTime = Date.now();
-                isDragging = false;
-                hasMoved = false;
+                isDragging = false; hasMoved = false;
                 currentPointerId = e.pointerId;
-                
                 el.classList.add('long-pressing');
                 
                 pressTimer = setTimeout(() => {
@@ -1018,11 +1183,8 @@
                     isDragging = true;
                     el.classList.remove('long-pressing');
                     el.classList.add('dragging');
-                    
                     if (navigator.vibrate) { try { navigator.vibrate(30); } catch(err) {} }
-                    if (currentPointerId !== null) {
-                        try { el.setPointerCapture(currentPointerId); } catch(err) {}
-                    }
+                    if (currentPointerId !== null) { try { el.setPointerCapture(currentPointerId); } catch(err) {} }
                 }, 600);
             };
             
@@ -1036,10 +1198,8 @@
                     }
                     return;
                 }
-                
                 hasMoved = true;
                 e.preventDefault();
-                
                 const point = document.elementFromPoint(e.clientX, e.clientY);
                 if (!point) return;
                 const targetTab = point.closest('.tab-btn');
@@ -1049,7 +1209,6 @@
                 const fromCat = el.dataset.cat;
                 const toCat = targetTab.dataset.cat;
                 if (!fromCat || !toCat) return;
-                
                 const fromIdx = appData.categories.indexOf(fromCat);
                 const toIdx = appData.categories.indexOf(toCat);
                 if (fromIdx < 0 || toIdx < 0 || fromIdx === toIdx) return;
@@ -1064,19 +1223,14 @@
                 if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
                 el.classList.remove('long-pressing');
                 el.classList.remove('dragging');
-                
                 const elapsed = Date.now() - downTime;
                 
                 if (isDragging) {
-                    if (!hasMoved) {
-                        renameCategory(cat);
-                    }
-                    isDragging = false;
-                    hasMoved = false;
+                    if (!hasMoved) renameCategory(cat);
+                    isDragging = false; hasMoved = false;
                     currentPointerId = null;
                     return;
                 }
-                
                 currentPointerId = null;
                 
                 if (elapsed < 600 && appData.categories.includes(cat)) {
@@ -1087,10 +1241,7 @@
                     if (clearBtn) clearBtn.classList.remove('visible');
                     const searchContainer = document.getElementById('searchContainer');
                     if (searchContainer) searchContainer.classList.remove('search-active');
-                    
-                    saveData();
-                    renderTabs();
-                    renderBooks();
+                    saveData(); renderTabs(); renderBooks();
                 }
             };
             
@@ -1098,8 +1249,7 @@
                 if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
                 el.classList.remove('long-pressing');
                 el.classList.remove('dragging');
-                isDragging = false;
-                hasMoved = false;
+                isDragging = false; hasMoved = false;
                 currentPointerId = null;
             };
             
@@ -1107,9 +1257,7 @@
             el.addEventListener('pointermove', onMove);
             el.addEventListener('pointerup', onUp);
             el.addEventListener('pointercancel', onCancel);
-            el.addEventListener('pointerleave', (e) => {
-                if (!isDragging) onCancel();
-            });
+            el.addEventListener('pointerleave', () => { if (!isDragging) onCancel(); });
             el.addEventListener('contextmenu', (e) => e.preventDefault());
         }
 
@@ -1129,7 +1277,6 @@
                 } else {
                     btn.innerText = tabText;
                 }
-                
                 attachTabPointer(btn, cat);
                 tabsContainer.appendChild(btn);
             });
@@ -1158,9 +1305,6 @@
             }
         }
 
-        // ============================================================
-        // MODAL AGREGAR LIBRO
-        // ============================================================
         function openAddBookModal() {
             const label = document.getElementById('addBookCategoryLabel');
             if (label) label.textContent = appData.activeCategory;
@@ -1169,18 +1313,12 @@
             document.body.style.overflow = 'hidden';
             updateFabVisibility();
             
-            // Focus al título tras la animación
             setTimeout(() => {
                 const titleInput = document.getElementById('title');
-                if (titleInput) {
-                    try { titleInput.focus(); } catch(e) {}
-                }
+                if (titleInput) { try { titleInput.focus(); } catch(e) {} }
             }, 100);
         }
 
-        // ============================================================
-        // LIBROS — Búsqueda global + Orden por prioridad
-        // ============================================================
         function renderBooks() {
             const booksList = document.getElementById('booksList');
             booksList.innerHTML = '';
@@ -1190,21 +1328,15 @@
             const isGlobalSearch = searchTerm.length > 0;
             
             let filteredBooks;
-            
             if (isGlobalSearch) {
-                filteredBooks = appData.books.filter(b => 
-                    b.title.toLowerCase().includes(searchTerm)
-                );
+                filteredBooks = appData.books.filter(b => b.title.toLowerCase().includes(searchTerm));
             } else {
                 filteredBooks = appData.books.filter(b => b.category === appData.activeCategory);
             }
 
             if (filteredBooks.length === 0) {
                 if (isGlobalSearch) {
-                    booksList.innerHTML = `<div class="empty-state">
-                        Sin resultados para "${searchEl.value}"<br>
-                        <span style="font-size: 13px; color: var(--text-muted); font-style: normal;">🔍 Busqué en todas las categorías</span>
-                    </div>`;
+                    booksList.innerHTML = `<div class="empty-state">Sin resultados para "${searchEl.value}"<br><span style="font-size: 13px; color: var(--text-muted); font-style: normal;">🔍 Busqué en todas las categorías</span></div>`;
                 } else {
                     booksList.innerHTML = '<div class="empty-state">El registro está vacío.</div>';
                 }
@@ -1219,7 +1351,6 @@
                 booksList.appendChild(header);
             }
 
-            // ⭐ ORDEN: activos primero, luego por prioridad descendente, luego por id descendente
             const sortedBooks = filteredBooks.slice().sort((a, b) => {
                 if(a.active !== b.active) return a.active ? -1 : 1;
                 if(a.priority !== b.priority) return b.priority - a.priority;
@@ -1230,6 +1361,34 @@
                 const stats = calculateStats(book);
                 const isTimerRunning = !!activeTimers[book.id];
                 const btnTimerText = isTimerRunning ? '⏸️ Pausar' : (book.dailySeconds > 0 ? '▶️ Continuar' : '▶️ Iniciar');
+                const metaPaginas = getMetaPaginas(book);
+                const paginasHoy = getPaginasLeidasHoy(book);
+                const hasData = hasAdaptiveData(book);
+                const projSource = book.projectionSource || 'auto';
+                const projIcon = book.adaptiveSpeed ? getProjectionSourceLabel(book) : '';
+                
+                let metaDisplay;
+                if (book.adaptiveSpeed) {
+                    if (paginasHoy === 0 && !hasData) {
+                        metaDisplay = `<strong>0</strong><span class="incognita">/__</span>`;
+                    } else if (paginasHoy === 0) {
+                        metaDisplay = `<strong>0</strong><span class="incognita">/${metaPaginas}</span> <span class="incognita" style="font-size: 11px;">(pendiente)</span>`;
+                    } else {
+                        metaDisplay = `<strong>${paginasHoy}</strong>/${metaPaginas}`;
+                    }
+                } else {
+                    metaDisplay = `<strong>${paginasHoy}</strong>/${metaPaginas}`;
+                }
+                
+                const isMetaMet = paginasHoy >= metaPaginas;
+                
+                let adaptiveBadge = '';
+                if (book.adaptiveSpeed) {
+                    const speedText = hasData 
+                        ? `📊 Velocidad real: <strong>${stats.effMins.toFixed(2)} min/pág</strong> <span style="opacity: 0.65;">(estimado: ${book.minsPerPage})</span>`
+                        : `📊 Adaptativa activa <span style="opacity: 0.65;">— sin datos aún, usando estimado ${book.minsPerPage} min/pág</span>`;
+                    adaptiveBadge = `<div class="adaptive-badge">${speedText}</div>`;
+                }
                 
                 const card = document.createElement('div');
                 card.className = `card ${!book.active ? 'inactive' : ''}`;
@@ -1259,6 +1418,7 @@
                                 oninput="document.getElementById('val-pri-${book.id}').innerText = this.value + '%'"
                                 onchange="updatePriority(${book.id}, this.value)">
                         </div>
+                        ${adaptiveBadge}
                     </div>
                     
                     <div id="edit-section-${book.id}" class="edit-section" style="display: none;">
@@ -1278,6 +1438,14 @@
                             <div class="form-group">
                                 <label>Meta diaria (min)</label>
                                 <input type="number" id="edit-daily-${book.id}" value="${book.dailyMins}" required min="1">
+                            </div>
+                            <div class="form-group full">
+                                <label>Velocidad para proyección de fecha final</label>
+                                <select id="edit-proj-source-${book.id}">
+                                    <option value="adaptive" ${projSource === 'auto' || projSource === 'adaptive' ? 'selected' : ''}>📊 Adaptativa (ritmo real aprendido)</option>
+                                    <option value="manual" ${projSource === 'manual' ? 'selected' : ''}>📝 Configurada (la que ingresaste)</option>
+                                </select>
+                                <p style="font-size: 11px; color: var(--text-muted); font-style: italic; margin-top: 4px;">Afecta las fechas finales, marcadores y línea de proyección 📈. Solo aplica si la velocidad adaptativa está activa.</p>
                             </div>
                         </div>
                         <div style="display: flex; gap: 10px;">
@@ -1307,13 +1475,31 @@
                             <div class="progress-track" style="height: 6px; margin: 10px 0;">
                                 <div id="timer-fill-${book.id}" class="progress-fill" style="width: 0%; background: var(--success);"></div>
                             </div>
-                            <div style="display: flex; justify-content: center; gap: 15px; align-items: center; margin-top: 12px;">
+                            <div class="timer-buttons-row">
                                 <button id="btn-timer-${book.id}" onclick="toggleTimer(${book.id})" class="btn-timer ${isTimerRunning ? 'running' : ''}">
                                     ${btnTimerText}
                                 </button>
                                 <button onclick="editTimer(${book.id})" class="icon-btn" style="font-size: 18px;" title="Ingresar tiempo manualmente">✏️</button>
                                 <button onclick="resetTimer(${book.id})" class="icon-btn" style="font-size: 18px;" title="Reiniciar a cero">🔄</button>
+                                <button onclick="toggleAdaptiveSpeed(${book.id})" class="adaptive-toggle-btn ${book.adaptiveSpeed ? 'active' : ''}" title="Velocidad adaptativa">📊</button>
                             </div>
+                            
+                            <div class="meta-pages-display ${isMetaMet ? 'meta-pages-success' : ''}">
+                                <div>Meta páginas: ${metaDisplay}</div>
+                                ${book.adaptiveSpeed ? `
+                                    <div class="projection-source-toggle">
+                                        <span>Proyección fecha:</span>
+                                        <button class="proj-source-btn ${(projSource === 'auto' || projSource === 'adaptive') ? 'active' : ''}" 
+                                            onclick="setProjectionSource(${book.id}, 'adaptive')" 
+                                            title="Usar velocidad adaptativa para la fecha final">📊</button>
+                                        <button class="proj-source-btn ${projSource === 'manual' ? 'active' : ''}" 
+                                            onclick="setProjectionSource(${book.id}, 'manual')" 
+                                            title="Usar velocidad configurada para la fecha final">📝</button>
+                                    </div>
+                                    <span class="meta-pages-hint">Al pausar el cronómetro se preguntará en qué página quedaste para recalcular la meta.</span>
+                                ` : ''}
+                            </div>
+                            
                             <p id="timer-msg-${book.id}" style="color: var(--success); font-style: italic; font-weight: bold; margin-top: 10px; display: none;">
                                 ¡Objetivo de lectura diario alcanzado! 🏆
                             </p>
@@ -1321,9 +1507,11 @@
 
                         <div class="stats-grid" style="margin-top: 15px;">
                             <div class="stat-item"><span class="stat-label">Tiempo Leído</span><span class="stat-value">${formatTime(stats.readMins)}</span></div>
-                            <div class="stat-item"><span class="stat-label">Restante</span><span class="stat-value">${formatTime(stats.remainingMins)}</span></div>
-                            <div class="stat-item"><span class="stat-label">Duración Total</span><span class="stat-value">${formatTime(stats.totalMins)}</span></div>
+                            <div class="stat-item"><span class="stat-label">Tiempo Restante</span><span class="stat-value">${formatTime(stats.remainingMins)}</span></div>
+                            <div class="stat-item"><span class="stat-label">Páginas Leídas</span><span class="stat-value">${book.currentPage}</span></div>
+                            <div class="stat-item"><span class="stat-label">Páginas Restantes</span><span class="stat-value highlight">${stats.remainingPages}</span></div>
                             <div class="stat-item"><span class="stat-label">Días Faltantes</span><span class="stat-value highlight">${stats.daysRemaining}</span></div>
+                            <div class="stat-item"><span class="stat-label">Velocidad proyección</span><span class="stat-value" style="color: var(--primary); font-weight: bold;">${stats.projMins.toFixed(2)} m/p ${projIcon}</span></div>
                             <div class="stat-item full"><span class="stat-label">Proyección Finalización</span><span class="stat-value success">${book.currentPage >= book.totalPages ? 'Obra Finalizada' : stats.dateStr}</span></div>
                         </div>
                     </div>
@@ -1341,10 +1529,15 @@
             
             appData.books.push({
                 id: Date.now(), title: document.getElementById('title').value, category: appData.activeCategory,
-                totalPages: parseInt(document.getElementById('totalPages').value), minsPerPage: parseFloat(document.getElementById('minsPerPage').value),
+                totalPages: parseInt(document.getElementById('totalPages').value), 
+                minsPerPage: parseFloat(document.getElementById('minsPerPage').value),
                 dailyMins: parseInt(document.getElementById('dailyMins').value), currentPage: initPage,
                 notes: "", checklists: [], active: true, priority: 50, dailySeconds: 0,
                 metricVisible: true,
+                adaptiveSpeed: false,
+                projectionSource: 'auto',
+                pageTimingLog: [],
+                pagesLog: [],
                 history: [{ date: isoToday, page: initPage }],
                 dailyLog: []
             });
@@ -1354,22 +1547,68 @@
             document.getElementById('searchContainer').classList.remove('search-active');
             
             saveData(); renderTabs(); renderBooks(); this.reset(); document.getElementById('currentPage').value = 0;
-            
-            // Cerrar modal
             closeModal('addBookModal');
         });
 
+        function applyPageChange(bookId, newPage, fromTimer = false) {
+            const book = appData.books.find(b => b.id === bookId);
+            if (!book) return false;
+            
+            const oldPage = book.currentPage;
+            const clampedPage = Math.max(0, Math.min(newPage, book.totalPages));
+            const delta = clampedPage - oldPage;
+            
+            if (delta === 0) return false;
+            
+            if (!book.pagesLog) book.pagesLog = [];
+            let entry = book.pagesLog.find(l => l.date === isoToday);
+            if (!entry) {
+                entry = { date: isoToday, pages: 0, startPage: oldPage, endPage: clampedPage };
+                book.pagesLog.push(entry);
+            }
+            entry.pages = (entry.pages || 0) + delta;
+            entry.endPage = clampedPage;
+            
+            if (book.adaptiveSpeed) {
+                const secondsToday = book.dailySeconds || 0;
+                if (secondsToday > 0 && delta > 0) {
+                    if (!book.pageTimingLog) book.pageTimingLog = [];
+                    let timingEntry = book.pageTimingLog.find(l => l.date === isoToday);
+                    if (timingEntry) {
+                        timingEntry.endPage = clampedPage;
+                        timingEntry.seconds = secondsToday;
+                    } else {
+                        book.pageTimingLog.push({
+                            date: isoToday,
+                            startPage: oldPage,
+                            endPage: clampedPage,
+                            seconds: secondsToday
+                        });
+                    }
+                    if (book.pageTimingLog.length > 50) {
+                        book.pageTimingLog = book.pageTimingLog.slice(-50);
+                    }
+                }
+            }
+            
+            book.currentPage = clampedPage;
+            
+            if (!book.history) book.history = [];
+            const existingIndex = book.history.findIndex(h => h.date === isoToday);
+            if (existingIndex >= 0) book.history[existingIndex].page = clampedPage;
+            else book.history.push({ date: isoToday, page: clampedPage });
+            
+            saveData();
+            return true;
+        }
+
         function updatePage(id) {
             const newPage = parseInt(document.getElementById(`update-page-${id}`).value);
-            const book = appData.books.find(b => b.id === id);
-            if (book) { 
-                book.currentPage = Math.max(0, Math.min(newPage, book.totalPages)); 
-                if(!book.history) book.history = [];
-                const existingIndex = book.history.findIndex(h => h.date === isoToday);
-                if (existingIndex >= 0) book.history[existingIndex].page = book.currentPage; 
-                else book.history.push({ date: isoToday, page: book.currentPage }); 
-                
-                saveData(); renderBooks(); 
+            if (isNaN(newPage)) return;
+            
+            const changed = applyPageChange(id, newPage, false);
+            if (changed) {
+                renderBooks();
                 if(document.getElementById('metricsModal').style.display === 'flex') {
                     refreshMetricsChart();
                     updateMetricsStatus();
@@ -1398,6 +1637,10 @@
                 book.totalPages = parseInt(document.getElementById(`edit-total-${id}`).value);
                 book.minsPerPage = parseFloat(document.getElementById(`edit-mins-${id}`).value);
                 book.dailyMins = parseInt(document.getElementById(`edit-daily-${id}`).value);
+                
+                const projSelect = document.getElementById(`edit-proj-source-${id}`);
+                if (projSelect) book.projectionSource = projSelect.value;
+                
                 if (book.currentPage > book.totalPages) book.currentPage = book.totalPages;
                 saveData(); renderBooks();
             }
@@ -1409,12 +1652,7 @@
         }
         function updatePriority(id, value) {
             const book = appData.books.find(b => b.id === id);
-            if(book) { 
-                book.priority = parseInt(value); 
-                saveData(); 
-                // Reordenar visualmente
-                renderBooks();
-            }
+            if(book) { book.priority = parseInt(value); saveData(); renderBooks(); }
         }
 
         function toggleTimer(id) {
@@ -1430,6 +1668,27 @@
                 btn.innerHTML = '▶️ Continuar'; btn.classList.remove('running');
                 saveData(); updateTimerUI(id);
                 updateDailySummary();
+                
+                if (book.adaptiveSpeed) {
+                    setTimeout(() => {
+                        const input = prompt(`Pausaste tras ${Math.floor(book.dailySeconds / 60)} min.\n¿En qué página quedaste?`, book.currentPage);
+                        if (input !== null && input.trim() !== "") {
+                            const newPage = parseInt(input);
+                            if (!isNaN(newPage) && newPage >= 0) {
+                                const changed = applyPageChange(id, newPage, true);
+                                if (changed) {
+                                    renderBooks();
+                                    if (navigator.vibrate) { try { navigator.vibrate(30); } catch(e) {} }
+                                }
+                            }
+                        }
+                        if (document.getElementById('metricsModal').style.display === 'flex') {
+                            refreshMetricsChart();
+                            updateMetricsStatus();
+                        }
+                    }, 100);
+                }
+                
                 if (document.getElementById('metricsModal').style.display === 'flex') {
                     refreshMetricsChart();
                     updateMetricsStatus();
@@ -1462,9 +1721,12 @@
             const percent = Math.min((currentSecs / targetSeconds) * 100, 100);
             const fill = document.getElementById(`timer-fill-${id}`);
             if (fill) fill.style.width = `${percent}%`;
+            
+            const metaPaginas = getMetaPaginas(book);
+            const paginasHoy = getPaginasLeidasHoy(book);
             const msg = document.getElementById(`timer-msg-${id}`);
             if (msg) {
-                if (currentSecs >= targetSeconds) msg.style.display = 'block';
+                if (paginasHoy >= metaPaginas) msg.style.display = 'block';
                 else msg.style.display = 'none';
             }
             
@@ -1534,7 +1796,6 @@
             let currentTime = new Date();
             const formatTimeOpts = { hour: '2-digit', minute: '2-digit', hour12: false };
             let scheduleHTML = '';
-
             let virtTime = new Date(currentTime.getTime());
             let selectedHours = appData.availableHours || [];
 
@@ -1549,46 +1810,25 @@
 
             booksToRead.forEach(book => {
                 let minsLeftToSchedule = book.remainingMins;
-
                 if (selectedHours.length === 0) {
                     const startTime = virtTime.toLocaleTimeString([], formatTimeOpts);
                     virtTime.setMinutes(virtTime.getMinutes() + minsLeftToSchedule);
                     const endTime = virtTime.toLocaleTimeString([], formatTimeOpts);
-                    
-                    scheduleHTML += `
-                        <div class="schedule-item">
-                            <span class="schedule-time">${startTime} - ${endTime}</span>
-                            <span class="schedule-title">
-                                <span class="schedule-category">${book.category}</span>
-                                ${book.title}
-                            </span>
-                            <span class="schedule-meta">Prioridad: ${book.priority}% | Duración: ${minsLeftToSchedule} min (Meta: ${book.dailyMins} min)</span>
-                        </div>`;
+                    scheduleHTML += `<div class="schedule-item"><span class="schedule-time">${startTime} - ${endTime}</span><span class="schedule-title"><span class="schedule-category">${book.category}</span>${book.title}</span><span class="schedule-meta">Prioridad: ${book.priority}% | Duración: ${minsLeftToSchedule} min (Meta: ${book.dailyMins} min)</span></div>`;
                 } else {
                     let partCount = 1;
                     while (minsLeftToSchedule > 0) {
                         advanceToValidTime(virtTime);
                         let minsInThisHour = 60 - virtTime.getMinutes();
                         let blockMins = Math.min(minsLeftToSchedule, minsInThisHour);
-
                         const startTime = virtTime.toLocaleTimeString([], formatTimeOpts);
                         virtTime.setMinutes(virtTime.getMinutes() + blockMins);
                         const endTime = virtTime.toLocaleTimeString([], formatTimeOpts);
-
                         let titleDisplay = book.title;
                         if (minsLeftToSchedule > blockMins || partCount > 1) {
                             titleDisplay += ` (Parte ${partCount})`; partCount++;
                         }
-
-                        scheduleHTML += `
-                            <div class="schedule-item">
-                                <span class="schedule-time">${startTime} - ${endTime}</span>
-                                <span class="schedule-title">
-                                    <span class="schedule-category">${book.category}</span>
-                                    ${titleDisplay}
-                                </span>
-                                <span class="schedule-meta">Prioridad: ${book.priority}% | Duración: ${blockMins} min</span>
-                            </div>`;
+                        scheduleHTML += `<div class="schedule-item"><span class="schedule-time">${startTime} - ${endTime}</span><span class="schedule-title"><span class="schedule-category">${book.category}</span>${titleDisplay}</span><span class="schedule-meta">Prioridad: ${book.priority}% | Duración: ${blockMins} min</span></div>`;
                         minsLeftToSchedule -= blockMins;
                     }
                 }
@@ -1615,22 +1855,16 @@
                 }
             });
             if (!hasData) return { min: -3, max: 3 };
-            
             const range = Math.max(maxY - minY, 3);
             const mid = (maxY + minY) / 2;
             const halfRange = range / 2 + 0.5;
-            
-            return {
-                min: Math.floor(mid - halfRange),
-                max: Math.ceil(mid + halfRange)
-            };
+            return { min: Math.floor(mid - halfRange), max: Math.ceil(mid + halfRange) };
         }
 
         function scrollChart(delta) {
             if (!progressChartInstance) return;
             const dates = progressChartInstance._timelineDates;
             if (!dates) return;
-            
             const maxIdx = dates.length - 1;
             const maxStart = Math.max(0, maxIdx - chartViewSize + 1);
             chartViewStart = Math.max(0, Math.min(chartViewStart + delta, maxStart));
@@ -1646,21 +1880,16 @@
             if (!progressChartInstance) return;
             const dates = progressChartInstance._timelineDates;
             if (!dates) return;
-            
             const maxIdx = dates.length - 1;
             const maxStart = Math.max(0, maxIdx - chartViewSize + 1);
             chartViewStart = Math.max(0, Math.min(chartViewStart, maxStart));
-            
             const xMin = chartViewStart;
             const xMax = Math.min(chartViewStart + chartViewSize - 1, maxIdx);
-            
             progressChartInstance.options.scales.x.min = xMin;
             progressChartInstance.options.scales.x.max = xMax;
-            
             const yRange = computeYRange(progressChartInstance.data, xMin, xMax);
             progressChartInstance.options.scales.y.min = yRange.min;
             progressChartInstance.options.scales.y.max = yRange.max;
-            
             progressChartInstance.update('none');
             updateNavUI();
         }
@@ -1669,11 +1898,9 @@
             if (!progressChartInstance) return;
             const dates = progressChartInstance._timelineDates;
             if (!dates) return;
-            
             const maxIdx = dates.length - 1;
             const maxStart = Math.max(0, maxIdx - chartViewSize + 1);
             const endIdx = Math.min(chartViewStart + chartViewSize - 1, maxIdx);
-            
             const slider = document.getElementById('chartSlider');
             if (slider) {
                 slider.min = 0;
@@ -1681,7 +1908,6 @@
                 slider.value = chartViewStart;
                 slider.disabled = maxStart <= 0;
             }
-            
             const navBtns = document.querySelectorAll('.chart-nav button');
             if (navBtns.length >= 4) {
                 const atStart = chartViewStart <= 0;
@@ -1691,7 +1917,6 @@
                 navBtns[3].disabled = atEnd;
                 navBtns[4].disabled = atEnd;
             }
-            
             const startParts = dates[chartViewStart].split('-');
             const endParts = dates[endIdx].split('-');
             const label = document.getElementById('chartRangeText');
@@ -1730,17 +1955,10 @@
             updateFabVisibility();
             
             updateMetricsStatus();
-            
-            try {
-                renderMetricsChart();
-            } catch (err) {
-                console.error('Error al renderizar la gráfica:', err);
-            }
+            try { renderMetricsChart(); } catch (err) { console.error('Error al renderizar la gráfica:', err); }
             
             setTimeout(() => {
-                if (progressChartInstance) {
-                    try { progressChartInstance.resize(); } catch(e) {}
-                }
+                if (progressChartInstance) { try { progressChartInstance.resize(); } catch(e) {} }
                 updateNavUI();
             }, 50);
         }
@@ -1762,9 +1980,7 @@
                 }
                 
                 let filtered = allActiveBooks;
-                if (hoySearchTerm) {
-                    filtered = allActiveBooks.filter(b => b.title.toLowerCase().includes(hoySearchTerm));
-                }
+                if (hoySearchTerm) filtered = allActiveBooks.filter(b => b.title.toLowerCase().includes(hoySearchTerm));
                 
                 const colorMap = getBookColorMap();
                 
@@ -1791,14 +2007,12 @@
                     const rows = pageBooks.map((book) => {
                         const color = colorMap[book.id] || BRIGHT_COLORS[0];
                         const isVisible = book.metricVisible !== false;
-                        
                         return `<div class="book-row ${isVisible ? '' : 'hidden-metric'}" data-book-id="${book.id}">
                             <input type="checkbox" ${isVisible ? 'checked' : ''} onchange="toggleBookVisibility(${book.id}, this)">
                             <span class="legend-dot" style="background: ${color}"></span>
                             <span class="book-score" data-book-id="${book.id}"></span>
                         </div>`;
                     }).join('');
-                    
                     listEl.innerHTML = rows;
                     listEl.dataset.structureKey = structureKey;
                     
@@ -1816,17 +2030,23 @@
                 pageBooks.forEach((book) => {
                     const scoreEl = listEl.querySelector(`.book-score[data-book-id="${book.id}"]`);
                     if (!scoreEl) return;
-                    const goalSecs = book.dailyMins * 60;
-                    const secs = book.dailySeconds || 0;
-                    const pts = secs === 0 ? -1 : secs / goalSecs;
-                    const pct = goalSecs > 0 ? Math.round((secs / goalSecs) * 100) : 0;
-                    const sign = pts >= 0 ? '+' : '';
-                    const check = secs >= goalSecs ? ' ✅' : '';
-                    scoreEl.innerHTML = `<strong>${book.title}</strong>: ${sign}${pts.toFixed(2)} (${pct}%)${check}`;
+                    const paginasHoy = getPaginasLeidasHoy(book);
+                    const metaPaginas = getMetaPaginas(book);
+                    const score = paginasHoy === 0 ? -1 : paginasHoy / metaPaginas;
+                    const check = paginasHoy >= metaPaginas ? ' ✅' : '';
+                    const sign = score >= 0 ? '+' : '';
+                    
+                    let metaText;
+                    if (book.adaptiveSpeed && paginasHoy === 0 && !hasAdaptiveData(book)) {
+                        metaText = `<strong>${paginasHoy}</strong><span style="opacity: 0.5;">/__</span>`;
+                    } else {
+                        metaText = `<strong>${paginasHoy}</strong>/${metaPaginas} pág`;
+                    }
+                    
+                    scoreEl.innerHTML = `<strong>${book.title}</strong>: ${metaText} (${sign}${score.toFixed(2)})${check}`;
                 });
                 
                 renderFinishInfo(allActiveBooks, colorMap, finishEl);
-                
             } catch (err) {
                 console.error('Error en updateMetricsStatus:', err);
                 const finishEl = document.getElementById('metricsFinishInfo');
@@ -1845,13 +2065,10 @@
             const finishRows = visibleBooks.map(book => {
                 const color = colorMap[book.id] || BRIGHT_COLORS[0];
                 const stats = calculateStats(book);
+                const projIcon = book.adaptiveSpeed ? getProjectionSourceLabel(book) : '';
                 
                 if (book.currentPage >= book.totalPages) {
-                    return `<div class="finish-date-item">
-                        <span class="finish-dot" style="background: ${color}"></span>
-                        <span class="finish-book-name">${book.title}</span>
-                        <span class="finish-date-text">🏁 Terminado</span>
-                    </div>`;
+                    return `<div class="finish-date-item"><span class="finish-dot" style="background: ${color}"></span><span class="finish-book-name">${book.title}</span><span class="finish-date-text">🏁 Terminado</span></div>`;
                 }
                 
                 const d = stats.finishDate;
@@ -1860,7 +2077,7 @@
                 const yy = d.getFullYear();
                 return `<div class="finish-date-item">
                     <span class="finish-dot" style="background: ${color}"></span>
-                    <span class="finish-book-name">${book.title}</span>
+                    <span class="finish-book-name">${book.title}${projIcon ? `<span class="finish-source-icon">${projIcon}</span>` : ''}</span>
                     <span class="finish-date-text">${dd}/${mm}/${yy}</span>
                     <span class="finish-days">· ${stats.daysRemaining}d</span>
                 </div>`;
@@ -1873,7 +2090,6 @@
             if (!progressChartInstance) return;
             const todayIdx = progressChartInstance._todayIdx;
             if (todayIdx === undefined) return;
-            
             chartViewSize = 12;
             chartViewStart = Math.max(0, todayIdx - Math.floor(chartViewSize / 2));
             applyChartView();
@@ -1882,11 +2098,7 @@
         function refreshMetricsChart() {
             if (!progressChartInstance) return;
             if (document.getElementById('metricsModal').style.display !== 'flex') return;
-            try {
-                renderMetricsChart();
-            } catch (err) {
-                console.error('Error refrescando gráfica:', err);
-            }
+            try { renderMetricsChart(); } catch (err) { console.error('Error refrescando gráfica:', err); }
         }
 
         let chartRefreshTimeout = null;
@@ -1921,23 +2133,21 @@
             
             let earliestDateStr = isoToday;
             activeBooks.forEach(book => {
-                const dates = [
-                    ...(book.history || []).map(h => h.date),
-                    ...(book.dailyLog || []).map(l => l.date)
-                ].filter(Boolean);
+                const dates = [...(book.history || []).map(h => h.date), ...(book.pagesLog || []).map(l => l.date)].filter(Boolean);
                 if (dates.length > 0) {
                     const e = dates.sort()[0];
                     if (e < earliestDateStr) earliestDateStr = e;
                 }
             });
             
+            // ⭐ Días restantes con PROJ velocity (para marcadores y líneas)
             const finishDaysList = activeBooks.map(book => {
                 if (book.dailyMins <= 0) return 0;
-                const remainingMins = Math.max(0, book.totalPages - book.currentPage) * book.minsPerPage;
-                return Math.ceil(remainingMins / book.dailyMins);
+                const projMins = getProjectionMinsPerPage(book);
+                const remainingPages = Math.max(0, book.totalPages - book.currentPage);
+                return Math.ceil((remainingPages * projMins) / book.dailyMins);
             });
             const maxFinishDays = Math.max(0, ...finishDaysList);
-            
             const maxFutureDays = Math.max(14, maxFinishDays + 7, Math.ceil(maxFinishDays * 1.5));
             
             const startDate = new Date(earliestDateStr + 'T00:00:00');
@@ -1955,35 +2165,26 @@
             }
             
             const todayIdx = timelineDates.indexOf(isoToday);
-            
             const maxIdx = timelineDates.length - 1;
             const maxStart = Math.max(0, maxIdx - chartViewSize + 1);
             
-            if (chartViewStart < 0) {
-                chartViewStart = Math.max(0, todayIdx - Math.floor(chartViewSize / 2));
-            }
+            if (chartViewStart < 0) chartViewStart = Math.max(0, todayIdx - Math.floor(chartViewSize / 2));
             chartViewStart = Math.max(0, Math.min(chartViewStart, maxStart));
             
-            const labels = timelineDates.map(d => {
-                const p = d.split('-');
-                return `${p[2]}/${p[1]}`;
-            });
+            const labels = timelineDates.map(d => { const p = d.split('-'); return `${p[2]}/${p[1]}`; });
             
+            // ⭐ bookTargets con PROJ (para la proyección positiva)
             const bookTargets = activeBooks.map(book => {
                 if (book.dailyMins <= 0) return 1;
-                return Math.max(1, Math.ceil((book.totalPages * book.minsPerPage) / book.dailyMins));
+                const projMins = getProjectionMinsPerPage(book);
+                return Math.max(1, Math.ceil((book.totalPages * projMins) / book.dailyMins));
             });
             
             const baseDatasets = [];
             const bookMetadata = [];
             
             activeBooks.forEach((book, index) => {
-                const goalSecs = book.dailyMins * 60;
-                
-                const allDates = [
-                    ...(book.history || []).map(h => h.date),
-                    ...(book.dailyLog || []).map(l => l.date)
-                ].filter(Boolean).sort();
+                const allDates = [...(book.history || []).map(h => h.date), ...(book.pagesLog || []).map(l => l.date)].filter(Boolean).sort();
                 const firstDate = allDates[0] || isoToday;
                 const startIdx = timelineDates.indexOf(firstDate);
                 
@@ -1996,44 +2197,42 @@
                     if (i < startIdx - 1) { dataPoints.push(null); return; }
                     if (i > todayIdx) { dataPoints.push(null); return; }
                     
-                    let secs = 0;
+                    const score = getScoreForDate(book, date);
                     
                     if (i === todayIdx) {
-                        secs = book.dailySeconds || 0;
-                        if (secs >= goalSecs) goalMetToday = true;
-                        if (secs > 0 && goalSecs > 0) cumScore += secs / goalSecs;
+                        const paginasHoy = getPaginasLeidasHoy(book);
+                        const metaHoy = getMetaPaginas(book);
+                        if (paginasHoy >= metaHoy) goalMetToday = true;
+                        if (paginasHoy > 0) cumScore += paginasHoy / metaHoy;
                         dataPoints.push(cumScore);
                         return;
                     }
                     
-                    const log = (book.dailyLog || []).find(l => l.date === date);
-                    secs = log ? (log.seconds || 0) : 0;
-                    
-                    if (secs === 0) cumScore -= 1;
-                    else if (goalSecs > 0) cumScore += secs / goalSecs;
-                    
+                    if (score === null || score === -1) cumScore -= 1;
+                    else cumScore += score;
                     dataPoints.push(cumScore);
                 });
                 
                 const color = colorMap[book.id] || BRIGHT_COLORS[0];
-                
+                const projIcon = book.adaptiveSpeed ? getProjectionSourceLabel(book) : '';
                 const radii = timelineDates.map((_, i) => {
-                    if (i === todayIdx) return goalMetToday ? 11 : (book.dailySeconds > 0 ? 9 : 7);
+                    if (i === todayIdx) {
+                        const paginasHoy = getPaginasLeidasHoy(book);
+                        return paginasHoy === 0 ? 7 : (goalMetToday ? 11 : 9);
+                    }
                     if (i < todayIdx && i >= startIdx) return 6;
                     if (i === startIdx - 1) return 5;
                     return 0;
                 });
                 
                 baseDatasets.push({
-                    label: book.title + (goalMetToday ? ' 🏆' : ''),
+                    label: book.title + (goalMetToday ? ' 🏆' : '') + (projIcon ? ` ${projIcon}` : ''),
                     data: dataPoints,
                     borderColor: color,
                     backgroundColor: color + '25',
                     borderWidth: 3,
                     pointRadius: radii,
-                    pointBackgroundColor: timelineDates.map((_, i) => 
-                        i === todayIdx && goalMetToday ? '#2d6a4f' : color
-                    ),
+                    pointBackgroundColor: timelineDates.map((_, i) => i === todayIdx && goalMetToday ? '#2d6a4f' : color),
                     pointBorderColor: '#ffffff',
                     pointBorderWidth: 2,
                     pointHoverRadius: 8,
@@ -2042,20 +2241,16 @@
                     spanGaps: false
                 });
                 
-                bookMetadata.push({
-                    book, color, scoreAtToday: cumScore, target: bookTargets[index], goalMetToday
-                });
+                bookMetadata.push({ book, color, scoreAtToday: cumScore, target: bookTargets[index], goalMetToday, projIcon });
             });
             
             const projectionDatasets = [];
-            
             bookMetadata.forEach(meta => {
                 if (showPositiveProjection) {
                     const projData = timelineDates.map((_, i) => {
                         if (i < todayIdx) return null;
                         if (i === todayIdx) return meta.scoreAtToday;
-                        const daysAhead = i - todayIdx;
-                        return Math.min(meta.scoreAtToday + daysAhead, meta.target);
+                        return Math.min(meta.scoreAtToday + (i - todayIdx), meta.target);
                     });
                     projectionDatasets.push({
                         label: `${meta.book.title} 📈`,
@@ -2071,13 +2266,11 @@
                         spanGaps: false
                     });
                 }
-                
                 if (showWarningProjection) {
                     const warnData = timelineDates.map((_, i) => {
                         if (i < todayIdx) return null;
                         if (i === todayIdx) return meta.scoreAtToday;
-                        const daysAhead = i - todayIdx;
-                        return Math.max(meta.scoreAtToday - daysAhead, -30);
+                        return Math.max(meta.scoreAtToday - (i - todayIdx), -30);
                     });
                     projectionDatasets.push({
                         label: `${meta.book.title} 📉`,
@@ -2102,17 +2295,10 @@
                 if (daysRemaining <= 0) return;
                 const finishIdx = todayIdx + daysRemaining;
                 if (finishIdx >= timelineDates.length || finishIdx < 0) return;
-                finishes.push({
-                    idx: finishIdx,
-                    date: timelineDates[finishIdx],
-                    color: meta.color,
-                    target: meta.target,
-                    title: meta.book.title
-                });
+                finishes.push({ idx: finishIdx, date: timelineDates[finishIdx], color: meta.color, target: meta.target, title: meta.book.title, projIcon: meta.projIcon });
             });
             
             const datasets = [...baseDatasets, ...projectionDatasets];
-            
             const xMinInitial = chartViewStart;
             const xMaxInitial = Math.min(chartViewStart + chartViewSize - 1, maxIdx);
             const initialYRange = computeYRange({ datasets }, xMinInitial, xMaxInitial);
@@ -2164,16 +2350,12 @@
                 afterDatasetsDraw(chart) {
                     const { ctx, chartArea, scales } = chart;
                     if (!scales.x || !scales.y) return;
-                    
                     const finList = (chart.options.plugins && chart.options.plugins.finishMarkers && chart.options.plugins.finishMarkers.finishes) || [];
                     if (finList.length === 0) return;
-                    
                     ctx.save();
-                    
                     finList.forEach(f => {
                         const y = scales.y.getPixelForValue(f.target);
                         if (y < chartArea.top + 2 || y > chartArea.bottom - 2) return;
-                        
                         ctx.strokeStyle = f.color + '70';
                         ctx.lineWidth = 1.5;
                         ctx.setLineDash([4, 4]);
@@ -2182,11 +2364,9 @@
                         ctx.lineTo(chartArea.right, y);
                         ctx.stroke();
                     });
-                    
                     finList.forEach((f, i) => {
                         const x = scales.x.getPixelForValue(f.idx);
                         if (x < chartArea.left || x > chartArea.right) return;
-                        
                         ctx.strokeStyle = f.color;
                         ctx.lineWidth = 2;
                         ctx.setLineDash([6, 4]);
@@ -2194,11 +2374,9 @@
                         ctx.moveTo(x, chartArea.top);
                         ctx.lineTo(x, chartArea.bottom);
                         ctx.stroke();
-                        
                         const p = f.date.split('-');
                         const dateLabel = `📅 ${p[2]}/${p[1]}`;
                         const targetLabel = `🎯 +${f.target}d`;
-                        
                         ctx.setLineDash([]);
                         ctx.font = 'bold 10px "Times New Roman", serif';
                         const dateW = ctx.measureText(dateLabel).width;
@@ -2206,10 +2384,8 @@
                         const targetW = ctx.measureText(targetLabel).width;
                         const boxW = Math.max(dateW, targetW) + 10;
                         const boxH = 30;
-                        
                         const bx = Math.max(chartArea.left + 2, Math.min(x - boxW / 2, chartArea.right - boxW - 2));
                         const by = chartArea.top + 28 + (i % 3) * 34;
-                        
                         ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
                         ctx.strokeStyle = f.color;
                         ctx.lineWidth = 1.5;
@@ -2217,18 +2393,15 @@
                         ctx.rect(bx, by, boxW, boxH);
                         ctx.fill();
                         ctx.stroke();
-                        
                         ctx.fillStyle = f.color;
                         ctx.font = 'bold 10px "Times New Roman", serif';
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
                         ctx.fillText(dateLabel, bx + boxW / 2, by + 9);
-                        
                         ctx.font = 'italic 9px "Times New Roman", serif';
                         ctx.fillStyle = f.color + 'cc';
                         ctx.fillText(targetLabel, bx + boxW / 2, by + 21);
                     });
-                    
                     ctx.restore();
                 }
             };
@@ -2247,7 +2420,7 @@
                         y: {
                             min: initialYRange.min,
                             max: initialYRange.max,
-                            title: { display: true, text: 'Progreso (+1 día cumplido, −1 si no lees)', font: { size: 11 } },
+                            title: { display: true, text: 'Progreso (páginas leídas vs meta)', font: { size: 11 } },
                             grid: { color: 'rgba(150, 150, 150, 0.15)' },
                             ticks: { precision: 0, stepSize: 1 }
                         },
@@ -2276,11 +2449,9 @@
                                     if (v === null || v === undefined) return '';
                                     const idx = c.dataIndex;
                                     const book = c.dataset._book;
-                                    
                                     const labelStr = c.dataset.label || '';
                                     const isProjection = labelStr.endsWith('📈');
                                     const isWarning = labelStr.endsWith('📉');
-                                    
                                     if (isProjection) {
                                         const display = Number.isInteger(v) ? v : v.toFixed(1);
                                         return `📈 Si cumples: ${display > 0 ? '+' : ''}${display}`;
@@ -2290,25 +2461,16 @@
                                         return `📉 Si no lees: ${display > 0 ? '+' : ''}${display}`;
                                     }
                                     
-                                    const goalSecs = (book && book.dailyMins ? book.dailyMins : 1) * 60;
+                                    const metaP = getMetaPaginas(book);
                                     let delta = '';
-                                    
                                     if (idx === todayIdx && book) {
-                                        const secs = book.dailySeconds || 0;
-                                        if (secs > 0) {
-                                            const pct = Math.round((secs / goalSecs) * 100);
-                                            delta = ` (hoy: ${Math.floor(secs/60)}/${book.dailyMins} min · ${pct}%)`;
-                                        } else {
-                                            delta = ' (aún sin leer hoy)';
-                                        }
+                                        const pagHoy = getPaginasLeidasHoy(book);
+                                        delta = ` (${pagHoy}/${metaP} pág hoy)`;
                                     } else if (idx < todayIdx && book) {
-                                        const log = (book.dailyLog || []).find(l => l.date === timelineDates[idx]);
-                                        if (log && log.seconds > 0) {
-                                            const pct = Math.round((log.seconds / goalSecs) * 100);
-                                            delta = ` (${Math.floor(log.seconds/60)}/${book.dailyMins} min · ${pct}%)`;
-                                        } else {
-                                            delta = ' (no leíste)';
-                                        }
+                                        const entry = (book.pagesLog || []).find(l => l.date === timelineDates[idx]);
+                                        const pag = entry ? entry.pages : 0;
+                                        const metaDelDia = entry?.metaPages || metaP;
+                                        delta = ` (${pag}/${metaDelDia} pág)`;
                                     }
                                     
                                     const display = Number.isInteger(v) ? v : v.toFixed(2);
@@ -2409,22 +2571,15 @@
             if (e.key === 'Enter') { e.preventDefault(); addChecklist(); }
         });
 
-        // ============================================================
-        // REFRESCO AL VOLVER A FOCO
-        // ============================================================
         let lastFocusRefresh = 0;
-        
         function refreshOnFocus() {
             if (document.hidden) return;
             const now = Date.now();
             if (now - lastFocusRefresh < 800) return;
             lastFocusRefresh = now;
-            
             const rolled = performDayRollover();
-            
             try { renderBooks(); } catch(e) { console.error(e); }
             try { updateDailySummary(); } catch(e) { console.error(e); }
-            
             try {
                 const metricsModal = document.getElementById('metricsModal');
                 if (metricsModal && metricsModal.style.display === 'flex') {
@@ -2432,15 +2587,10 @@
                     refreshMetricsChart();
                 }
             } catch(e) { console.error(e); }
-            
-            if (rolled && navigator.vibrate) {
-                try { navigator.vibrate([30, 50, 30]); } catch(e) {}
-            }
+            if (rolled && navigator.vibrate) { try { navigator.vibrate([30, 50, 30]); } catch(e) {} }
         }
         
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) refreshOnFocus();
-        });
+        document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshOnFocus(); });
         window.addEventListener('focus', refreshOnFocus);
         
         setInterval(() => {
