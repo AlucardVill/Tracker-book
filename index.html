@@ -41,7 +41,6 @@
         }
         .btn-schedule:hover { background: #333; }
 
-        /* Estilos del Desplegable de Horas */
         .hours-dropdown-btn {
             background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main);
             padding: 10px 15px; border-radius: 4px; font-size: 15px; cursor: pointer; font-family: var(--font-family);
@@ -53,13 +52,8 @@
             background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 4px;
             margin-bottom: 20px; display: none; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
         }
-        .hours-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(55px, 1fr)); gap: 8px; margin-top: 10px;
-        }
-        .hour-btn {
-            padding: 6px 0; border-radius: 4px; font-size: 13px; text-align: center; cursor: pointer; font-family: var(--font-family);
-            transition: all 0.2s;
-        }
+        .hours-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(55px, 1fr)); gap: 8px; margin-top: 10px; }
+        .hour-btn { padding: 6px 0; border-radius: 4px; font-size: 13px; text-align: center; cursor: pointer; font-family: var(--font-family); transition: all 0.2s; }
         .hour-btn.selected { background: var(--primary); color: white; border: 1px solid var(--primary); }
         .hour-btn.unselected { background: var(--bg-color); color: var(--text-muted); border: 1px solid var(--border-color); }
         .hour-btn.unselected:hover { border-color: var(--primary); color: var(--primary); }
@@ -80,25 +74,15 @@
             font-size: 12px; cursor: pointer;
         }
 
-        .card {
-            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px;
-            padding: 20px; margin-bottom: 20px; box-shadow: 2px 2px 8px rgba(0,0,0,0.04);
-        }
+        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 20px; margin-bottom: 20px; box-shadow: 2px 2px 8px rgba(0,0,0,0.04); }
         .card.inactive { opacity: 0.7; background: #faf9f7; }
         
         .card-header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
-        .card-title {
-            font-size: 20px; color: var(--primary); font-weight: bold; cursor: pointer;
-            display: inline-flex; align-items: center; gap: 8px; transition: color 0.2s; margin: 0;
-        }
+        .card-title { font-size: 20px; color: var(--primary); font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: color 0.2s; margin: 0; }
         .card-title:hover { color: var(--primary-hover); text-decoration: underline; }
         .card-actions { display: flex; gap: 12px; }
         
-        .card-controls {
-            display: flex; flex-direction: column; gap: 10px; background: var(--bg-color);
-            padding: 12px; border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 15px;
-            text-align: center;
-        }
+        .card-controls { display: flex; flex-direction: column; gap: 10px; background: var(--bg-color); padding: 12px; border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 15px; text-align: center; }
         .status-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; font-size: 14px; }
         .status-toggle input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary); }
         .priority-control { display: flex; align-items: center; justify-content: center; gap: 10px; }
@@ -109,10 +93,7 @@
         .form-group.full { grid-column: 1 / -1; }
 
         label { display: block; font-size: 12px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 5px; }
-        input[type="text"], input[type="number"], textarea {
-            width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px;
-            font-size: 15px; outline: none; transition: border-color 0.2s; background: #faf9f7; font-family: var(--font-family);
-        }
+        input[type="text"], input[type="number"], textarea { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 15px; outline: none; transition: border-color 0.2s; background: #faf9f7; font-family: var(--font-family); }
         input:focus, textarea:focus { border-color: var(--primary); background: white; }
 
         .btn-submit { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 5px; font-family: var(--font-family); }
@@ -155,9 +136,10 @@
         .checklist-text { flex: 1; font-size: 15px; word-break: break-word; }
         .checklist-text.done { text-decoration: line-through; color: var(--text-muted); }
 
-        .schedule-item { padding: 12px; border-left: 4px solid var(--primary); background: var(--card-bg); margin-bottom: 10px; border-radius: 0 4px 4px 0; display: flex; flex-direction: column; gap: 4px; border-top: 1px solid var(--border-color); border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+        .schedule-item { padding: 12px; border-left: 4px solid var(--primary); background: var(--card-bg); margin-bottom: 10px; border-radius: 0 4px 4px 0; display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--border-color); border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
         .schedule-time { font-weight: bold; color: var(--primary); font-size: 15px; }
-        .schedule-title { color: var(--text-main); font-size: 18px; }
+        .schedule-title { color: var(--text-main); font-size: 18px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .schedule-category { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background: #eae5dc; color: var(--primary); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--border-color); }
         .schedule-meta { font-size: 13px; color: var(--text-muted); font-style: italic; }
     </style>
 </head>
@@ -171,7 +153,6 @@
 
         <button onclick="generateSchedule()" class="btn-schedule">📅 Generar Horario de Hoy</button>
 
-        <!-- Desplegable de Horas Disponibles -->
         <button onclick="toggleHoursPanel()" class="hours-dropdown-btn">
             <span>⏱️ Configurar Horas Disponibles</span>
             <span id="hoursToggleIcon">▼</span>
@@ -247,14 +228,18 @@
             categories: ['Lecturas Actuales', 'Por Leer'],
             activeCategory: 'Lecturas Actuales',
             books: [],
-            availableHours: [] 
+            availableHours: [],
+            lastDate: new Date().toDateString()
         };
         let activeTimers = {}; 
 
         const savedData = localStorage.getItem('readingTrackerData');
+        const currentDateStr = new Date().toDateString();
+
         if (savedData) {
             appData = JSON.parse(savedData);
             if(!appData.availableHours) appData.availableHours = [];
+            
             appData.books.forEach(b => {
                 if(b.notes === undefined) b.notes = "";
                 if(b.checklists === undefined) b.checklists = [];
@@ -262,6 +247,15 @@
                 if(b.priority === undefined) b.priority = 50;
                 if(b.dailySeconds === undefined) b.dailySeconds = 0;
             });
+
+            // Reinicio automático diario
+            if (appData.lastDate !== currentDateStr) {
+                appData.books.forEach(b => b.dailySeconds = 0);
+                appData.lastDate = currentDateStr;
+                saveData();
+            }
+        } else {
+            appData.lastDate = currentDateStr;
         }
 
         let currentModalBookId = null;
@@ -290,16 +284,13 @@
 
         function saveData() { localStorage.setItem('readingTrackerData', JSON.stringify(appData)); }
 
-        // --- Funciones del Panel de Horas ---
         function toggleHoursPanel() {
             const panel = document.getElementById('hoursPanel');
             const icon = document.getElementById('hoursToggleIcon');
             if (panel.style.display === 'none' || panel.style.display === '') {
-                panel.style.display = 'block';
-                icon.innerText = '▲';
+                panel.style.display = 'block'; icon.innerText = '▲';
             } else {
-                panel.style.display = 'none';
-                icon.innerText = '▼';
+                panel.style.display = 'none'; icon.innerText = '▼';
             }
         }
 
@@ -309,7 +300,6 @@
             for(let i = 0; i < 24; i++) {
                 const hourLabel = `${i.toString().padStart(2, '0')}:00`;
                 const isSelected = appData.availableHours.includes(i);
-                
                 const btn = document.createElement('button');
                 btn.innerText = hourLabel;
                 btn.className = isSelected ? 'hour-btn selected' : 'hour-btn unselected';
@@ -321,8 +311,7 @@
                         appData.availableHours.push(i);
                         appData.availableHours.sort((a,b) => a-b);
                     }
-                    saveData();
-                    renderHoursGrid();
+                    saveData(); renderHoursGrid();
                 };
                 grid.appendChild(btn);
             }
@@ -512,7 +501,7 @@
 
         function deleteBook(id) {
             if(confirm('¿Eliminar este registro de forma permanente?')) { 
-                if(activeTimers[id]) clearInterval(activeTimers[id]);
+                if(activeTimers[id]) clearInterval(activeTimers[id].interval);
                 appData.books = appData.books.filter(b => b.id !== id); saveData(); renderTabs(); renderBooks(); 
             }
         }
@@ -545,22 +534,31 @@
             if(book) { book.priority = parseInt(value); saveData(); }
         }
 
+        // --- Temporizador basado en Timestamp (Soporta Segundo Plano) ---
         function toggleTimer(id) {
             const book = appData.books.find(b => b.id === id);
             const btn = document.getElementById(`btn-timer-${id}`);
             
             if (activeTimers[id]) {
-                clearInterval(activeTimers[id]); delete activeTimers[id];
+                clearInterval(activeTimers[id].interval);
+                const elapsed = Math.floor((Date.now() - activeTimers[id].startTick) / 1000);
+                book.dailySeconds = activeTimers[id].initial + elapsed;
+                delete activeTimers[id];
+                
                 btn.innerHTML = '▶️ Continuar'; btn.classList.remove('running');
-                saveData(); 
+                saveData(); updateTimerUI(id);
             } else {
                 btn.innerHTML = '⏸️ Pausar'; btn.classList.add('running');
-                activeTimers[id] = setInterval(() => {
-                    if (!book.dailySeconds) book.dailySeconds = 0;
-                    book.dailySeconds++;
-                    updateTimerUI(id);
-                    if(book.dailySeconds % 60 === 0) saveData(); 
-                }, 1000);
+                activeTimers[id] = {
+                    startTick: Date.now(),
+                    initial: book.dailySeconds || 0,
+                    interval: setInterval(() => {
+                        const elapsed = Math.floor((Date.now() - activeTimers[id].startTick) / 1000);
+                        book.dailySeconds = activeTimers[id].initial + elapsed;
+                        updateTimerUI(id);
+                        if (book.dailySeconds % 60 === 0) saveData(); 
+                    }, 1000)
+                };
             }
         }
 
@@ -596,8 +594,11 @@
                     const parsed = parseInt(input);
                     if (!isNaN(parsed) && parsed >= 0) {
                         book.dailySeconds = parsed * 60;
-                        saveData();
-                        updateTimerUI(id);
+                        if (activeTimers[id]) {
+                            activeTimers[id].initial = book.dailySeconds;
+                            activeTimers[id].startTick = Date.now();
+                        }
+                        saveData(); updateTimerUI(id);
                     }
                 }
             }
@@ -608,23 +609,20 @@
                 const book = appData.books.find(b => b.id === id);
                 if (book) {
                     book.dailySeconds = 0;
-                    if(activeTimers[id]) { clearInterval(activeTimers[id]); delete activeTimers[id]; }
+                    if(activeTimers[id]) { clearInterval(activeTimers[id].interval); delete activeTimers[id]; }
                     saveData(); renderBooks(); 
                 }
             }
         }
 
-        // --- Algoritmo de Generación de Horario Inteligente ---
         function generateSchedule() {
             let activeBooks = appData.books.filter(b => b.active === true && b.currentPage < b.totalPages);
-            
             let booksToRead = [];
+            
             activeBooks.forEach(book => {
                 const readMinsToday = Math.floor((book.dailySeconds || 0) / 60);
                 const remainingMins = book.dailyMins - readMinsToday;
-                if (remainingMins > 0) {
-                    booksToRead.push({ ...book, remainingMins: remainingMins });
-                }
+                if (remainingMins > 0) booksToRead.push({ ...book, remainingMins: remainingMins });
             });
 
             if(booksToRead.length === 0) { 
@@ -654,24 +652,23 @@
                 let minsLeftToSchedule = book.remainingMins;
 
                 if (selectedHours.length === 0) {
-                    // Si no hay horas seleccionadas, se asigna el tiempo corrido
                     const startTime = virtTime.toLocaleTimeString([], formatTimeOpts);
                     virtTime.setMinutes(virtTime.getMinutes() + minsLeftToSchedule);
                     const endTime = virtTime.toLocaleTimeString([], formatTimeOpts);
+                    
                     scheduleHTML += `
                         <div class="schedule-item">
                             <span class="schedule-time">${startTime} - ${endTime}</span>
-                            <span class="schedule-title">${book.title}</span>
-                            <span class="schedule-meta">Prioridad: ${book.priority}% | Duración: ${minsLeftToSchedule} min</span>
+                            <span class="schedule-title">
+                                <span class="schedule-category">${book.category}</span>
+                                ${book.title}
+                            </span>
+                            <span class="schedule-meta">Prioridad: ${book.priority}% | Duración: ${minsLeftToSchedule} min (Meta: ${book.dailyMins} min)</span>
                         </div>`;
                 } else {
-                    // Si hay horas seleccionadas, fragmenta de forma inteligente
                     let partCount = 1;
-                    
                     while (minsLeftToSchedule > 0) {
                         advanceToValidTime(virtTime);
-                        
-                        let currentHour = virtTime.getHours();
                         let minsInThisHour = 60 - virtTime.getMinutes();
                         let blockMins = Math.min(minsLeftToSchedule, minsInThisHour);
 
@@ -681,17 +678,18 @@
 
                         let titleDisplay = book.title;
                         if (minsLeftToSchedule > blockMins || partCount > 1) {
-                            titleDisplay += ` (Parte ${partCount})`;
-                            partCount++;
+                            titleDisplay += ` (Parte ${partCount})`; partCount++;
                         }
 
                         scheduleHTML += `
                             <div class="schedule-item">
                                 <span class="schedule-time">${startTime} - ${endTime}</span>
-                                <span class="schedule-title">${titleDisplay}</span>
+                                <span class="schedule-title">
+                                    <span class="schedule-category">${book.category}</span>
+                                    ${titleDisplay}
+                                </span>
                                 <span class="schedule-meta">Prioridad: ${book.priority}% | Duración: ${blockMins} min</span>
                             </div>`;
-
                         minsLeftToSchedule -= blockMins;
                     }
                 }
@@ -759,10 +757,7 @@
             if (e.key === 'Enter') { e.preventDefault(); addChecklist(); }
         });
 
-        // Inicialización
-        renderHoursGrid();
-        renderTabs(); 
-        renderBooks();
+        renderHoursGrid(); renderTabs(); renderBooks();
     </script>
 </body>
 </html>
