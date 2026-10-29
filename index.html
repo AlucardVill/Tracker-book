@@ -149,6 +149,8 @@
         .schedule-meta { font-size: 13px; color: var(--text-muted); font-style: italic; }
         
         .chart-container { position: relative; height: 350px; width: 100%; margin-top: 20px; }
+        .btn-reset-zoom { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted); padding: 6px 14px; border-radius: 4px; font-size: 13px; cursor: pointer; font-family: var(--font-family); transition: all 0.2s; }
+        .btn-reset-zoom:hover { border-color: var(--primary); color: var(--primary); }
     </style>
 </head>
 <body>
@@ -237,13 +239,16 @@
         <div class="modal-content" style="max-width: 650px;">
             <button class="modal-close" onclick="closeModal('metricsModal')">&times;</button>
             <h2 style="font-size: 22px; color: var(--primary); margin-bottom: 5px;">Métricas de Progreso</h2>
-            <p style="font-size: 14px; color: var(--text-muted); font-style: italic;">Cada línea sube <strong>+1</strong> al cumplir el objetivo diario y baja <strong>−1</strong> si no lees. Arrastra la gráfica para explorar días futuros.</p>
+            <p style="font-size: 14px; color: var(--text-muted); font-style: italic;">Cada línea sube <strong>+1</strong> al cumplir el objetivo diario y baja <strong>−1</strong> si no lees. La línea punteada verde marca los días totales que necesitas para terminar la obra.</p>
             
             <div class="chart-container">
                 <canvas id="progressChart"></canvas>
             </div>
-            <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 15px;">
-                *Arrastra para desplazarte · Rueda del ratón o pinza para hacer zoom · La sección punteada = días futuros.
+            <div style="display: flex; justify-content: center; margin-top: 12px;">
+                <button onclick="resetZoom()" class="btn-reset-zoom">🔄 Reajustar vista</button>
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 10px;">
+                *Arrastra para desplazarte · Rueda del ratón o pinza para hacer zoom · El eje Y se ajusta automáticamente al zoom.
             </p>
         </div>
     </div>
@@ -779,11 +784,66 @@
             document.body.style.overflow = 'hidden';
         }
 
-        // --- Gráfica Dinámica: sube/baja según objetivo diario ---
+        // ============================================================
+        // GRÁFICA DE MÉTRICAS — Sistema de puntuación ±1 por día
+        // ============================================================
         function openMetricsModal() {
             document.getElementById('metricsModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
             renderMetricsChart();
+        }
+
+        // Calcula el rango Y por defecto a partir de TODOS los datos + objetivo
+        function computeDefaultY(chart) {
+            let minY = 0, maxY = 0;
+            chart.data.datasets.forEach(ds => {
+                ds.data.forEach(v => {
+                    if (typeof v === 'number' && isFinite(v)) {
+                        if (v < minY) minY = v;
+                        if (v > maxY) maxY = v;
+                    }
+                });
+            });
+            const target = chart._maxTargetScore || 0;
+            if (target > maxY) maxY = target;
+            const range = Math.max(1, maxY - minY);
+            const pad = Math.max(1, Math.ceil(range * 0.1));
+            return { min: minY - pad, max: maxY + pad };
+        }
+
+        // Aplica el rango Y basado SOLO en los datos visibles (para zoom)
+        function applyDynamicY(chart) {
+            const xScale = chart.scales.x;
+            if (!xScale) return;
+            const { min, max } = xScale;
+            let minY = Infinity, maxY = -Infinity, hasData = false;
+            chart.data.datasets.forEach(ds => {
+                const start = Math.max(0, Math.floor(min));
+                const end = Math.min(ds.data.length - 1, Math.ceil(max));
+                for (let i = start; i <= end; i++) {
+                    const v = ds.data[i];
+                    if (typeof v === 'number' && isFinite(v)) {
+                        hasData = true;
+                        if (v < minY) minY = v;
+                        if (v > maxY) maxY = v;
+                    }
+                }
+            });
+            if (!hasData) return;
+            const range = Math.max(1, maxY - minY);
+            const pad = Math.max(1, Math.ceil(range * 0.2));
+            chart.options.scales.y.min = minY - pad;
+            chart.options.scales.y.max = maxY + pad;
+        }
+
+        // Restaura la vista por defecto (sin zoom, con rango basado en objetivo)
+        function resetZoom() {
+            if (!progressChartInstance) return;
+            if (progressChartInstance.resetZoom) progressChartInstance.resetZoom();
+            const def = computeDefaultY(progressChartInstance);
+            progressChartInstance.options.scales.y.min = def.min;
+            progressChartInstance.options.scales.y.max = def.max;
+            progressChartInstance.update();
         }
 
         function renderMetricsChart() {
@@ -812,6 +872,13 @@
             });
             
             const brightColors = ['#e63946', '#00b4d8', '#2a9d8f', '#ffb703', '#9b5de5', '#f72585', '#06d6a0', '#ef476f'];
+            
+            // Objetivo: días que necesita cada libro para terminar
+            const bookTargets = activeBooks.map(book => {
+                const remainingMins = Math.max(0, book.totalPages - book.currentPage) * book.minsPerPage;
+                return Math.max(1, Math.ceil(remainingMins / book.dailyMins));
+            });
+            const maxTarget = Math.max(...bookTargets, 5);
             
             const datasets = activeBooks.map((book, index) => {
                 let cumScore = 0;
@@ -855,12 +922,15 @@
                     pointHoverRadius: 7,
                     fill: false,
                     tension: 0.15,
+                    _book: book,
+                    _target: bookTargets[index],
                     segment: {
                         borderDash: (s) => (s.p1DataIndex > todayIdx ? [6, 5] : undefined)
                     }
                 };
             });
             
+            // Plugin: línea del cero
             const zeroLine = {
                 id: 'zeroLine',
                 beforeDatasetsDraw(chart) {
@@ -880,7 +950,37 @@
                 }
             };
             
+            // Plugin: línea de objetivo máximo
+            const targetLine = {
+                id: 'targetLine',
+                beforeDatasetsDraw(chart) {
+                    const { ctx, chartArea, scales } = chart;
+                    if (!scales.y) return;
+                    const target = chart._maxTargetScore;
+                    if (!target) return;
+                    const y = scales.y.getPixelForValue(target);
+                    if (y < chartArea.top + 5 || y > chartArea.bottom - 5) return;
+                    ctx.save();
+                    ctx.strokeStyle = 'rgba(45, 106, 79, 0.45)';
+                    ctx.lineWidth = 1.5;
+                    ctx.setLineDash([3, 4]);
+                    ctx.beginPath();
+                    ctx.moveTo(chartArea.left, y);
+                    ctx.lineTo(chartArea.right, y);
+                    ctx.stroke();
+                    ctx.fillStyle = 'rgba(45, 106, 79, 0.75)';
+                    ctx.font = 'italic 11px "Times New Roman", serif';
+                    ctx.textAlign = 'right';
+                    ctx.fillText(`Objetivo máximo (+${target})`, chartArea.right - 6, y - 5);
+                    ctx.restore();
+                }
+            };
+            
             const zoomEnabled = typeof ChartZoom !== 'undefined';
+            
+            // Rango Y inicial basado en datos + objetivo
+            const initialMinY = Math.min(-Math.max(2, Math.ceil(maxTarget / 4)), 0);
+            const initialMaxY = Math.max(5, maxTarget);
             
             progressChartInstance = new Chart(ctx, {
                 type: 'line',
@@ -891,9 +991,11 @@
                     interaction: { mode: 'index', intersect: false },
                     scales: {
                         y: {
-                            title: { display: true, text: 'Balance (objetivos cumplidos − fallidos)', font: { size: 13 } },
+                            min: initialMinY,
+                            max: initialMaxY,
+                            title: { display: true, text: 'Balance acumulado (±1 por día)', font: { size: 12 } },
                             grid: { color: 'rgba(150, 150, 150, 0.15)' },
-                            ticks: { precision: 0, stepSize: 2 }
+                            ticks: { precision: 0 }
                         },
                         x: {
                             min: 0,
@@ -921,21 +1023,48 @@
                                 },
                                 label: (c) => {
                                     const v = c.parsed.y;
-                                    return `${c.dataset.label}: ${v > 0 ? '+' : ''}${v}`;
+                                    const idx = c.dataIndex;
+                                    const book = c.dataset._book;
+                                    let info = '';
+                                    if (idx === todayIdx && book) {
+                                        const secs = book.dailySeconds || 0;
+                                        info = ` · hoy ${Math.floor(secs/60)}/${book.dailyMins} min`;
+                                    } else if (idx < todayIdx && book) {
+                                        const log = (book.dailyLog || []).find(l => l.date === timelineDates[idx]);
+                                        if (log) info = ` · ${Math.floor(log.seconds/60)}/${book.dailyMins} min`;
+                                    }
+                                    return `${c.dataset.label}: ${v > 0 ? '+' : ''}${v}${info}`;
+                                },
+                                afterLabel: (c) => {
+                                    if (c.dataIndex === todayIdx) return '';
+                                    if (c.dataIndex > todayIdx) return '(proyección)';
+                                    return '';
                                 }
                             }
                         },
                         ...(zoomEnabled ? {
                             zoom: {
-                                pan: { enabled: true, mode: 'x' },
-                                zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' },
+                                pan: {
+                                    enabled: true,
+                                    mode: 'x',
+                                    onPan: ({ chart }) => applyDynamicY(chart)
+                                },
+                                zoom: {
+                                    wheel: { enabled: true },
+                                    pinch: { enabled: true },
+                                    mode: 'x',
+                                    onZoom: ({ chart }) => applyDynamicY(chart)
+                                },
                                 limits: { x: { min: 0, max: timelineDates.length - 1 } }
                             }
                         } : {})
                     }
                 },
-                plugins: [zeroLine]
+                plugins: [zeroLine, targetLine]
             });
+            
+            // Guardar el objetivo máximo en la instancia para que el plugin lo use
+            progressChartInstance._maxTargetScore = maxTarget;
         }
 
         function closeModal(modalId) {
