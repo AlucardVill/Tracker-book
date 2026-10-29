@@ -239,7 +239,7 @@
         <div class="modal-content" style="max-width: 650px;">
             <button class="modal-close" onclick="closeModal('metricsModal')">&times;</button>
             <h2 style="font-size: 22px; color: var(--primary); margin-bottom: 5px;">Métricas de Progreso</h2>
-            <p style="font-size: 14px; color: var(--text-muted); font-style: italic;">Cada línea sube <strong>+1</strong> al cumplir el objetivo diario y baja <strong>−1</strong> si no lees. La línea punteada verde marca los días totales que necesitas para terminar la obra.</p>
+            <p style="font-size: 14px; color: var(--text-muted); font-style: italic;">La línea sube <strong>proporcionalmente</strong> a lo que lees: la meta diaria da <strong>+1</strong>, leer el doble da <strong>+2</strong>, no leer resta <strong>−1</strong>. La línea verde marca los días totales para terminar el libro.</p>
             
             <div class="chart-container">
                 <canvas id="progressChart"></canvas>
@@ -785,7 +785,7 @@
         }
 
         // ============================================================
-        // GRÁFICA DE MÉTRICAS — Sistema de puntuación ±1 por día
+        // GRÁFICA DE MÉTRICAS — Puntuación proporcional por día
         // ============================================================
         function openMetricsModal() {
             document.getElementById('metricsModal').style.display = 'flex';
@@ -793,25 +793,6 @@
             renderMetricsChart();
         }
 
-        // Calcula el rango Y por defecto a partir de TODOS los datos + objetivo
-        function computeDefaultY(chart) {
-            let minY = 0, maxY = 0;
-            chart.data.datasets.forEach(ds => {
-                ds.data.forEach(v => {
-                    if (typeof v === 'number' && isFinite(v)) {
-                        if (v < minY) minY = v;
-                        if (v > maxY) maxY = v;
-                    }
-                });
-            });
-            const target = chart._maxTargetScore || 0;
-            if (target > maxY) maxY = target;
-            const range = Math.max(1, maxY - minY);
-            const pad = Math.max(1, Math.ceil(range * 0.1));
-            return { min: minY - pad, max: maxY + pad };
-        }
-
-        // Aplica el rango Y basado SOLO en los datos visibles (para zoom)
         function applyDynamicY(chart) {
             const xScale = chart.scales.x;
             if (!xScale) return;
@@ -831,18 +812,29 @@
             });
             if (!hasData) return;
             const range = Math.max(1, maxY - minY);
-            const pad = Math.max(1, Math.ceil(range * 0.2));
+            const pad = Math.max(0.5, range * 0.15);
             chart.options.scales.y.min = minY - pad;
             chart.options.scales.y.max = maxY + pad;
         }
 
-        // Restaura la vista por defecto (sin zoom, con rango basado en objetivo)
         function resetZoom() {
             if (!progressChartInstance) return;
             if (progressChartInstance.resetZoom) progressChartInstance.resetZoom();
-            const def = computeDefaultY(progressChartInstance);
-            progressChartInstance.options.scales.y.min = def.min;
-            progressChartInstance.options.scales.y.max = def.max;
+            
+            let actualMax = 0, actualMin = 0;
+            progressChartInstance.data.datasets.forEach(ds => {
+                ds.data.forEach(v => {
+                    if (typeof v === 'number' && isFinite(v)) {
+                        if (v > actualMax) actualMax = v;
+                        if (v < actualMin) actualMin = v;
+                    }
+                });
+            });
+            const target = progressChartInstance._maxTargetScore || 0;
+            const maxY = Math.max(actualMax, target) + 2;
+            const minY = Math.min(actualMin - 2, -2);
+            progressChartInstance.options.scales.y.min = minY;
+            progressChartInstance.options.scales.y.max = maxY;
             progressChartInstance.update();
         }
 
@@ -873,10 +865,9 @@
             
             const brightColors = ['#e63946', '#00b4d8', '#2a9d8f', '#ffb703', '#9b5de5', '#f72585', '#06d6a0', '#ef476f'];
             
-            // Objetivo: días que necesita cada libro para terminar
+            // OBJETIVO FIJO: días totales para terminar el libro a ritmo de meta
             const bookTargets = activeBooks.map(book => {
-                const remainingMins = Math.max(0, book.totalPages - book.currentPage) * book.minsPerPage;
-                return Math.max(1, Math.ceil(remainingMins / book.dailyMins));
+                return Math.max(1, Math.ceil((book.totalPages * book.minsPerPage) / book.dailyMins));
             });
             const maxTarget = Math.max(...bookTargets, 5);
             
@@ -889,19 +880,23 @@
                     if (i > todayIdx) {
                         dataPoints.push(cumScore);
                     } else {
-                        let met = false, hasData = false;
+                        let secs = 0, hasData = false;
                         
                         if (i === todayIdx) {
                             if ((book.dailySeconds || 0) > 0) {
-                                met = (book.dailySeconds || 0) >= goalSecs;
+                                secs = book.dailySeconds;
                                 hasData = true;
                             }
                         } else {
                             const log = (book.dailyLog || []).find(l => l.date === date);
-                            if (log) { met = log.met; hasData = true; }
+                            if (log) { secs = log.seconds || 0; hasData = true; }
                         }
                         
-                        if (hasData) cumScore += met ? 1 : -1;
+                        if (hasData) {
+                            // PROPORCIONAL: más lectura = más puntos. Falta total = -1.
+                            if (secs === 0) cumScore -= 1;
+                            else cumScore += secs / goalSecs;
+                        }
                         dataPoints.push(cumScore);
                     }
                 });
@@ -950,7 +945,7 @@
                 }
             };
             
-            // Plugin: línea de objetivo máximo
+            // Plugin: línea de objetivo (días totales para terminar)
             const targetLine = {
                 id: 'targetLine',
                 beforeDatasetsDraw(chart) {
@@ -961,26 +956,35 @@
                     const y = scales.y.getPixelForValue(target);
                     if (y < chartArea.top + 5 || y > chartArea.bottom - 5) return;
                     ctx.save();
-                    ctx.strokeStyle = 'rgba(45, 106, 79, 0.45)';
+                    ctx.strokeStyle = 'rgba(45, 106, 79, 0.55)';
                     ctx.lineWidth = 1.5;
                     ctx.setLineDash([3, 4]);
                     ctx.beginPath();
                     ctx.moveTo(chartArea.left, y);
                     ctx.lineTo(chartArea.right, y);
                     ctx.stroke();
-                    ctx.fillStyle = 'rgba(45, 106, 79, 0.75)';
+                    ctx.fillStyle = 'rgba(45, 106, 79, 0.8)';
                     ctx.font = 'italic 11px "Times New Roman", serif';
                     ctx.textAlign = 'right';
-                    ctx.fillText(`Objetivo máximo (+${target})`, chartArea.right - 6, y - 5);
+                    ctx.fillText(`Meta final: +${target} días`, chartArea.right - 6, y - 5);
                     ctx.restore();
                 }
             };
             
             const zoomEnabled = typeof ChartZoom !== 'undefined';
             
-            // Rango Y inicial basado en datos + objetivo
-            const initialMinY = Math.min(-Math.max(2, Math.ceil(maxTarget / 4)), 0);
-            const initialMaxY = Math.max(5, maxTarget);
+            // Rango Y: considerar datos reales Y objetivo
+            let actualMax = 0, actualMin = 0;
+            datasets.forEach(ds => {
+                ds.data.forEach(v => {
+                    if (typeof v === 'number' && isFinite(v)) {
+                        if (v > actualMax) actualMax = v;
+                        if (v < actualMin) actualMin = v;
+                    }
+                });
+            });
+            const initialMaxY = Math.max(actualMax, maxTarget) + 2;
+            const initialMinY = Math.min(actualMin - 2, -2);
             
             progressChartInstance = new Chart(ctx, {
                 type: 'line',
@@ -993,9 +997,8 @@
                         y: {
                             min: initialMinY,
                             max: initialMaxY,
-                            title: { display: true, text: 'Balance acumulado (±1 por día)', font: { size: 12 } },
-                            grid: { color: 'rgba(150, 150, 150, 0.15)' },
-                            ticks: { precision: 0 }
+                            title: { display: true, text: 'Progreso (días de lectura acumulados)', font: { size: 12 } },
+                            grid: { color: 'rgba(150, 150, 150, 0.15)' }
                         },
                         x: {
                             min: 0,
@@ -1025,18 +1028,29 @@
                                     const v = c.parsed.y;
                                     const idx = c.dataIndex;
                                     const book = c.dataset._book;
-                                    let info = '';
+                                    const goalSecs = book.dailyMins * 60;
+                                    let delta = '';
+                                    
                                     if (idx === todayIdx && book) {
                                         const secs = book.dailySeconds || 0;
-                                        info = ` · hoy ${Math.floor(secs/60)}/${book.dailyMins} min`;
+                                        if (secs > 0) {
+                                            const pct = Math.round((secs / goalSecs) * 100);
+                                            delta = ` (hoy: ${Math.floor(secs/60)}/${book.dailyMins} min · ${pct}%)`;
+                                        }
                                     } else if (idx < todayIdx && book) {
                                         const log = (book.dailyLog || []).find(l => l.date === timelineDates[idx]);
-                                        if (log) info = ` · ${Math.floor(log.seconds/60)}/${book.dailyMins} min`;
+                                        if (log && log.seconds > 0) {
+                                            const pct = Math.round((log.seconds / goalSecs) * 100);
+                                            delta = ` (${Math.floor(log.seconds/60)}/${book.dailyMins} min · ${pct}%)`;
+                                        } else if (log) {
+                                            delta = ' (no leíste)';
+                                        }
                                     }
-                                    return `${c.dataset.label}: ${v > 0 ? '+' : ''}${v}${info}`;
+                                    
+                                    const display = Number.isInteger(v) ? v : v.toFixed(1);
+                                    return `${c.dataset.label}: ${display > 0 ? '+' : ''}${display}${delta}`;
                                 },
                                 afterLabel: (c) => {
-                                    if (c.dataIndex === todayIdx) return '';
                                     if (c.dataIndex > todayIdx) return '(proyección)';
                                     return '';
                                 }
@@ -1063,7 +1077,6 @@
                 plugins: [zeroLine, targetLine]
             });
             
-            // Guardar el objetivo máximo en la instancia para que el plugin lo use
             progressChartInstance._maxTargetScore = maxTarget;
         }
 
