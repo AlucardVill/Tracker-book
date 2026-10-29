@@ -21,7 +21,7 @@
             --hover-bg: #e2e8e7;       /* Tono Emerald suave */
             --card-bg: #ffffff;        /* Blanco */
             --border-color: #e6c8b7;   /* Champagne */
-            --success: #c3955b;        /* Cognac (para contrastar) */
+            --success: #c3955b;        /* Cognac */
             --danger: #9b2226;
             --font-family: "Times New Roman", Times, serif;
         }
@@ -416,7 +416,7 @@
         
         .hoy-search-container { position: relative; margin-bottom: 6px; margin-top: 2px; }
         .hoy-search-container input { width: 100%; padding: 6px 26px 6px 24px; border: 1px solid var(--border-color); border-radius: 3px; font-size: 12px; font-family: var(--font-family); background: var(--bg-color); outline: none; transition: all 0.2s; line-height: 1.4; color: var(--text-main); }
-        .hoy-search-container input:focus { border-color: var(--primary); background: white; color: #1a1a1a; }
+        .hoy-search-container input:focus { border-color: var(--primary); }
         .hoy-search-container input::placeholder { color: var(--text-muted); font-style: italic; opacity: 0.7; }
         .hoy-search-container::before { content: '🔍'; position: absolute; left: 6px; top: 50%; transform: translateY(-50%); font-size: 10px; pointer-events: none; opacity: 0.55; }
         .hoy-search-clear { position: absolute; right: 2px; top: 50%; transform: translateY(-50%); background: transparent; border: none; font-size: 14px; cursor: pointer; color: var(--text-muted); padding: 2px 6px; display: none; line-height: 1; }
@@ -443,9 +443,9 @@
         .proj-btn:active { transform: scale(0.92); }
         .proj-btn-caption { font-size: 9px; color: var(--text-muted); text-align: center; margin-top: 2px; font-style: italic; }
 
-        .metrics-finish-info { font-size: 12px; color: var(--text-main); margin-top: 6px; padding: 10px 12px; background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border: 1px solid #b7e4c7; border-radius: 4px; line-height: 1.5; }
+        .metrics-finish-info { font-size: 12px; color: var(--text-main); margin-top: 6px; padding: 10px 12px; background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 4px; line-height: 1.5; }
         .finish-header { color: var(--success); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; font-weight: bold; }
-        .finish-date-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 13px; border-top: 1px solid rgba(183, 228, 199, 0.5); }
+        .finish-date-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 13px; border-top: 1px solid var(--border-color); }
         .finish-date-item:first-child { border-top: none; padding-top: 0; }
         .finish-date-item:last-child { padding-bottom: 0; }
         .finish-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.15); }
@@ -502,28 +502,6 @@
 
         .add-book-modal-title { font-size: 22px; color: var(--primary); margin-bottom: 5px; }
         .add-book-modal-subtitle { font-size: 14px; color: var(--text-muted); font-style: italic; margin-bottom: 20px; }
-
-        /* ============================================================ */
-        /* ISOLATE METRICS MODAL - Mantener diseño original               */
-        /* ============================================================ */
-        #metricsModal .modal-content {
-            --bg-color: #fdfbf7;
-            --text-main: #1a1a1a;
-            --text-muted: #5c5c5c;
-            --primary: #722f37;
-            --primary-hover: #5a232b;
-            --hover-bg: #eae5dc;
-            --card-bg: #ffffff;
-            --border-color: #dcd7ce;
-            --success: #2d6a4f;
-            --danger: #9b2226;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-        }
-        #metricsModal .modal-close {
-            background: var(--card-bg);
-            color: var(--text-main);
-        }
     </style>
 </head>
 <body>
@@ -691,8 +669,6 @@
     </div>
 
     <script>
-        Chart.defaults.font.family = '"Times New Roman", Times, serif';
-        Chart.defaults.color = '#5c5c5c';
         let progressChartInstance = null; 
 
         const BRIGHT_COLORS = ['#e63946', '#00b4d8', '#2a9d8f', '#ffb703', '#9b5de5', '#f72585', '#06d6a0', '#ef476f'];
@@ -717,7 +693,7 @@
         let activeTimers = {}; 
 
         // ============================================================
-        // SISTEMA DE TEMAS
+        // SISTEMA DE TEMAS Y GRÁFICA
         // ============================================================
         function applyTheme(theme) {
             const btn = document.getElementById('themeToggleBtn');
@@ -728,6 +704,7 @@
                 document.body.removeAttribute('data-theme');
                 if (btn) btn.innerText = '🌿 Esmeralda';
             }
+            updateChartColors(); // Actualiza los colores del gráfico al cambiar de tema
         }
 
         function toggleTheme() {
@@ -737,9 +714,30 @@
             applyTheme(newTheme);
         }
 
-        // Cargar tema guardado
+        // Configura Chart.js para respetar el modo claro/oscuro
+        function updateChartColors() {
+            const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            Chart.defaults.color = isDark ? '#f9edf0' : '#5c5c5c';
+            Chart.defaults.borderColor = isDark ? 'rgba(249, 237, 240, 0.1)' : 'rgba(150, 150, 150, 0.15)';
+            
+            Chart.defaults.plugins.tooltip.backgroundColor = isDark ? 'rgba(19, 36, 33, 0.95)' : 'rgba(255, 255, 255, 0.95)';
+            Chart.defaults.plugins.tooltip.titleColor = isDark ? '#f9edf0' : '#1a1a1a';
+            Chart.defaults.plugins.tooltip.bodyColor = isDark ? '#f9edf0' : '#1a1a1a';
+            Chart.defaults.plugins.tooltip.borderColor = isDark ? 'rgba(249, 237, 240, 0.2)' : 'rgba(0, 0, 0, 0.1)';
+            Chart.defaults.plugins.tooltip.borderWidth = 1;
+        }
+
+        // Escuchar cambios en el sistema operativo
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            updateChartColors();
+            if (progressChartInstance) renderMetricsChart();
+        });
+
+        // Inicialización
         const savedTheme = localStorage.getItem('appTheme') || 'emerald';
         applyTheme(savedTheme);
+        updateChartColors();
 
         // ============================================================
         // HELPERS PARA PÁGINAS
@@ -2241,7 +2239,8 @@
                     const y = scales.y.getPixelForValue(0);
                     if (y < chartArea.top || y > chartArea.bottom) return;
                     ctx.save();
-                    ctx.strokeStyle = 'rgba(114, 47, 55, 0.35)';
+                    const isDark = document.body.getAttribute('data-theme') === 'amber' ? false : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                    ctx.strokeStyle = isDark ? 'rgba(249, 237, 240, 0.2)' : 'rgba(114, 47, 55, 0.35)';
                     ctx.lineWidth = 1.5;
                     ctx.setLineDash([6, 4]);
                     ctx.beginPath();
@@ -2260,14 +2259,15 @@
                     const x = scales.x.getPixelForValue(todayIdx);
                     if (x < chartArea.left || x > chartArea.right) return;
                     ctx.save();
-                    ctx.strokeStyle = 'rgba(114, 47, 55, 0.3)';
+                    const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    ctx.strokeStyle = isDark ? 'rgba(249, 237, 240, 0.3)' : 'rgba(114, 47, 55, 0.3)';
                     ctx.lineWidth = 1.5;
                     ctx.setLineDash([3, 3]);
                     ctx.beginPath();
                     ctx.moveTo(x, chartArea.top);
                     ctx.lineTo(x, chartArea.bottom);
                     ctx.stroke();
-                    ctx.fillStyle = 'rgba(114, 47, 55, 0.85)';
+                    ctx.fillStyle = isDark ? 'rgba(249, 237, 240, 0.85)' : 'rgba(114, 47, 55, 0.85)';
                     ctx.font = 'bold italic 11px "Times New Roman", serif';
                     ctx.textAlign = 'center';
                     ctx.fillText('HOY', x, chartArea.top + 12);
@@ -2283,6 +2283,8 @@
                     const finList = (chart.options.plugins && chart.options.plugins.finishMarkers && chart.options.plugins.finishMarkers.finishes) || [];
                     if (finList.length === 0) return;
                     ctx.save();
+                    const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    
                     finList.forEach(f => {
                         const y = scales.y.getPixelForValue(f.target);
                         if (y < chartArea.top + 2 || y > chartArea.bottom - 2) return;
@@ -2316,18 +2318,21 @@
                         const boxH = 30;
                         const bx = Math.max(chartArea.left + 2, Math.min(x - boxW / 2, chartArea.right - boxW - 2));
                         const by = chartArea.top + 28 + (i % 3) * 34;
-                        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                        
+                        ctx.fillStyle = isDark ? 'rgba(19, 36, 33, 0.95)' : 'rgba(255, 255, 255, 0.95)';
                         ctx.strokeStyle = f.color;
                         ctx.lineWidth = 1.5;
                         ctx.beginPath();
                         ctx.rect(bx, by, boxW, boxH);
                         ctx.fill();
                         ctx.stroke();
+                        
                         ctx.fillStyle = f.color;
                         ctx.font = 'bold 10px "Times New Roman", serif';
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
                         ctx.fillText(dateLabel, bx + boxW / 2, by + 9);
+                        
                         ctx.font = 'italic 9px "Times New Roman", serif';
                         ctx.fillStyle = f.color + 'cc';
                         ctx.fillText(targetLabel, bx + boxW / 2, by + 21);
@@ -2351,7 +2356,7 @@
                             min: initialYRange.min,
                             max: initialYRange.max,
                             title: { display: true, text: 'Progreso (páginas leídas vs meta)', font: { size: 11 } },
-                            grid: { color: 'rgba(150, 150, 150, 0.15)' },
+                            grid: { color: Chart.defaults.borderColor },
                             ticks: { precision: 0, stepSize: 1 }
                         },
                         x: {
