@@ -974,19 +974,18 @@
 
         function attachTabPointer(el, cat) {
             let pressTimer = null;
-            let startX = 0, startY = 0;
-            let downTime = 0;
             let isDragging = false;
             let hasMoved = false;
-            let currentPointerId = null;
+            let hoveredTab = null;
             
             const onDown = (e) => {
                 if (e.target.classList && e.target.classList.contains('tab-delete')) return;
-                startX = e.clientX; startY = e.clientY;
-                downTime = Date.now();
-                isDragging = false; hasMoved = false;
-                currentPointerId = e.pointerId;
+                
+                isDragging = false; hasMoved = false; hoveredTab = null;
                 el.classList.add('long-pressing');
+                
+                document.addEventListener('pointerup', handleEarlyRelease);
+                document.addEventListener('pointercancel', handleEarlyRelease);
                 
                 pressTimer = setTimeout(() => {
                     pressTimer = null;
@@ -994,56 +993,91 @@
                     el.classList.remove('long-pressing');
                     el.classList.add('dragging');
                     if (navigator.vibrate) { try { navigator.vibrate(30); } catch(err) {} }
-                    if (currentPointerId !== null) { try { el.setPointerCapture(currentPointerId); } catch(err) {} }
+                    
+                    document.removeEventListener('pointerup', handleEarlyRelease);
+                    document.removeEventListener('pointercancel', handleEarlyRelease);
+                    
+                    document.addEventListener('pointermove', globalMove);
+                    document.addEventListener('pointerup', globalUp);
+                    document.addEventListener('pointercancel', globalCancel);
                 }, 600);
             };
             
-            const onMove = (e) => {
-                if (!isDragging) {
-                    const dx = Math.abs(e.clientX - startX);
-                    const dy = Math.abs(e.clientY - startY);
-                    if (dx > 8 || dy > 8) {
-                        if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
-                        el.classList.remove('long-pressing');
-                    }
-                    return;
-                }
+            const handleEarlyRelease = () => {
+                if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+                el.classList.remove('long-pressing');
+                document.removeEventListener('pointerup', handleEarlyRelease);
+                document.removeEventListener('pointercancel', handleEarlyRelease);
+            };
+            
+            const globalMove = (e) => {
+                if (!isDragging) return;
                 hasMoved = true;
-                e.preventDefault();
+                if (e.cancelable) e.preventDefault();
+                
                 const point = document.elementFromPoint(e.clientX, e.clientY);
                 if (!point) return;
                 const targetTab = point.closest('.tab-btn');
-                if (!targetTab || targetTab === el) return;
-                if (targetTab.classList.contains('tab-btn-new')) return;
                 
-                const fromCat = el.dataset.cat;
-                const toCat = targetTab.dataset.cat;
-                if (!fromCat || !toCat) return;
-                const fromIdx = appData.categories.indexOf(fromCat);
-                const toIdx = appData.categories.indexOf(toCat);
-                if (fromIdx < 0 || toIdx < 0 || fromIdx === toIdx) return;
-                
-                const [moved] = appData.categories.splice(fromIdx, 1);
-                appData.categories.splice(toIdx, 0, moved);
-                saveData();
-                renderTabs();
+                if (targetTab && targetTab !== el && !targetTab.classList.contains('tab-btn-new')) {
+                    hoveredTab = targetTab;
+                } else {
+                    hoveredTab = null;
+                }
             };
             
-            const onUp = (e) => {
-                if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
-                el.classList.remove('long-pressing');
+            const globalUp = (e) => {
+                if (!isDragging) return;
                 el.classList.remove('dragging');
-                const elapsed = Date.now() - downTime;
                 
+                if (!hasMoved) {
+                    renameCategory(cat);
+                } else if (hoveredTab) {
+                    const fromCat = el.dataset.cat;
+                    const toCat = hoveredTab.dataset.cat;
+                    
+                    if (fromCat && toCat) {
+                        const fromIdx = appData.categories.indexOf(fromCat);
+                        const toIdx = appData.categories.indexOf(toCat);
+                        
+                        if (fromIdx >= 0 && toIdx >= 0 && fromIdx !== toIdx) {
+                            const [moved] = appData.categories.splice(fromIdx, 1);
+                            appData.categories.splice(toIdx, 0, moved);
+                            saveData();
+                            renderTabs();
+                        }
+                    }
+                }
+                
+                isDragging = false;
+                hasMoved = false;
+                hoveredTab = null;
+                
+                document.removeEventListener('pointermove', globalMove);
+                document.removeEventListener('pointerup', globalUp);
+                document.removeEventListener('pointercancel', globalCancel);
+            };
+            
+            const globalCancel = () => {
+                el.classList.remove('dragging');
+                isDragging = false;
+                hasMoved = false;
+                hoveredTab = null;
+                
+                document.removeEventListener('pointermove', globalMove);
+                document.removeEventListener('pointerup', globalUp);
+                document.removeEventListener('pointercancel', globalCancel);
+            };
+            
+            el.addEventListener('pointerdown', onDown);
+            
+            // Manejo normal del toque (cambiar pestaña)
+            el.addEventListener('click', (e) => {
                 if (isDragging) {
-                    if (!hasMoved) renameCategory(cat);
-                    isDragging = false; hasMoved = false;
-                    currentPointerId = null;
+                    e.preventDefault();
                     return;
                 }
-                currentPointerId = null;
-                
-                if (elapsed < 600 && appData.categories.includes(cat)) {
+                if (appData.categories.includes(cat)) {
                     appData.activeCategory = cat;
                     const searchEl = document.getElementById('bookSearch');
                     if (searchEl) searchEl.value = '';
@@ -1053,21 +1087,8 @@
                     if (searchContainer) searchContainer.classList.remove('search-active');
                     saveData(); renderTabs(); renderBooks();
                 }
-            };
+            });
             
-            const onCancel = () => {
-                if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
-                el.classList.remove('long-pressing');
-                el.classList.remove('dragging');
-                isDragging = false; hasMoved = false;
-                currentPointerId = null;
-            };
-            
-            el.addEventListener('pointerdown', onDown);
-            el.addEventListener('pointermove', onMove);
-            el.addEventListener('pointerup', onUp);
-            el.addEventListener('pointercancel', onCancel);
-            el.addEventListener('pointerleave', () => { if (!isDragging) onCancel(); });
             el.addEventListener('contextmenu', (e) => e.preventDefault());
         }
 
@@ -1307,7 +1328,7 @@
             closeModal('addBookModal');
         });
 
-        // ⭐ Actualización de página segura y protegida contra negativos
+        // Actualización de página segura y protegida contra negativos
         function applyPageChange(bookId, newPage) {
             const book = appData.books.find(b => b.id === bookId);
             if (!book) return false;
