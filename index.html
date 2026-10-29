@@ -157,6 +157,21 @@
             padding: 10px; background: var(--card-bg); border: 1px solid var(--border-color); 
             border-radius: 4px; line-height: 1.8;
         }
+        .metrics-finish-info {
+            font-size: 12px;
+            color: var(--text-main);
+            text-align: center;
+            margin-top: 6px;
+            padding: 8px 10px;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+            border: 1px solid #b7e4c7;
+            border-radius: 4px;
+            line-height: 1.7;
+        }
+        .metrics-finish-info .finish-row {
+            display: block;
+            font-style: italic;
+        }
 
         .projection-toggles {
             display: flex;
@@ -186,9 +201,6 @@
         .proj-toggle.positive span { color: var(--success); font-weight: bold; }
         .proj-toggle.warning span { color: var(--text-muted); font-weight: bold; }
 
-        /* ============================================ */
-        /* NAVEGACIÓN POR BOTONES + SLIDER              */
-        /* ============================================ */
         .chart-nav {
             display: grid;
             grid-template-columns: 44px 44px 1fr 44px 44px;
@@ -290,6 +302,25 @@
             opacity: 0.35;
             cursor: not-allowed;
         }
+
+        .btn-footer-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .btn-footer-row button {
+            flex: 1;
+            min-width: 140px;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-family: var(--font-family);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+            touch-action: manipulation;
+        }
     </style>
 </head>
 <body>
@@ -376,10 +407,11 @@
             <button class="modal-close" onclick="closeModal('metricsModal')">&times;</button>
             <h2 style="font-size: 22px; color: var(--primary); margin-bottom: 5px;">Métricas de Progreso</h2>
             <p style="font-size: 14px; color: var(--text-muted); font-style: italic;">
-                Línea <strong>sólida</strong> = tu progreso real. <strong>Punteadas</strong> = dos futuros posibles desde hoy.
+                Línea <strong>sólida</strong> = tu progreso real. <strong>Punteadas</strong> = futuros posibles. <strong>Línea vertical + fecha</strong> = fin estimado del libro.
             </p>
             
             <div id="metricsStatus" class="metrics-status">Cargando…</div>
+            <div id="metricsFinishInfo" class="metrics-finish-info">Cargando fechas…</div>
 
             <div class="projection-toggles">
                 <label class="proj-toggle positive">
@@ -396,7 +428,6 @@
                 <canvas id="progressChart"></canvas>
             </div>
 
-            <!-- Navegación táctil -->
             <div class="chart-nav">
                 <button onclick="scrollChart(-7)" title="7 días atrás">⏪</button>
                 <button onclick="scrollChart(-1)" title="Día anterior">◀</button>
@@ -408,11 +439,12 @@
                 <button onclick="scrollChart(7)" title="7 días adelante">⏩</button>
             </div>
 
-            <div style="display: flex; justify-content: center; margin-top: 12px;">
+            <div class="btn-footer-row">
                 <button onclick="resetZoom()" class="btn-reset-zoom">🎯 Centrar en HOY</button>
+                <button onclick="jumpToFinish()" class="btn-reset-zoom">📅 Ir al final</button>
             </div>
             <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 10px;">
-                *Usa los botones ◀ ▶ o la barra para desplazarte · Rueda del ratón o pinza para acercar/alejar.
+                *Usa los botones ◀ ▶ o la barra para desplazarte · Rueda del ratón para acercar/alejar.
             </p>
         </div>
     </div>
@@ -422,13 +454,11 @@
         Chart.defaults.color = '#5c5c5c';
         let progressChartInstance = null; 
 
-        // Estado de proyecciones
         let showPositiveProjection = localStorage.getItem('showPositiveProj') !== 'false';
         let showWarningProjection = localStorage.getItem('showWarningProj') !== 'false';
 
-        // Estado de navegación de la gráfica
-        let chartViewStart = -1;      // -1 = auto (centrar en HOY)
-        let chartViewSize = 18;       // días visibles a la vez
+        let chartViewStart = -1;
+        let chartViewSize = 18;
 
         let appData = {
             categories: ['Lecturas Actuales', 'Por Leer'],
@@ -522,7 +552,7 @@
             finishDate.setDate(finishDate.getDate() + daysRemaining);
             const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
             const dateStr = finishDate.toLocaleDateString('es-ES', dateOptions);
-            return { totalMins, readMins, remainingMins, daysRemaining, percent, dateStr };
+            return { totalMins, readMins, remainingMins, daysRemaining, percent, dateStr, finishDate };
         }
 
         function saveData() { localStorage.setItem('readingTrackerData', JSON.stringify(appData)); }
@@ -984,7 +1014,7 @@
         }
 
         // ============================================================
-        // NAVEGACIÓN POR BOTONES Y SLIDER
+        // NAVEGACIÓN
         // ============================================================
         function scrollChart(delta) {
             if (!progressChartInstance) return;
@@ -1026,7 +1056,6 @@
             const maxStart = Math.max(0, maxIdx - chartViewSize + 1);
             const endIdx = Math.min(chartViewStart + chartViewSize - 1, maxIdx);
             
-            // Actualizar slider
             const slider = document.getElementById('chartSlider');
             if (slider) {
                 slider.min = 0;
@@ -1035,18 +1064,16 @@
                 slider.disabled = maxStart <= 0;
             }
             
-            // Actualizar botones
             const navBtns = document.querySelectorAll('.chart-nav button');
             if (navBtns.length >= 4) {
                 const atStart = chartViewStart <= 0;
                 const atEnd = chartViewStart >= maxStart;
-                navBtns[0].disabled = atStart;  // ⏪
-                navBtns[1].disabled = atStart;  // ◀
-                navBtns[3].disabled = atEnd;    // ▶
-                navBtns[4].disabled = atEnd;    // ⏩
+                navBtns[0].disabled = atStart;
+                navBtns[1].disabled = atStart;
+                navBtns[3].disabled = atEnd;
+                navBtns[4].disabled = atEnd;
             }
             
-            // Actualizar texto del rango
             const startParts = dates[chartViewStart].split('-');
             const endParts = dates[endIdx].split('-');
             const label = document.getElementById('chartRangeText');
@@ -1055,14 +1082,26 @@
             }
         }
 
+        function jumpToFinish() {
+            if (!progressChartInstance) return;
+            const finishes = progressChartInstance._bookFinishes || [];
+            if (finishes.length === 0) {
+                alert('No hay fechas finales configuradas (libros ya terminados).');
+                return;
+            }
+            const maxFinishIdx = Math.max(...finishes.map(f => f.idx));
+            const maxIdx = progressChartInstance._timelineDates.length - 1;
+            const maxStart = Math.max(0, maxIdx - chartViewSize + 1);
+            chartViewStart = Math.max(0, Math.min(maxFinishIdx - Math.floor(chartViewSize / 2), maxStart));
+            applyChartView();
+        }
+
         // ============================================================
-        // GRÁFICA — Progreso real + Proyecciones toggleables
+        // GRÁFICA
         // ============================================================
         function openMetricsModal() {
             document.getElementById('togglePosProj').checked = showPositiveProjection;
             document.getElementById('toggleWarnProj').checked = showWarningProjection;
-            
-            // Resetear para centrar en HOY al abrir
             chartViewStart = -1;
             
             document.getElementById('metricsModal').style.display = 'flex';
@@ -1078,10 +1117,12 @@
         function updateMetricsStatus() {
             const activeBooks = appData.books.filter(b => b.active);
             const el = document.getElementById('metricsStatus');
-            if (!el) return;
+            const finishEl = document.getElementById('metricsFinishInfo');
+            if (!el || !finishEl) return;
             
             if (activeBooks.length === 0) {
                 el.innerHTML = '<em>Sin lecturas activas</em>';
+                finishEl.innerHTML = '';
                 return;
             }
             
@@ -1099,6 +1140,21 @@
             });
             
             el.innerHTML = `<strong>Hoy:</strong> ${parts.join(' · ')}`;
+            
+            // Info de fecha final
+            const finishRows = activeBooks.map(book => {
+                const stats = calculateStats(book);
+                if (book.currentPage >= book.totalPages) {
+                    return `<span class="finish-row">🏁 <strong>${book.title}</strong>: terminado</span>`;
+                }
+                const d = stats.finishDate;
+                const dd = String(d.getDate()).padStart(2, '0');
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const yy = d.getFullYear();
+                return `<span class="finish-row">📅 <strong>${book.title}</strong>: ${dd}/${mm}/${yy} · en ${stats.daysRemaining} días</span>`;
+            }).join('');
+            
+            finishEl.innerHTML = `<strong style="color: var(--success)">Fechas finales estimadas</strong>${finishRows}`;
         }
 
         function applyDynamicY(chart) {
@@ -1138,7 +1194,6 @@
         function refreshMetricsChart() {
             if (!progressChartInstance) return;
             if (document.getElementById('metricsModal').style.display !== 'flex') return;
-            // chartViewStart ya persiste como global, no necesitamos guardar/restaurar
             renderMetricsChart();
         }
 
@@ -1158,7 +1213,6 @@
             if (progressChartInstance) { progressChartInstance.destroy(); progressChartInstance = null; }
             if (activeBooks.length === 0) return;
             
-            // Fecha de inicio más antigua
             let earliestDateStr = isoToday;
             activeBooks.forEach(book => {
                 const dates = [
@@ -1171,12 +1225,15 @@
                 }
             });
             
-            // Extensión dinámica hasta la fecha límite
-            const maxFutureDays = Math.max(14, ...activeBooks.map(book => {
+            // Calcular días de finalización por libro
+            const finishDaysList = activeBooks.map(book => {
                 const remainingMins = Math.max(0, book.totalPages - book.currentPage) * book.minsPerPage;
-                const remainingDays = Math.ceil(remainingMins / book.dailyMins);
-                return Math.ceil(remainingDays * 1.5);
-            }));
+                return Math.ceil(remainingMins / book.dailyMins);
+            });
+            const maxFinishDays = Math.max(0, ...finishDaysList);
+            
+            // Extensión dinámica: cubrir el finishIdx + margen
+            const maxFutureDays = Math.max(14, maxFinishDays + 7, Math.ceil(maxFinishDays * 1.5));
             
             const startDate = new Date(earliestDateStr + 'T00:00:00');
             startDate.setDate(startDate.getDate() - 1);
@@ -1194,7 +1251,6 @@
             
             const todayIdx = timelineDates.indexOf(isoToday);
             
-            // Inicializar chartViewStart si es la primera vez
             if (chartViewStart < 0) {
                 chartViewStart = Math.max(0, todayIdx - Math.floor(chartViewSize / 2));
             }
@@ -1342,11 +1398,39 @@
                 }
             });
             
-            const datasets = [...baseDatasets, ...projectionDatasets];
+            // Datasets de fin (marcas invisibles para que el plugin las dibuje)
+            const finishDatasets = [];
+            bookMetadata.forEach((meta, i) => {
+                if (meta.book.currentPage >= meta.book.totalPages) return;
+                const daysRemaining = finishDaysList[i];
+                if (daysRemaining <= 0) return;
+                const finishIdx = todayIdx + daysRemaining;
+                if (finishIdx >= timelineDates.length) return;
+                
+                // Dataset "fantasma" que solo sirve para que el plugin tenga info
+                const finishData = timelineDates.map(() => null);
+                finishDatasets.push({
+                    label: `📅 Fin: ${meta.book.title}`,
+                    data: finishData,
+                    borderColor: meta.color,
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
+                    fill: false,
+                    _isFinishMarker: true,
+                    _finishIdx: finishIdx,
+                    _finishDate: timelineDates[finishIdx],
+                    _finishTarget: meta.target,
+                    _finishColor: meta.color,
+                    _finishTitle: meta.book.title
+                });
+            });
             
-            // Rango Y
+            const datasets = [...baseDatasets, ...projectionDatasets, ...finishDatasets];
+            
+            // Rango Y — incluir marcas de fin (targets)
             let actualMax = 0, actualMin = 0, hasData = false;
             datasets.forEach(ds => {
+                if (ds._isFinishMarker) return;
                 ds.data.forEach(v => {
                     if (typeof v === 'number' && isFinite(v)) {
                         hasData = true;
@@ -1355,6 +1439,8 @@
                     }
                 });
             });
+            // Incluir targets de libros
+            bookTargets.forEach(t => { if (t > actualMax) actualMax = t; });
             
             let finalMin = actualMin;
             let finalMax = actualMax;
@@ -1409,6 +1495,92 @@
                 }
             };
             
+            // Plugin: líneas de fin (vertical) y target (horizontal)
+            const finishMarkers = {
+                id: 'finishMarkers',
+                afterDatasetsDraw(chart) {
+                    const { ctx, chartArea, scales } = chart;
+                    if (!scales.x || !scales.y) return;
+                    
+                    const finishDs = chart.data.datasets.filter(ds => ds._isFinishMarker);
+                    if (finishDs.length === 0) return;
+                    
+                    ctx.save();
+                    
+                    // Primero: horizontales de target
+                    finishDs.forEach(ds => {
+                        const y = scales.y.getPixelForValue(ds._finishTarget);
+                        if (y < chartArea.top + 2 || y > chartArea.bottom - 2) return;
+                        
+                        ctx.strokeStyle = ds._finishColor + '70';
+                        ctx.lineWidth = 1.5;
+                        ctx.setLineDash([4, 4]);
+                        ctx.beginPath();
+                        ctx.moveTo(chartArea.left, y);
+                        ctx.lineTo(chartArea.right, y);
+                        ctx.stroke();
+                    });
+                    
+                    // Segundo: verticales de fin con label
+                    const seenX = new Set();
+                    finishDs.forEach((ds, i) => {
+                        const x = scales.x.getPixelForValue(ds._finishIdx);
+                        if (x < chartArea.left || x > chartArea.right) return;
+                        
+                        const xKey = Math.round(x);
+                        if (seenX.has(xKey)) return;
+                        seenX.add(xKey);
+                        
+                        ctx.strokeStyle = ds._finishColor;
+                        ctx.lineWidth = 2;
+                        ctx.setLineDash([6, 4]);
+                        ctx.beginPath();
+                        ctx.moveTo(x, chartArea.top);
+                        ctx.lineTo(x, chartArea.bottom);
+                        ctx.stroke();
+                        
+                        // Label: fecha + target
+                        const p = ds._finishDate.split('-');
+                        const dateLabel = `📅 ${p[2]}/${p[1]}`;
+                        const targetLabel = `🎯 +${ds._finishTarget}d`;
+                        
+                        ctx.font = 'bold 10px "Times New Roman", serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        
+                        const dateW = ctx.measureText(dateLabel).width;
+                        const targetW = ctx.measureText(targetLabel).width;
+                        const boxW = Math.max(dateW, targetW) + 10;
+                        const boxH = 30;
+                        
+                        const bx = Math.max(chartArea.left, Math.min(x - boxW / 2, chartArea.right - boxW));
+                        const by = chartArea.top + 28 + i * 34;
+                        
+                        // Fondo
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                        ctx.strokeStyle = ds._finishColor;
+                        ctx.lineWidth = 1.5;
+                        ctx.setLineDash([]);
+                        ctx.beginPath();
+                        ctx.rect(bx, by, boxW, boxH);
+                        ctx.fill();
+                        ctx.stroke();
+                        
+                        // Texto fecha
+                        ctx.fillStyle = ds._finishColor;
+                        ctx.font = 'bold 10px "Times New Roman", serif';
+                        ctx.fillText(dateLabel, bx + boxW / 2, by + 9);
+                        
+                        // Texto target
+                        ctx.font = 'italic 9px "Times New Roman", serif';
+                        ctx.fillStyle = ds._finishColor + 'cc';
+                        ctx.fillText(targetLabel, bx + boxW / 2, by + 21);
+                    });
+                    
+                    ctx.restore();
+                }
+            };
+            
             const zoomEnabled = typeof ChartZoom !== 'undefined';
             
             const xMinInitial = chartViewStart;
@@ -1440,10 +1612,18 @@
                     plugins: {
                         legend: {
                             position: 'bottom',
-                            labels: { usePointStyle: true, boxWidth: 10, font: { size: 11 } }
+                            labels: { usePointStyle: true, boxWidth: 10, font: { size: 11 }, filter: (item, chart) => {
+                                // Ocultar los datasets de marca de fin de la leyenda
+                                const ds = chart.data.datasets[item.datasetIndex];
+                                return !ds._isFinishMarker;
+                            }}
                         },
                         tooltip: {
-                            filter: (item) => item.parsed.y !== null && item.parsed.y !== undefined,
+                            filter: (item) => {
+                                const ds = item.dataset;
+                                if (ds._isFinishMarker) return false;
+                                return item.parsed.y !== null && item.parsed.y !== undefined;
+                            },
                             callbacks: {
                                 title: (items) => {
                                     const idx = items[0].dataIndex;
@@ -1513,11 +1693,29 @@
                         } : {})
                     }
                 },
-                plugins: [zeroLine, todayMarker]
+                plugins: [zeroLine, todayMarker, finishMarkers]
             });
             
             progressChartInstance._timelineDates = timelineDates;
             progressChartInstance._todayIdx = todayIdx;
+            
+            // Guardar info de finishes para el botón "Ir al final"
+            const bookFinishes = [];
+            bookMetadata.forEach((meta, i) => {
+                if (meta.book.currentPage >= meta.book.totalPages) return;
+                const daysRemaining = finishDaysList[i];
+                if (daysRemaining <= 0) return;
+                const finishIdx = todayIdx + daysRemaining;
+                if (finishIdx >= timelineDates.length) return;
+                bookFinishes.push({
+                    idx: finishIdx,
+                    date: timelineDates[finishIdx],
+                    title: meta.book.title,
+                    color: meta.color,
+                    target: meta.target
+                });
+            });
+            progressChartInstance._bookFinishes = bookFinishes;
         }
 
         function closeModal(modalId) {
