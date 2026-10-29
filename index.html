@@ -148,8 +148,8 @@
         .schedule-category { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background: #eae5dc; color: var(--primary); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--border-color); }
         .schedule-meta { font-size: 13px; color: var(--text-muted); font-style: italic; }
         
-        .chart-container { position: relative; height: 350px; width: 100%; margin-top: 10px; }
-        .btn-reset-zoom { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted); padding: 6px 14px; border-radius: 4px; font-size: 13px; cursor: pointer; font-family: var(--font-family); transition: all 0.2s; }
+        .chart-container { position: relative; height: 320px; width: 100%; margin-top: 10px; }
+        .btn-reset-zoom { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 16px; border-radius: 4px; font-size: 13px; cursor: pointer; font-family: var(--font-family); transition: all 0.2s; }
         .btn-reset-zoom:hover { border-color: var(--primary); color: var(--primary); }
         
         .metrics-status { 
@@ -174,16 +174,122 @@
             text-transform: none;
             letter-spacing: 0;
             margin: 0;
-            padding: 6px 12px;
+            padding: 8px 12px;
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 4px;
             transition: all 0.2s;
+            touch-action: manipulation;
         }
         .proj-toggle:hover { border-color: var(--primary); }
-        .proj-toggle input { width: 14px; height: 14px; accent-color: var(--primary); margin: 0; cursor: pointer; }
+        .proj-toggle input { width: 16px; height: 16px; accent-color: var(--primary); margin: 0; cursor: pointer; }
         .proj-toggle.positive span { color: var(--success); font-weight: bold; }
         .proj-toggle.warning span { color: var(--text-muted); font-weight: bold; }
+
+        /* ============================================ */
+        /* NAVEGACIÓN POR BOTONES + SLIDER              */
+        /* ============================================ */
+        .chart-nav {
+            display: grid;
+            grid-template-columns: 44px 44px 1fr 44px 44px;
+            gap: 6px;
+            align-items: center;
+            margin-top: 15px;
+            padding: 10px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+        .chart-nav button {
+            min-width: 44px;
+            min-height: 44px;
+            padding: 0;
+            font-size: 16px;
+            font-family: var(--font-family);
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .chart-nav button:active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: scale(0.95);
+        }
+        .chart-nav button:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+        .chart-nav-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            min-width: 0;
+        }
+        .chart-range-text {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-style: italic;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        .chart-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 24px;
+            background: transparent;
+            cursor: pointer;
+            margin: 0;
+        }
+        .chart-slider::-webkit-slider-runnable-track {
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+        .chart-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 50%;
+            margin-top: -9px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: 2px solid white;
+        }
+        .chart-slider::-moz-range-track {
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+        .chart-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .chart-slider:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -289,11 +395,24 @@
             <div class="chart-container">
                 <canvas id="progressChart"></canvas>
             </div>
+
+            <!-- Navegación táctil -->
+            <div class="chart-nav">
+                <button onclick="scrollChart(-7)" title="7 días atrás">⏪</button>
+                <button onclick="scrollChart(-1)" title="Día anterior">◀</button>
+                <div class="chart-nav-center">
+                    <div id="chartRangeText" class="chart-range-text">—</div>
+                    <input type="range" id="chartSlider" class="chart-slider" min="0" max="0" value="0" step="1" oninput="onSliderChange(this.value)">
+                </div>
+                <button onclick="scrollChart(1)" title="Día siguiente">▶</button>
+                <button onclick="scrollChart(7)" title="7 días adelante">⏩</button>
+            </div>
+
             <div style="display: flex; justify-content: center; margin-top: 12px;">
-                <button onclick="resetZoom()" class="btn-reset-zoom">🔄 Reajustar vista</button>
+                <button onclick="resetZoom()" class="btn-reset-zoom">🎯 Centrar en HOY</button>
             </div>
             <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 10px;">
-                *Arrastra para desplazarte hasta la fecha límite de tu libro · Rueda del ratón o pinza para zoom.
+                *Usa los botones ◀ ▶ o la barra para desplazarte · Rueda del ratón o pinza para acercar/alejar.
             </p>
         </div>
     </div>
@@ -303,9 +422,13 @@
         Chart.defaults.color = '#5c5c5c';
         let progressChartInstance = null; 
 
-        // Estado de proyecciones (persistido en localStorage)
+        // Estado de proyecciones
         let showPositiveProjection = localStorage.getItem('showPositiveProj') !== 'false';
         let showWarningProjection = localStorage.getItem('showWarningProj') !== 'false';
+
+        // Estado de navegación de la gráfica
+        let chartViewStart = -1;      // -1 = auto (centrar en HOY)
+        let chartViewSize = 18;       // días visibles a la vez
 
         let appData = {
             categories: ['Lecturas Actuales', 'Por Leer'],
@@ -861,12 +984,86 @@
         }
 
         // ============================================================
+        // NAVEGACIÓN POR BOTONES Y SLIDER
+        // ============================================================
+        function scrollChart(delta) {
+            if (!progressChartInstance) return;
+            const dates = progressChartInstance._timelineDates;
+            if (!dates) return;
+            
+            const maxIdx = dates.length - 1;
+            const maxStart = Math.max(0, maxIdx - chartViewSize + 1);
+            chartViewStart = Math.max(0, Math.min(chartViewStart + delta, maxStart));
+            applyChartView();
+        }
+
+        function onSliderChange(val) {
+            chartViewStart = parseInt(val);
+            applyChartView();
+        }
+
+        function applyChartView() {
+            if (!progressChartInstance) return;
+            const dates = progressChartInstance._timelineDates;
+            if (!dates) return;
+            
+            const maxIdx = dates.length - 1;
+            const maxStart = Math.max(0, maxIdx - chartViewSize + 1);
+            chartViewStart = Math.max(0, Math.min(chartViewStart, maxStart));
+            
+            progressChartInstance.options.scales.x.min = chartViewStart;
+            progressChartInstance.options.scales.x.max = Math.min(chartViewStart + chartViewSize - 1, maxIdx);
+            progressChartInstance.update('none');
+            updateNavUI();
+        }
+
+        function updateNavUI() {
+            if (!progressChartInstance) return;
+            const dates = progressChartInstance._timelineDates;
+            if (!dates) return;
+            
+            const maxIdx = dates.length - 1;
+            const maxStart = Math.max(0, maxIdx - chartViewSize + 1);
+            const endIdx = Math.min(chartViewStart + chartViewSize - 1, maxIdx);
+            
+            // Actualizar slider
+            const slider = document.getElementById('chartSlider');
+            if (slider) {
+                slider.min = 0;
+                slider.max = maxStart;
+                slider.value = chartViewStart;
+                slider.disabled = maxStart <= 0;
+            }
+            
+            // Actualizar botones
+            const navBtns = document.querySelectorAll('.chart-nav button');
+            if (navBtns.length >= 4) {
+                const atStart = chartViewStart <= 0;
+                const atEnd = chartViewStart >= maxStart;
+                navBtns[0].disabled = atStart;  // ⏪
+                navBtns[1].disabled = atStart;  // ◀
+                navBtns[3].disabled = atEnd;    // ▶
+                navBtns[4].disabled = atEnd;    // ⏩
+            }
+            
+            // Actualizar texto del rango
+            const startParts = dates[chartViewStart].split('-');
+            const endParts = dates[endIdx].split('-');
+            const label = document.getElementById('chartRangeText');
+            if (label) {
+                label.textContent = `${startParts[2]}/${startParts[1]}/${startParts[0].slice(2)} → ${endParts[2]}/${endParts[1]}/${endParts[0].slice(2)}`;
+            }
+        }
+
+        // ============================================================
         // GRÁFICA — Progreso real + Proyecciones toggleables
         // ============================================================
         function openMetricsModal() {
-            // Sincronizar checkboxes con el estado actual
             document.getElementById('togglePosProj').checked = showPositiveProjection;
             document.getElementById('toggleWarnProj').checked = showWarningProjection;
+            
+            // Resetear para centrar en HOY al abrir
+            chartViewStart = -1;
             
             document.getElementById('metricsModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
@@ -874,7 +1071,8 @@
             updateMetricsStatus();
             setTimeout(() => {
                 if (progressChartInstance) progressChartInstance.resize();
-            }, 30);
+                updateNavUI();
+            }, 50);
         }
 
         function updateMetricsStatus() {
@@ -929,43 +1127,19 @@
 
         function resetZoom() {
             if (!progressChartInstance) return;
-            if (progressChartInstance.resetZoom) progressChartInstance.resetZoom();
+            const todayIdx = progressChartInstance._todayIdx;
+            if (todayIdx === undefined) return;
             
-            let actualMax = 0, actualMin = 0, hasData = false;
-            progressChartInstance.data.datasets.forEach(ds => {
-                ds.data.forEach(v => {
-                    if (typeof v === 'number' && isFinite(v)) {
-                        hasData = true;
-                        if (v > actualMax) actualMax = v;
-                        if (v < actualMin) actualMin = v;
-                    }
-                });
-            });
-            
-            const range = Math.max(actualMax - actualMin, 3);
-            const pad = Math.max(1, range * 0.15);
-            progressChartInstance.options.scales.y.min = Math.floor(actualMin - pad);
-            progressChartInstance.options.scales.y.max = Math.ceil(actualMax + pad);
-            progressChartInstance.update();
+            chartViewSize = 18;
+            chartViewStart = Math.max(0, todayIdx - Math.floor(chartViewSize / 2));
+            applyChartView();
         }
 
         function refreshMetricsChart() {
             if (!progressChartInstance) return;
             if (document.getElementById('metricsModal').style.display !== 'flex') return;
-            
-            const saved = {
-                xMin: progressChartInstance.options.scales.x.min,
-                xMax: progressChartInstance.options.scales.x.max
-            };
-            
+            // chartViewStart ya persiste como global, no necesitamos guardar/restaurar
             renderMetricsChart();
-            
-            if (progressChartInstance && saved) {
-                const maxIdx = progressChartInstance.data.labels.length - 1;
-                progressChartInstance.options.scales.x.min = Math.max(0, Math.min(saved.xMin, maxIdx));
-                progressChartInstance.options.scales.x.max = Math.max(0, Math.min(saved.xMax, maxIdx));
-                progressChartInstance.update('none');
-            }
         }
 
         let chartRefreshTimeout = null;
@@ -997,11 +1171,11 @@
                 }
             });
             
-            // EXTENSIÓN DINÁMICA: hasta la fecha límite del libro más largo (+ margen)
+            // Extensión dinámica hasta la fecha límite
             const maxFutureDays = Math.max(14, ...activeBooks.map(book => {
                 const remainingMins = Math.max(0, book.totalPages - book.currentPage) * book.minsPerPage;
                 const remainingDays = Math.ceil(remainingMins / book.dailyMins);
-                return Math.ceil(remainingDays * 1.5);  // 50% extra para ver la proyección
+                return Math.ceil(remainingDays * 1.5);
             }));
             
             const startDate = new Date(earliestDateStr + 'T00:00:00');
@@ -1020,6 +1194,11 @@
             
             const todayIdx = timelineDates.indexOf(isoToday);
             
+            // Inicializar chartViewStart si es la primera vez
+            if (chartViewStart < 0) {
+                chartViewStart = Math.max(0, todayIdx - Math.floor(chartViewSize / 2));
+            }
+            
             const labels = timelineDates.map(d => {
                 const p = d.split('-');
                 return `${p[2]}/${p[1]}`;
@@ -1027,12 +1206,10 @@
             
             const brightColors = ['#e63946', '#00b4d8', '#2a9d8f', '#ffb703', '#9b5de5', '#f72585', '#06d6a0', '#ef476f'];
             
-            // Target: días totales teóricos por libro
             const bookTargets = activeBooks.map(book => {
                 return Math.max(1, Math.ceil((book.totalPages * book.minsPerPage) / book.dailyMins));
             });
             
-            // Construir datasets base + metadata
             const baseDatasets = [];
             const bookMetadata = [];
             
@@ -1109,7 +1286,7 @@
                 });
             });
             
-            // Agregar proyecciones
+            // Proyecciones
             const projectionDatasets = [];
             
             bookMetadata.forEach(meta => {
@@ -1167,7 +1344,7 @@
             
             const datasets = [...baseDatasets, ...projectionDatasets];
             
-            // Cálculo del rango Y — incluye todo lo visible
+            // Rango Y
             let actualMax = 0, actualMin = 0, hasData = false;
             datasets.forEach(ds => {
                 ds.data.forEach(v => {
@@ -1234,6 +1411,9 @@
             
             const zoomEnabled = typeof ChartZoom !== 'undefined';
             
+            const xMinInitial = chartViewStart;
+            const xMaxInitial = Math.min(chartViewStart + chartViewSize - 1, timelineDates.length - 1);
+            
             progressChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: { labels, datasets },
@@ -1246,16 +1426,15 @@
                         y: {
                             min: initialMinY,
                             max: initialMaxY,
-                            title: { display: true, text: 'Progreso acumulado (+1 día cumplido, −1 si no lees)', font: { size: 11 } },
+                            title: { display: true, text: 'Progreso (+1 día cumplido, −1 si no lees)', font: { size: 11 } },
                             grid: { color: 'rgba(150, 150, 150, 0.15)' },
                             ticks: { precision: 0, stepSize: 1 }
                         },
                         x: {
-                            min: 0,
-                            max: Math.min(timelineDates.length - 1, todayIdx + 10),
-                            title: { display: true, text: '← Arrastra hasta la fecha límite →', font: { size: 12 } },
+                            min: xMinInitial,
+                            max: xMaxInitial,
                             grid: { display: false },
-                            ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 12 }
+                            ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 8, font: { size: 10 } }
                         }
                     },
                     plugins: {
@@ -1281,7 +1460,7 @@
                                     
                                     if (c.dataset._isProjection) {
                                         const display = Number.isInteger(v) ? v : v.toFixed(1);
-                                        return `📈 Si cumples cada día: ${display > 0 ? '+' : ''}${display}`;
+                                        return `📈 Si cumples: ${display > 0 ? '+' : ''}${display}`;
                                     }
                                     if (c.dataset._isWarning) {
                                         const display = Number.isInteger(v) ? v : v.toFixed(1);
@@ -1317,16 +1496,17 @@
                         },
                         ...(zoomEnabled ? {
                             zoom: {
-                                pan: {
-                                    enabled: true,
-                                    mode: 'x',
-                                    onPan: ({ chart }) => applyDynamicY(chart)
-                                },
+                                pan: { enabled: false },
                                 zoom: {
                                     wheel: { enabled: true },
-                                    pinch: { enabled: true },
+                                    pinch: { enabled: false },
                                     mode: 'x',
-                                    onZoom: ({ chart }) => applyDynamicY(chart)
+                                    onZoom: ({ chart }) => {
+                                        chartViewStart = Math.round(chart.scales.x.min);
+                                        chartViewSize = Math.round(chart.scales.x.max - chart.scales.x.min) + 1;
+                                        applyDynamicY(chart);
+                                        updateNavUI();
+                                    }
                                 },
                                 limits: { x: { min: 0, max: timelineDates.length - 1 } }
                             }
@@ -1335,6 +1515,9 @@
                 },
                 plugins: [zeroLine, todayMarker]
             });
+            
+            progressChartInstance._timelineDates = timelineDates;
+            progressChartInstance._todayIdx = todayIdx;
         }
 
         function closeModal(modalId) {
@@ -1394,7 +1577,6 @@
             if (e.key === 'Enter') { e.preventDefault(); addChecklist(); }
         });
 
-        // Sincronizar checkboxes al cargar
         document.getElementById('togglePosProj').checked = showPositiveProjection;
         document.getElementById('toggleWarnProj').checked = showWarningProjection;
 
