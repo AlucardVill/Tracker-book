@@ -235,14 +235,14 @@
     <div id="metricsModal" class="modal-overlay">
         <div class="modal-content" style="max-width: 650px;">
             <button class="modal-close" onclick="closeModal('metricsModal')">&times;</button>
-            <h2 style="font-size: 22px; color: var(--primary); margin-bottom: 5px;">Índice de Rendimiento de Lectura</h2>
-            <p style="font-size: 14px; color: var(--text-muted); font-style: italic;">Las líneas suben al cumplir o superar tu meta diaria, y bajan si no lees o lees por debajo del objetivo.</p>
+            <h2 style="font-size: 22px; color: var(--primary); margin-bottom: 5px;">Métricas de Progreso</h2>
+            <p style="font-size: 14px; color: var(--text-muted); font-style: italic;">Avance en páginas leídas acumuladas por cada obra activa.</p>
             
             <div class="chart-container">
                 <canvas id="progressChart"></canvas>
             </div>
             <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 15px;">
-                *El historial refleja la evolución diaria de tus lecturas activas.
+                *Las líneas conectan desde la página inicial de registro hasta tus actualizaciones.
             </p>
         </div>
     </div>
@@ -275,6 +275,7 @@
                 if(b.active === undefined) b.active = true;
                 if(b.priority === undefined) b.priority = 50;
                 if(b.dailySeconds === undefined) b.dailySeconds = 0;
+                if(b.initialPage === undefined) b.initialPage = 0;
                 
                 if(b.history === undefined) {
                     b.history = [{ date: isoToday, page: b.currentPage }];
@@ -528,7 +529,7 @@
                 id: Date.now(), title: document.getElementById('title').value, category: appData.activeCategory,
                 totalPages: parseInt(document.getElementById('totalPages').value), minsPerPage: parseFloat(document.getElementById('minsPerPage').value),
                 dailyMins: parseInt(document.getElementById('dailyMins').value), currentPage: initPage,
-                notes: "", checklists: [], active: true, priority: 50, dailySeconds: 0,
+                initialPage: initPage, notes: "", checklists: [], active: true, priority: 50, dailySeconds: 0,
                 history: [{ date: isoToday, page: initPage }] 
             });
             saveData(); renderTabs(); renderBooks(); this.reset(); document.getElementById('currentPage').value = 0;
@@ -750,7 +751,7 @@
             document.body.style.overflow = 'hidden';
         }
 
-        // --- Gráfica de Índice de Cumplimiento (Sube al cumplir meta, baja al incumplir) ---
+        // --- Gráfica con punto inicial "Inicio" en 0 para visualización ascendente inmediata ---
         function openMetricsModal() {
             document.getElementById('metricsModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
@@ -766,7 +767,6 @@
                 return;
             }
 
-            // Construir línea de tiempo continua de fechas
             let allDates = new Set();
             activeBooks.forEach(book => { if(book.history) book.history.forEach(h => allDates.add(h.date)); });
             allDates.add(isoToday);
@@ -790,42 +790,29 @@
                 continuousDates = [isoToday];
             }
 
+            // Crear etiquetas del eje X agregando 'Inicio' al principio
+            let labels = ['Inicio'];
+            continuousDates.forEach(d => {
+                const split = d.split('-');
+                labels.push(`${split[2]}/${split[1]}`);
+            });
+
             const colors = ['#722f37', '#2d6a4f', '#1d3557', '#d4a373', '#e07a5f', '#3d405b'];
 
             const datasets = activeBooks.map((book, index) => {
-                let dataPoints = [];
-                let performanceIndex = 0; // Inicia en cero
-                let lastKnownPage = null;
-                
-                // Meta diaria calculada en páginas
-                let dailyGoalPages = book.dailyMins / book.minsPerPage;
+                let dataPoints = [0]; // La línea empieza en 0
+                let basePage = (book.initialPage !== undefined) ? book.initialPage : 0;
+                let currentAccumulated = 0;
+                let lastPage = basePage;
 
                 continuousDates.forEach(date => {
                     let entry = book.history ? book.history.find(h => h.date === date) : null;
-                    
-                    if (lastKnownPage === null) {
-                        // Primer punto de referencia
-                        if (entry) lastKnownPage = entry.page;
-                        dataPoints.push(performanceIndex); 
-                    } else {
-                        let pagesReadToday = 0;
-                        if (entry) {
-                            pagesReadToday = Math.max(0, entry.page - lastKnownPage);
-                            lastKnownPage = entry.page;
-                        }
-                        
-                        // Si ya terminó la obra, la línea se congela en su punto máximo
-                        if (lastKnownPage >= book.totalPages) {
-                            dataPoints.push(performanceIndex);
-                        } else {
-                            // Cálculo del estímulo visual:
-                            // Si lee exactamente la meta, incrementa en +dailyGoalPages (sube).
-                            // Si lee 0 páginas, decrementa en -dailyGoalPages (baja).
-                            let netChange = (2 * pagesReadToday) - dailyGoalPages;
-                            performanceIndex += netChange;
-                            dataPoints.push(performanceIndex);
-                        }
+                    if (entry) {
+                        let pagesReadThisDay = Math.max(0, entry.page - lastPage);
+                        currentAccumulated += pagesReadThisDay;
+                        lastPage = entry.page;
                     }
+                    dataPoints.push(currentAccumulated);
                 });
 
                 return {
@@ -834,7 +821,7 @@
                     borderColor: colors[index % colors.length],
                     backgroundColor: colors[index % colors.length],
                     borderWidth: 2,
-                    tension: 0.1, 
+                    tension: 0.2, 
                     pointRadius: 4,
                     pointHoverRadius: 6
                 };
@@ -845,10 +832,7 @@
             progressChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: continuousDates.map(d => {
-                        const split = d.split('-');
-                        return `${split[2]}/${split[1]}`; 
-                    }),
+                    labels: labels,
                     datasets: datasets
                 },
                 options: {
@@ -856,10 +840,11 @@
                     maintainAspectRatio: false,
                     scales: {
                         y: {
-                            title: { display: true, text: 'Puntos de Cumplimiento', font: { family: '"Times New Roman", serif', size: 14 } },
+                            beginAtZero: true,
+                            title: { display: true, text: 'Páginas Leídas Acumuladas', font: { family: '"Times New Roman", serif', size: 14 } },
                             grid: { color: (context) => context.tick.value === 0 ? '#1a1a1a' : '#eae5dc' } 
                         },
-                        x: { title: { display: true, text: 'Fechas', font: { family: '"Times New Roman", serif', size: 14 } } }
+                        x: { title: { display: true, text: 'Línea de Tiempo', font: { family: '"Times New Roman", serif', size: 14 } } }
                     },
                     plugins: {
                         legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { family: '"Times New Roman", serif', size: 12 } } },
@@ -867,8 +852,7 @@
                             callbacks: {
                                 label: function(context) { 
                                     let val = context.parsed.y;
-                                    let prefix = val > 0 ? '+' : '';
-                                    return `${context.dataset.label}: ${prefix}${val.toFixed(1)} pts.`; 
+                                    return `${context.dataset.label}: +${val} pág.`; 
                                 }
                             }
                         }
