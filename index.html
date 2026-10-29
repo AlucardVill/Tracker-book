@@ -191,9 +191,6 @@
         .search-clear.visible { display: block; }
         .search-clear:hover { color: var(--primary); }
 
-        /* ============================================ */
-        /* HEADER DE BÚSQUEDA GLOBAL                     */
-        /* ============================================ */
         .search-results-header {
             padding: 10px 14px;
             background: #f4eee1;
@@ -207,9 +204,6 @@
         }
         .search-results-header strong { color: var(--primary); }
 
-        /* ============================================ */
-        /* BADGE DE CATEGORÍA (solo en modo búsqueda)    */
-        /* ============================================ */
         .card-category-badge {
             display: inline-block;
             font-size: 10px;
@@ -319,15 +313,8 @@
             transition: all 0.2s;
             line-height: 1.4;
         }
-        .hoy-search-container input:focus {
-            border-color: var(--primary);
-            background: white;
-        }
-        .hoy-search-container input::placeholder {
-            color: var(--text-muted);
-            font-style: italic;
-            opacity: 0.7;
-        }
+        .hoy-search-container input:focus { border-color: var(--primary); background: white; }
+        .hoy-search-container input::placeholder { color: var(--text-muted); font-style: italic; opacity: 0.7; }
         .hoy-search-container::before {
             content: '🔍';
             position: absolute;
@@ -587,8 +574,61 @@
         }
 
         const savedData = localStorage.getItem('readingTrackerData');
-        const currentDateStr = new Date().toDateString();
-        const isoToday = getLocalISO();
+        // ⚠️ Ahora son MUTABLES: cambian cuando hay rollover de día
+        let currentDateStr = new Date().toDateString();
+        let isoToday = getLocalISO();
+
+        // ============================================================
+        // ROLLOVER DE DÍA — reutilizable (inicial + visibilitychange + interval)
+        // ============================================================
+        function performDayRollover() {
+            const nowDateStr = new Date().toDateString();
+            if (appData.lastDate === nowDateStr) return false;
+            
+            const newIsoToday = getLocalISO();
+            const lastDate = new Date(appData.lastDate);
+            const todayDate = new Date(nowDateStr);
+            const daysDiff = Math.max(1, Math.round((todayDate - lastDate) / 86400000));
+            
+            appData.books.forEach(b => {
+                const goalSecs = b.dailyMins * 60;
+                
+                if (b.active) {
+                    const lastISO = getLocalISO(lastDate);
+                    const idx = b.dailyLog.findIndex(l => l.date === lastISO);
+                    const entry = { date: lastISO, seconds: b.dailySeconds || 0, met: (b.dailySeconds || 0) >= goalSecs };
+                    if (idx >= 0) b.dailyLog[idx] = entry;
+                    else b.dailyLog.push(entry);
+                    
+                    for (let i = 1; i < daysDiff; i++) {
+                        const md = new Date(lastDate);
+                        md.setDate(md.getDate() + i);
+                        const mISO = getLocalISO(md);
+                        const idx2 = b.dailyLog.findIndex(l => l.date === mISO);
+                        const entry2 = { date: mISO, seconds: 0, met: false };
+                        if (idx2 >= 0) b.dailyLog[idx2] = entry2;
+                        else b.dailyLog.push(entry2);
+                    }
+                }
+                
+                b.dailySeconds = 0;
+                const todayEntry = b.history.find(h => h.date === newIsoToday);
+                if(!todayEntry) b.history.push({ date: newIsoToday, page: b.currentPage });
+            });
+            
+            appData.lastDate = nowDateStr;
+            currentDateStr = nowDateStr;
+            isoToday = newIsoToday;
+            
+            // Resetear timers activos (que apuntaban al día anterior)
+            Object.keys(activeTimers).forEach(id => {
+                try { clearInterval(activeTimers[id].interval); } catch(e) {}
+                delete activeTimers[id];
+            });
+            
+            saveData();
+            return true;
+        }
 
         if (savedData) {
             appData = JSON.parse(savedData);
@@ -608,39 +648,8 @@
                 }
             });
 
-            if (appData.lastDate !== currentDateStr) {
-                const lastDate = new Date(appData.lastDate);
-                const todayDate = new Date(currentDateStr);
-                const daysDiff = Math.round((todayDate - lastDate) / 86400000);
-                
-                appData.books.forEach(b => {
-                    const goalSecs = b.dailyMins * 60;
-                    
-                    if (b.active) {
-                        const lastISO = getLocalISO(lastDate);
-                        const idx = b.dailyLog.findIndex(l => l.date === lastISO);
-                        const entry = { date: lastISO, seconds: b.dailySeconds || 0, met: (b.dailySeconds || 0) >= goalSecs };
-                        if (idx >= 0) b.dailyLog[idx] = entry;
-                        else b.dailyLog.push(entry);
-                        
-                        for (let i = 1; i < daysDiff; i++) {
-                            const md = new Date(lastDate);
-                            md.setDate(md.getDate() + i);
-                            const mISO = getLocalISO(md);
-                            const idx2 = b.dailyLog.findIndex(l => l.date === mISO);
-                            const entry2 = { date: mISO, seconds: 0, met: false };
-                            if (idx2 >= 0) b.dailyLog[idx2] = entry2;
-                            else b.dailyLog.push(entry2);
-                        }
-                    }
-                    
-                    b.dailySeconds = 0;
-                    const todayEntry = b.history.find(h => h.date === isoToday);
-                    if(!todayEntry) b.history.push({ date: isoToday, page: b.currentPage });
-                });
-                appData.lastDate = currentDateStr;
-                saveData();
-            }
+            // Rollover si corresponde (usa la función reutilizable)
+            performDayRollover();
         } else {
             appData.lastDate = currentDateStr;
         }
@@ -792,6 +801,7 @@
             return `${m} min`;
         }
 
+        // ⚠️ calculateStats usa `new Date()` siempre → fechas frescas al llamar
         function calculateStats(book) {
             const totalMins = book.totalPages * book.minsPerPage;
             const readMins = book.currentPage * book.minsPerPage;
@@ -999,7 +1009,6 @@
                 
                 if (elapsed < 600 && appData.categories.includes(cat)) {
                     appData.activeCategory = cat;
-                    // Al cambiar de categoría, limpiar búsqueda para volver a la vista normal
                     const searchEl = document.getElementById('bookSearch');
                     if (searchEl) searchEl.value = '';
                     const clearBtn = document.getElementById('searchClear');
@@ -1077,9 +1086,6 @@
             }
         }
 
-        // ============================================================
-        // LIBROS — Búsqueda global en TODAS las categorías
-        // ============================================================
         function renderBooks() {
             const booksList = document.getElementById('booksList');
             booksList.innerHTML = '';
@@ -1091,12 +1097,10 @@
             let filteredBooks;
             
             if (isGlobalSearch) {
-                // Búsqueda global: todas las categorías
                 filteredBooks = appData.books.filter(b => 
                     b.title.toLowerCase().includes(searchTerm)
                 );
             } else {
-                // Vista normal: solo categoría activa
                 filteredBooks = appData.books.filter(b => b.category === appData.activeCategory);
             }
 
@@ -1112,7 +1116,6 @@
                 return;
             }
 
-            // Header informativo si estamos en búsqueda global
             if (isGlobalSearch) {
                 const header = document.createElement('div');
                 header.className = 'search-results-header';
@@ -1724,6 +1727,7 @@
             }
         }
 
+        // ⚠️ Ahora `calculateStats` usa `new Date()` → al abrir el modal o refrescar, fechas frescas
         function renderFinishInfo(allActiveBooks, colorMap, finishEl) {
             const visibleBooks = allActiveBooks.filter(b => b.metricVisible !== false);
             
@@ -2296,6 +2300,53 @@
         document.getElementById('newChecklistInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') { e.preventDefault(); addChecklist(); }
         });
+
+        // ============================================================
+        // REFRESCO AL VOLVER A FOCO / VISIBILIDAD / PERIÓDICO
+        // ============================================================
+        let lastFocusRefresh = 0;
+        
+        function refreshOnFocus() {
+            if (document.hidden) return;
+            const now = Date.now();
+            if (now - lastFocusRefresh < 800) return; // evita duplicados focus+visibility
+            lastFocusRefresh = now;
+            
+            const rolled = performDayRollover();
+            
+            try { renderBooks(); } catch(e) { console.error(e); }
+            try { updateDailySummary(); } catch(e) { console.error(e); }
+            
+            try {
+                const metricsModal = document.getElementById('metricsModal');
+                if (metricsModal && metricsModal.style.display === 'flex') {
+                    updateMetricsStatus();
+                    refreshMetricsChart();
+                }
+            } catch(e) { console.error(e); }
+            
+            if (rolled && navigator.vibrate) {
+                try { navigator.vibrate([30, 50, 30]); } catch(e) {}
+            }
+        }
+        
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) refreshOnFocus();
+        });
+        window.addEventListener('focus', refreshOnFocus);
+        
+        // Chequeo periódico por si la app queda abierta toda la noche
+        setInterval(() => {
+            if (document.hidden) return;
+            if (performDayRollover()) {
+                try { renderBooks(); } catch(e) {}
+                try { updateDailySummary(); } catch(e) {}
+                const metricsModal = document.getElementById('metricsModal');
+                if (metricsModal && metricsModal.style.display === 'flex') {
+                    try { updateMetricsStatus(); refreshMetricsChart(); } catch(e) {}
+                }
+            }
+        }, 60000);
 
         document.getElementById('btnPosProj').classList.toggle('active', showPositiveProjection);
         document.getElementById('btnWarnProj').classList.toggle('active', showWarningProjection);
