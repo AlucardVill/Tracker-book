@@ -8,18 +8,28 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2"></script>
     <style>
         :root {
-            /* NUEVA PALETA PRINCIPAL */
+            /* TEMA ESMERALDA (POR DEFECTO) */
             --bg-color: #f9edf0;       /* Blush */
             --text-main: #261311;      /* Espresso */
             --text-muted: #8c7a76;     /* Espresso suavizado */
-            --primary: #ba6a36;        /* Amber */
-            --primary-hover: #9c5424;  /* Amber oscuro */
-            --hover-bg: #f5dfe3;       /* Blush más intenso para hovers */
-            --card-bg: #ffffff;        /* Blanco para las tarjetas */
+            --primary: #1c3934;        /* Emerald */
+            --primary-rgb: 28, 57, 52; /* Para sombras */
+            --primary-hover: #112420;  /* Emerald oscuro */
+            --hover-bg: #e2e8e7;       /* Tono Emerald suave */
+            --card-bg: #ffffff;        /* Blanco */
             --border-color: #e6c8b7;   /* Champagne */
-            --success: #1c3934;        /* Emerald */
+            --success: #c3955b;        /* Cognac (para contrastar) */
             --danger: #9b2226;
             --font-family: "Times New Roman", Times, serif;
+        }
+
+        /* TEMA ÁMBAR (ALTERNATIVO) */
+        body[data-theme="amber"] {
+            --primary: #ba6a36;        /* Amber */
+            --primary-rgb: 186, 106, 54;
+            --primary-hover: #9c5424;  /* Amber oscuro */
+            --hover-bg: #f4e6dc;       /* Tono Amber suave */
+            --success: #1c3934;        /* Emerald para éxito */
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -30,12 +40,13 @@
             color: var(--text-main); 
             padding-bottom: 100px; 
             line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .container { max-width: 550px; margin: 0 auto; padding: 20px; }
 
-        header { text-align: center; padding: 25px 0 15px 0; border-bottom: 2px solid var(--primary); margin-bottom: 20px; }
-        h1 { color: var(--primary); font-size: 30px; margin-bottom: 5px; font-weight: normal; letter-spacing: 1px; }
+        header { text-align: center; padding: 25px 0 15px 0; border-bottom: 2px solid var(--primary); margin-bottom: 20px; transition: border-color 0.3s ease; }
+        h1 { color: var(--primary); font-size: 30px; margin-bottom: 5px; font-weight: normal; letter-spacing: 1px; transition: color 0.3s ease; }
         header p { color: var(--text-muted); font-size: 15px; font-style: italic; margin-bottom: 10px; }
 
         .daily-summary {
@@ -85,11 +96,33 @@
         .hour-btn.unselected { background: var(--bg-color); color: var(--text-muted); border: 1px solid var(--border-color); }
         .hour-btn.unselected:hover { border-color: var(--primary); color: var(--primary); }
 
+        .theme-toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+        }
+        .theme-toggle-row span { font-size: 13px; color: var(--text-main); font-weight: bold; }
+        .btn-theme-toggle {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 14px;
+            border-radius: 4px;
+            font-family: var(--font-family);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-theme-toggle:hover { border-color: var(--primary); color: var(--primary); }
+
         .export-import-row {
             display: flex;
             gap: 8px;
-            margin-top: 18px;
-            padding-top: 14px;
+            margin-top: 15px;
+            padding-top: 15px;
             border-top: 1px solid var(--border-color);
         }
         .export-import-row button {
@@ -133,7 +166,7 @@
         .tab-btn.dragging {
             opacity: 0.9;
             transform: scale(1.05);
-            box-shadow: 0 6px 16px rgba(186, 106, 54, 0.45); /* Sombra Amber */
+            box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.45);
             z-index: 1000;
             position: relative;
             pointer-events: none;
@@ -143,8 +176,8 @@
             animation: longPressPulse 0.5s ease-out;
         }
         @keyframes longPressPulse {
-            0% { box-shadow: 0 0 0 0 rgba(186, 106, 54, 0.55); }
-            100% { box-shadow: 0 0 0 8px rgba(186, 106, 54, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.55); }
+            100% { box-shadow: 0 0 0 8px rgba(var(--primary-rgb), 0); }
         }
         .tab-delete {
             background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%;
@@ -166,6 +199,7 @@
             background: var(--card-bg);
             outline: none;
             transition: all 0.2s;
+            color: var(--text-main);
         }
         .search-container input:focus { border-color: var(--primary); background: white; }
         .search-container.search-active input { border-color: var(--primary); background: white; }
@@ -283,7 +317,7 @@
         
         .progress-header { display: flex; justify-content: space-between; font-size: 14px; color: var(--text-muted); margin-bottom: 6px; }
         .progress-track { background: var(--border-color); border-radius: 2px; height: 8px; width: 100%; margin-bottom: 20px; overflow: hidden; }
-        .progress-fill { background: var(--primary); height: 100%; transition: width 0.4s ease; }
+        .progress-fill { background: var(--primary); height: 100%; transition: width 0.4s ease, background-color 0.3s ease; }
 
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--bg-color); padding: 15px; border-radius: 4px; border: 1px solid var(--border-color); margin-bottom: 15px; }
         .stat-item.full { grid-column: 1 / -1; }
@@ -298,8 +332,8 @@
         .btn-update { background: var(--text-main); color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 14px; font-family: var(--font-family); }
         
         .daily-timer { border: 1px solid var(--border-color); border-radius: 4px; padding: 15px; background: var(--card-bg); text-align: center; }
-        .timer-display { font-size: 24px; color: var(--primary); margin: 10px 0; font-variant-numeric: tabular-nums; }
-        .btn-timer { background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 4px; font-size: 15px; cursor: pointer; font-family: var(--font-family); display: inline-flex; align-items: center; gap: 8px; }
+        .timer-display { font-size: 24px; color: var(--primary); margin: 10px 0; font-variant-numeric: tabular-nums; transition: color 0.3s ease; }
+        .btn-timer { background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 4px; font-size: 15px; cursor: pointer; font-family: var(--font-family); display: inline-flex; align-items: center; gap: 8px; transition: background-color 0.3s ease; }
         .btn-timer.running { background: var(--primary); }
         
         .meta-pages-display {
@@ -310,6 +344,7 @@
             border-radius: 4px;
             font-size: 13px;
             line-height: 1.6;
+            transition: background-color 0.3s ease;
         }
         .meta-pages-display strong {
             color: var(--primary);
@@ -343,7 +378,7 @@
         .hoy-title { color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px; }
         
         .hoy-search-container { position: relative; margin-bottom: 6px; margin-top: 2px; }
-        .hoy-search-container input { width: 100%; padding: 6px 26px 6px 24px; border: 1px solid var(--border-color); border-radius: 3px; font-size: 12px; font-family: var(--font-family); background: var(--bg-color); outline: none; transition: all 0.2s; line-height: 1.4; }
+        .hoy-search-container input { width: 100%; padding: 6px 26px 6px 24px; border: 1px solid var(--border-color); border-radius: 3px; font-size: 12px; font-family: var(--font-family); background: var(--bg-color); outline: none; transition: all 0.2s; line-height: 1.4; color: var(--text-main); }
         .hoy-search-container input:focus { border-color: var(--primary); background: white; }
         .hoy-search-container input::placeholder { color: var(--text-muted); font-style: italic; opacity: 0.7; }
         .hoy-search-container::before { content: '🔍'; position: absolute; left: 6px; top: 50%; transform: translateY(-50%); font-size: 10px; pointer-events: none; opacity: 0.55; }
@@ -413,18 +448,18 @@
             font-weight: 300;
             line-height: 1;
             cursor: pointer;
-            box-shadow: 0 4px 14px rgba(186, 106, 54, 0.45); /* Sombra Amber */
+            box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.45);
             z-index: 900;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s, background-color 0.3s ease;
             touch-action: manipulation;
             user-select: none;
             -webkit-user-select: none;
             padding-bottom: 3px;
         }
-        .fab-add:hover { transform: scale(1.06); box-shadow: 0 6px 20px rgba(186, 106, 54, 0.55); }
+        .fab-add:hover { transform: scale(1.06); box-shadow: 0 6px 20px rgba(var(--primary-rgb), 0.55); }
         .fab-add:active { transform: scale(0.94); }
         .fab-add.hidden { opacity: 0; pointer-events: none; transform: scale(0.8); }
 
@@ -474,6 +509,11 @@
             <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px; font-style: italic;">Marca las horas del día en las que sueles estar disponible para leer. El horario inteligente se ajustará automáticamente a estos bloques.</p>
             <div id="hoursGrid" class="hours-grid"></div>
             
+            <div class="theme-toggle-row">
+                <span>Estilo visual:</span>
+                <button id="themeToggleBtn" class="btn-theme-toggle" onclick="toggleTheme()">🌿 Esmeralda (Cambiar a Ámbar)</button>
+            </div>
+
             <div class="export-import-row">
                 <button onclick="exportData()" title="Descargar copia de seguridad">💾 Exportar</button>
                 <button onclick="importData()" title="Restaurar desde archivo">📁 Importar</button>
@@ -615,7 +655,7 @@
 
     <script>
         Chart.defaults.font.family = '"Times New Roman", Times, serif';
-        Chart.defaults.color = '#5c5c5c'; /* Color de texto de gráfica se mantiene */
+        Chart.defaults.color = '#5c5c5c';
         let progressChartInstance = null; 
 
         const BRIGHT_COLORS = ['#e63946', '#00b4d8', '#2a9d8f', '#ffb703', '#9b5de5', '#f72585', '#06d6a0', '#ef476f'];
@@ -639,6 +679,34 @@
         };
         let activeTimers = {}; 
 
+        // ============================================================
+        // SISTEMA DE TEMAS
+        // ============================================================
+        function applyTheme(theme) {
+            const btn = document.getElementById('themeToggleBtn');
+            if (theme === 'amber') {
+                document.body.setAttribute('data-theme', 'amber');
+                if (btn) btn.innerText = '🍂 Ámbar (Cambiar a Esmeralda)';
+            } else {
+                document.body.removeAttribute('data-theme');
+                if (btn) btn.innerText = '🌿 Esmeralda (Cambiar a Ámbar)';
+            }
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute('data-theme') === 'amber' ? 'amber' : 'emerald';
+            const newTheme = currentTheme === 'amber' ? 'emerald' : 'amber';
+            localStorage.setItem('appTheme', newTheme);
+            applyTheme(newTheme);
+        }
+
+        // Cargar tema guardado
+        const savedTheme = localStorage.getItem('appTheme') || 'emerald';
+        applyTheme(savedTheme);
+
+        // ============================================================
+        // HELPERS PARA PÁGINAS
+        // ============================================================
         function getLocalISO(d = new Date()) {
             return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
         }
@@ -647,9 +715,6 @@
         let currentDateStr = new Date().toDateString();
         let isoToday = getLocalISO();
 
-        // ============================================================
-        // HELPERS PARA PÁGINAS
-        // ============================================================
         function getMetaPaginas(book) {
             if (!book.dailyMins || book.dailyMins <= 0) return 1;
             if (!book.minsPerPage || book.minsPerPage <= 0) return 1;
@@ -2139,7 +2204,7 @@
                     const y = scales.y.getPixelForValue(0);
                     if (y < chartArea.top || y > chartArea.bottom) return;
                     ctx.save();
-                    ctx.strokeStyle = 'rgba(114, 47, 55, 0.35)'; /* Se mantiene el color original del cero en métricas */
+                    ctx.strokeStyle = 'rgba(114, 47, 55, 0.35)';
                     ctx.lineWidth = 1.5;
                     ctx.setLineDash([6, 4]);
                     ctx.beginPath();
