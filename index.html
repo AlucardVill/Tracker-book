@@ -41,7 +41,7 @@
             flex-wrap: wrap;
             align-items: center;
             justify-content: center;
-            gap: 4px 12px;
+            gap: 4px 14px;
             margin-top: 4px;
             padding: 6px 14px;
             background: #faf6ef;
@@ -135,7 +135,9 @@
             z-index: 100;
             border-color: var(--primary);
         }
-        .tab-btn.long-pressing { animation: longPressPulse 0.6s ease-out; }
+        .tab-btn.long-pressing {
+            animation: longPressPulse 0.6s ease-out;
+        }
         @keyframes longPressPulse {
             0% { box-shadow: 0 0 0 0 rgba(114, 47, 55, 0.55); }
             100% { box-shadow: 0 0 0 8px rgba(114, 47, 55, 0); }
@@ -233,26 +235,12 @@
         .priority-control label { font-size: 14px; margin: 0; text-transform: none; }
         .priority-control input[type="range"] { width: 120px; accent-color: var(--primary); cursor: pointer; }
         
-        .adaptive-badge {
-            display: inline-block;
-            margin-top: 6px;
-            padding: 4px 10px;
-            font-size: 11px;
-            background: #fff8e8;
-            border: 1px solid #f0dca8;
-            color: #8a6d1a;
-            border-radius: 3px;
-            font-style: normal;
-            line-height: 1.5;
-        }
-        .adaptive-badge strong { color: #6b540f; }
-
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         .form-group.full { grid-column: 1 / -1; }
 
         label { display: block; font-size: 12px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 5px; }
-        input[type="text"], input[type="number"], input[type="search"], textarea, select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 15px; outline: none; transition: border-color 0.2s; background: #faf9f7; font-family: var(--font-family); }
-        input:focus, textarea:focus, select:focus { border-color: var(--primary); background: white; }
+        input[type="text"], input[type="number"], input[type="search"], textarea { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 15px; outline: none; transition: border-color 0.2s; background: #faf9f7; font-family: var(--font-family); }
+        input:focus, textarea:focus { border-color: var(--primary); background: white; }
 
         .btn-submit { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 5px; font-family: var(--font-family); }
         .btn-cancel { background: var(--text-muted); color: white; border: none; padding: 12px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 5px; font-family: var(--font-family); }
@@ -280,38 +268,8 @@
         
         .daily-timer { border: 1px solid var(--border-color); border-radius: 4px; padding: 15px; background: #ffffff; text-align: center; }
         .timer-display { font-size: 24px; color: var(--primary); margin: 10px 0; font-variant-numeric: tabular-nums; }
-        .timer-buttons-row {
-            display: flex; justify-content: center; gap: 10px; align-items: center; margin-top: 12px;
-            flex-wrap: wrap;
-        }
         .btn-timer { background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 4px; font-size: 15px; cursor: pointer; font-family: var(--font-family); display: inline-flex; align-items: center; gap: 8px; }
         .btn-timer.running { background: #d97706; }
-        
-        .adaptive-toggle-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 1.5px solid var(--border-color);
-            background: var(--bg-color);
-            cursor: pointer;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            opacity: 0.35;
-            transition: all 0.2s;
-            touch-action: manipulation;
-            user-select: none;
-            -webkit-user-select: none;
-            flex-shrink: 0;
-        }
-        .adaptive-toggle-btn.active {
-            opacity: 1;
-            background: #fff8e8;
-            border-color: #d4a500;
-        }
-        .adaptive-toggle-btn:active { transform: scale(0.92); }
         
         .meta-pages-display {
             margin-top: 12px;
@@ -326,49 +284,7 @@
             color: var(--primary);
             font-size: 18px;
         }
-        .meta-pages-display .incognita {
-            color: var(--text-muted);
-            font-style: italic;
-            opacity: 0.8;
-        }
-        .meta-pages-hint {
-            display: block;
-            margin-top: 4px;
-            font-size: 11px;
-            color: var(--text-muted);
-            font-style: italic;
-        }
         .meta-pages-success strong { color: var(--success); }
-
-        .projection-source-toggle {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            margin-top: 6px;
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-        .proj-source-btn {
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            padding: 3px 8px;
-            border-radius: 3px;
-            font-size: 11px;
-            font-family: var(--font-family);
-            cursor: pointer;
-            transition: all 0.15s;
-            color: var(--text-muted);
-            opacity: 0.5;
-        }
-        .proj-source-btn.active {
-            opacity: 1;
-            background: #fff8e8;
-            border-color: #d4a500;
-            color: #6b540f;
-            font-weight: bold;
-        }
-        .proj-source-btn:hover { opacity: 0.85; }
-        .proj-source-btn:active { transform: scale(0.95); }
 
         .empty-state { text-align: center; color: var(--text-muted); padding: 30px 0; font-size: 16px; font-style: italic; }
 
@@ -433,7 +349,6 @@
         .finish-book-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: bold; color: var(--text-main); }
         .finish-date-text { font-weight: bold; color: var(--success); white-space: nowrap; font-size: 13px; }
         .finish-days { color: var(--text-muted); font-style: italic; font-size: 12px; white-space: nowrap; }
-        .finish-source-icon { font-size: 11px; opacity: 0.75; margin-left: 3px; }
 
         .chart-empty-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--text-muted); font-style: italic; font-size: 14px; text-align: center; padding: 0 20px; pointer-events: none; z-index: 2; }
 
@@ -680,57 +595,14 @@
         let isoToday = getLocalISO();
 
         // ============================================================
-        // HELPERS — VELOCIDAD, META Y PROYECCIÓN
+        // HELPERS PARA PÁGINAS
         // ============================================================
-        
-        function getEffectiveMinsPerPage(book) {
-            if (!book.adaptiveSpeed) return book.minsPerPage;
-            
-            const logs = (book.pageTimingLog || []).slice(-20).filter(l => 
-                l.seconds > 0 && 
-                l.endPage > l.startPage && 
-                l.endPage <= (book.totalPages || 999999)
-            );
-            
-            if (logs.length === 0) return book.minsPerPage;
-            
-            let totalSecs = 0, totalPages = 0;
-            logs.forEach(l => {
-                totalSecs += l.seconds;
-                totalPages += (l.endPage - l.startPage);
-            });
-            
-            if (totalPages <= 0) return book.minsPerPage;
-            const result = totalSecs / totalPages / 60;
-            return Math.max(0.1, Math.min(10, result));
-        }
-
-        function getProjectionMinsPerPage(book) {
-            if (!book.adaptiveSpeed) return book.minsPerPage;
-            const source = book.projectionSource || 'auto';
-            if (source === 'manual') return book.minsPerPage;
-            return getEffectiveMinsPerPage(book);
-        }
-
-        function getProjectionSourceLabel(book) {
-            if (!book.adaptiveSpeed) return '';
-            const source = book.projectionSource || 'auto';
-            if (source === 'manual') return '📝';
-            return '📊';
-        }
-
-        function hasAdaptiveData(book) {
-            return (book.pageTimingLog || []).some(l => l.seconds > 0 && l.endPage > l.startPage);
-        }
-
         function getMetaPaginas(book) {
             if (!book.dailyMins || book.dailyMins <= 0) return 1;
-            const effMins = getEffectiveMinsPerPage(book);
-            if (!effMins || effMins <= 0) return 1;
-            return Math.max(1, Math.round(book.dailyMins / effMins));
+            if (!book.minsPerPage || book.minsPerPage <= 0) return 1;
+            return Math.max(1, Math.round(book.dailyMins / book.minsPerPage));
         }
 
-        // ⭐ PROTECCIÓN 1: nunca devuelve páginas negativas
         function getPaginasLeidasHoy(book) {
             if (!book.pagesLog) return 0;
             const todayEntry = book.pagesLog.find(l => l.date === isoToday);
@@ -743,33 +615,28 @@
             
             if (date === isoToday) {
                 const leidas = entry ? Math.max(0, (entry.pages || 0)) : 0;
-                if (leidas === 0) return 0;
+                if (leidas === 0) return 0; 
                 const meta = getMetaPaginas(book);
                 return leidas / meta;
             }
             
-            if (!entry) return -1;
+            if (!entry) return -1; 
             const pages = Math.max(0, entry.pages || 0);
             if (pages === 0) return -1;
-            const metaDelDia = entry.metaPages || getMetaPaginas(book);
+            const metaDelDia = getMetaPaginas(book);
             return pages / metaDelDia;
         }
 
-        function setProjectionSource(bookId, source) {
-            const book = appData.books.find(b => b.id === bookId);
-            if (!book) return;
-            book.projectionSource = source;
-            saveData();
-            renderBooks();
-            if (document.getElementById('metricsModal').style.display === 'flex') {
-                refreshMetricsChart();
-                updateMetricsStatus();
-            }
+        function updateFabVisibility() {
+            const fab = document.getElementById('fabAdd');
+            if (!fab) return;
+            const anyOpen = ['bookModal', 'scheduleModal', 'metricsModal', 'addBookModal'].some(id => {
+                const el = document.getElementById(id);
+                return el && el.style.display === 'flex';
+            });
+            fab.classList.toggle('hidden', anyOpen);
         }
 
-        // ============================================================
-        // ROLLOVER
-        // ============================================================
         function performDayRollover() {
             const nowDateStr = new Date().toDateString();
             if (appData.lastDate === nowDateStr) return false;
@@ -778,32 +645,17 @@
             const lastDate = new Date(appData.lastDate);
             const todayDate = new Date(nowDateStr);
             const daysDiff = Math.max(1, Math.round((todayDate - lastDate) / 86400000));
-            const lastISO = getLocalISO(lastDate);
             
             appData.books.forEach(b => {
-                if (b.pagesLog) {
-                    const lastEntry = b.pagesLog.find(l => l.date === lastISO);
-                    if (lastEntry && lastEntry.metaPages === undefined) {
-                        lastEntry.metaPages = b.adaptiveSpeed 
-                            ? getMetaPaginas(b)
-                            : Math.max(1, Math.round(b.dailyMins / b.minsPerPage));
-                    }
-                }
-                
                 if (b.active) {
+                    if (!b.pagesLog) b.pagesLog = [];
+                    
                     for (let i = 1; i < daysDiff; i++) {
                         const md = new Date(lastDate);
                         md.setDate(md.getDate() + i);
                         const mISO = getLocalISO(md);
-                        if (!b.pagesLog) b.pagesLog = [];
                         if (!b.pagesLog.find(l => l.date === mISO)) {
-                            b.pagesLog.push({
-                                date: mISO,
-                                pages: 0,
-                                metaPages: b.adaptiveSpeed 
-                                    ? getMetaPaginas(b)
-                                    : Math.max(1, Math.round(b.dailyMins / b.minsPerPage))
-                            });
+                            b.pagesLog.push({ date: mISO, pages: 0 });
                         }
                     }
                 }
@@ -836,20 +688,13 @@
                 if(b.active === undefined) b.active = true;
                 if(b.priority === undefined) b.priority = 50;
                 if(b.dailySeconds === undefined) b.dailySeconds = 0;
-                if(b.dailyLog === undefined) b.dailyLog = [];
-                if(b.metricVisible === undefined) b.metricVisible = true;
-                if(b.adaptiveSpeed === undefined) b.adaptiveSpeed = false;
-                if(b.pageTimingLog === undefined) b.pageTimingLog = [];
                 if(b.pagesLog === undefined) b.pagesLog = [];
-                if(b.projectionSource === undefined) b.projectionSource = 'auto';
+                if(b.metricVisible === undefined) b.metricVisible = true;
                 
-                // ⭐ PROTECCIÓN 2: SANEAMIENTO DE DATOS ANTIGUOS
-                // Si hay páginas negativas guardadas (por el bug anterior), las limpiamos.
+                // Limpieza de datos viejos o erróneos (páginas negativas)
                 if (b.pagesLog && Array.isArray(b.pagesLog)) {
                     b.pagesLog.forEach(entry => {
-                        if (entry.pages !== undefined && entry.pages < 0) {
-                            entry.pages = 0; // Reseteamos a 0 si estaba en negativo
-                        }
+                        if (entry.pages !== undefined && entry.pages < 0) entry.pages = 0;
                     });
                 }
                 
@@ -865,16 +710,6 @@
 
         let currentModalBookId = null;
 
-        function updateFabVisibility() {
-            const fab = document.getElementById('fabAdd');
-            if (!fab) return;
-            const anyOpen = ['bookModal', 'scheduleModal', 'metricsModal', 'addBookModal'].some(id => {
-                const el = document.getElementById(id);
-                return el && el.style.display === 'flex';
-            });
-            fab.classList.toggle('hidden', anyOpen);
-        }
-
         function updateDailySummary() {
             const el = document.getElementById('dailySummary');
             if (!el) return;
@@ -888,6 +723,7 @@
             let totalSecs = 0;
             let totalPages = 0;
             let metCount = 0;
+            
             activeBooks.forEach(b => {
                 totalSecs += (b.dailySeconds || 0);
                 const pagHoy = getPaginasLeidasHoy(b);
@@ -983,16 +819,12 @@
                     
                     imported.books.forEach(b => {
                         if (b.metricVisible === undefined) b.metricVisible = true;
-                        if (b.dailyLog === undefined) b.dailyLog = [];
+                        if (b.pagesLog === undefined) b.pagesLog = [];
                         if (b.dailySeconds === undefined) b.dailySeconds = 0;
                         if (b.priority === undefined) b.priority = 50;
                         if (b.active === undefined) b.active = true;
                         if (b.notes === undefined) b.notes = "";
                         if (b.checklists === undefined) b.checklists = [];
-                        if (b.adaptiveSpeed === undefined) b.adaptiveSpeed = false;
-                        if (b.pageTimingLog === undefined) b.pageTimingLog = [];
-                        if (b.pagesLog === undefined) b.pagesLog = [];
-                        if (b.projectionSource === undefined) b.projectionSource = 'auto';
                         if (b.history === undefined) b.history = [{ date: isoToday, page: b.currentPage || 0 }];
                         
                         if (b.pagesLog && Array.isArray(b.pagesLog)) {
@@ -1027,19 +859,13 @@
         }
 
         function calculateStats(book) {
-            const effMins = getEffectiveMinsPerPage(book);
-            const projMins = getProjectionMinsPerPage(book);
-            
-            const totalMins = book.totalPages * projMins;
-            const readMins = book.currentPage * projMins;
+            const totalMins = book.totalPages * book.minsPerPage;
+            const readMins = book.currentPage * book.minsPerPage;
             const remainingPages = book.totalPages - book.currentPage;
-            const remainingMins = remainingPages * projMins;
-            
+            const remainingMins = remainingPages * book.minsPerPage;
             const metaPaginas = getMetaPaginas(book);
             
-            const daysRemaining = book.dailyMins > 0 && projMins > 0 
-                ? Math.ceil((remainingPages * projMins) / book.dailyMins) 
-                : 0;
+            const daysRemaining = metaPaginas > 0 ? Math.ceil(remainingPages / metaPaginas) : 0;
             
             const percent = Math.min(((book.currentPage / book.totalPages) * 100), 100).toFixed(1);
             const finishDate = new Date();
@@ -1047,7 +873,7 @@
             const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
             const dateStr = finishDate.toLocaleDateString('es-ES', dateOptions);
             
-            return { totalMins, readMins, remainingMins, remainingPages, daysRemaining, percent, dateStr, finishDate, effMins, projMins, metaPaginas };
+            return { totalMins, readMins, remainingMins, remainingPages, daysRemaining, percent, dateStr, finishDate, metaPaginas };
         }
 
         function saveData() { localStorage.setItem('readingTrackerData', JSON.stringify(appData)); }
@@ -1085,15 +911,6 @@
             
             updateMetricsStatus();
             try { renderMetricsChart(); } catch(e) { console.error(e); }
-        }
-
-        function toggleAdaptiveSpeed(bookId) {
-            const book = appData.books.find(b => b.id === bookId);
-            if (!book) return;
-            book.adaptiveSpeed = !book.adaptiveSpeed;
-            saveData();
-            renderBooks();
-            if (navigator.vibrate) { try { navigator.vibrate(20); } catch(e) {} }
         }
 
         function changeHoyPage(delta) {
@@ -1356,32 +1173,7 @@
                 const btnTimerText = isTimerRunning ? '⏸️ Pausar' : (book.dailySeconds > 0 ? '▶️ Continuar' : '▶️ Iniciar');
                 const metaPaginas = getMetaPaginas(book);
                 const paginasHoy = getPaginasLeidasHoy(book);
-                const hasData = hasAdaptiveData(book);
-                const projSource = book.projectionSource || 'auto';
-                const projIcon = book.adaptiveSpeed ? getProjectionSourceLabel(book) : '';
-                
-                let metaDisplay;
-                if (book.adaptiveSpeed) {
-                    if (paginasHoy === 0 && !hasData) {
-                        metaDisplay = `<strong>0</strong><span class="incognita">/__</span>`;
-                    } else if (paginasHoy === 0) {
-                        metaDisplay = `<strong>0</strong><span class="incognita">/${metaPaginas}</span> <span class="incognita" style="font-size: 11px;">(pendiente)</span>`;
-                    } else {
-                        metaDisplay = `<strong>${paginasHoy}</strong>/${metaPaginas}`;
-                    }
-                } else {
-                    metaDisplay = `<strong>${paginasHoy}</strong>/${metaPaginas}`;
-                }
-                
                 const isMetaMet = paginasHoy >= metaPaginas;
-                
-                let adaptiveBadge = '';
-                if (book.adaptiveSpeed) {
-                    const speedText = hasData 
-                        ? `📊 Velocidad real: <strong>${stats.effMins.toFixed(2)} min/pág</strong> <span style="opacity: 0.65;">(estimado: ${book.minsPerPage})</span>`
-                        : `📊 Adaptativa activa <span style="opacity: 0.65;">— sin datos aún, usando estimado ${book.minsPerPage} min/pág</span>`;
-                    adaptiveBadge = `<div class="adaptive-badge">${speedText}</div>`;
-                }
                 
                 const card = document.createElement('div');
                 card.className = `card ${!book.active ? 'inactive' : ''}`;
@@ -1411,7 +1203,6 @@
                                 oninput="document.getElementById('val-pri-${book.id}').innerText = this.value + '%'"
                                 onchange="updatePriority(${book.id}, this.value)">
                         </div>
-                        ${adaptiveBadge}
                     </div>
                     
                     <div id="edit-section-${book.id}" class="edit-section" style="display: none;">
@@ -1431,14 +1222,6 @@
                             <div class="form-group">
                                 <label>Meta diaria (min)</label>
                                 <input type="number" id="edit-daily-${book.id}" value="${book.dailyMins}" required min="1">
-                            </div>
-                            <div class="form-group full">
-                                <label>Velocidad para proyección de fecha final</label>
-                                <select id="edit-proj-source-${book.id}">
-                                    <option value="adaptive" ${projSource === 'auto' || projSource === 'adaptive' ? 'selected' : ''}>📊 Adaptativa (ritmo real aprendido)</option>
-                                    <option value="manual" ${projSource === 'manual' ? 'selected' : ''}>📝 Configurada (la que ingresaste)</option>
-                                </select>
-                                <p style="font-size: 11px; color: var(--text-muted); font-style: italic; margin-top: 4px;">Afecta las fechas finales, marcadores y línea de proyección 📈. Solo aplica si la velocidad adaptativa está activa.</p>
                             </div>
                         </div>
                         <div style="display: flex; gap: 10px;">
@@ -1468,29 +1251,16 @@
                             <div class="progress-track" style="height: 6px; margin: 10px 0;">
                                 <div id="timer-fill-${book.id}" class="progress-fill" style="width: 0%; background: var(--success);"></div>
                             </div>
-                            <div class="timer-buttons-row">
+                            <div style="display: flex; justify-content: center; gap: 15px; align-items: center; margin-top: 12px;">
                                 <button id="btn-timer-${book.id}" onclick="toggleTimer(${book.id})" class="btn-timer ${isTimerRunning ? 'running' : ''}">
                                     ${btnTimerText}
                                 </button>
                                 <button onclick="editTimer(${book.id})" class="icon-btn" style="font-size: 18px;" title="Ingresar tiempo manualmente">✏️</button>
                                 <button onclick="resetTimer(${book.id})" class="icon-btn" style="font-size: 18px;" title="Reiniciar a cero">🔄</button>
-                                <button onclick="toggleAdaptiveSpeed(${book.id})" class="adaptive-toggle-btn ${book.adaptiveSpeed ? 'active' : ''}" title="Velocidad adaptativa">📊</button>
                             </div>
                             
                             <div class="meta-pages-display ${isMetaMet ? 'meta-pages-success' : ''}">
-                                <div>Meta páginas: ${metaDisplay}</div>
-                                ${book.adaptiveSpeed ? `
-                                    <div class="projection-source-toggle">
-                                        <span>Proyección fecha:</span>
-                                        <button class="proj-source-btn ${(projSource === 'auto' || projSource === 'adaptive') ? 'active' : ''}" 
-                                            onclick="setProjectionSource(${book.id}, 'adaptive')" 
-                                            title="Usar velocidad adaptativa para la fecha final">📊</button>
-                                        <button class="proj-source-btn ${projSource === 'manual' ? 'active' : ''}" 
-                                            onclick="setProjectionSource(${book.id}, 'manual')" 
-                                            title="Usar velocidad configurada para la fecha final">📝</button>
-                                    </div>
-                                    <span class="meta-pages-hint">Al pausar el cronómetro se preguntará en qué página quedaste para recalcular la meta.</span>
-                                ` : ''}
+                                <div>Meta páginas: <strong>${paginasHoy}</strong>/${metaPaginas}</div>
                             </div>
                             
                             <p id="timer-msg-${book.id}" style="color: var(--success); font-style: italic; font-weight: bold; margin-top: 10px; display: none;">
@@ -1500,11 +1270,9 @@
 
                         <div class="stats-grid" style="margin-top: 15px;">
                             <div class="stat-item"><span class="stat-label">Tiempo Leído</span><span class="stat-value">${formatTime(stats.readMins)}</span></div>
-                            <div class="stat-item"><span class="stat-label">Tiempo Restante</span><span class="stat-value">${formatTime(stats.remainingMins)}</span></div>
-                            <div class="stat-item"><span class="stat-label">Páginas Leídas</span><span class="stat-value">${book.currentPage}</span></div>
-                            <div class="stat-item"><span class="stat-label">Páginas Restantes</span><span class="stat-value highlight">${stats.remainingPages}</span></div>
+                            <div class="stat-item"><span class="stat-label">Restante</span><span class="stat-value">${formatTime(stats.remainingMins)}</span></div>
+                            <div class="stat-item"><span class="stat-label">Duración Total</span><span class="stat-value">${formatTime(stats.totalMins)}</span></div>
                             <div class="stat-item"><span class="stat-label">Días Faltantes</span><span class="stat-value highlight">${stats.daysRemaining}</span></div>
-                            <div class="stat-item"><span class="stat-label">Velocidad proyección</span><span class="stat-value" style="color: var(--primary); font-weight: bold;">${stats.projMins.toFixed(2)} m/p ${projIcon}</span></div>
                             <div class="stat-item full"><span class="stat-label">Proyección Finalización</span><span class="stat-value success">${book.currentPage >= book.totalPages ? 'Obra Finalizada' : stats.dateStr}</span></div>
                         </div>
                     </div>
@@ -1527,12 +1295,8 @@
                 dailyMins: parseInt(document.getElementById('dailyMins').value), currentPage: initPage,
                 notes: "", checklists: [], active: true, priority: 50, dailySeconds: 0,
                 metricVisible: true,
-                adaptiveSpeed: false,
-                projectionSource: 'auto',
-                pageTimingLog: [],
                 pagesLog: [],
-                history: [{ date: isoToday, page: initPage }],
-                dailyLog: []
+                history: [{ date: isoToday, page: initPage }]
             });
             
             document.getElementById('bookSearch').value = '';
@@ -1543,8 +1307,8 @@
             closeModal('addBookModal');
         });
 
-        // ⭐ PROTECCIÓN 3: Lógica de actualización segura de páginas
-        function applyPageChange(bookId, newPage, fromTimer = false) {
+        // ⭐ Actualización de página segura y protegida contra negativos
+        function applyPageChange(bookId, newPage) {
             const book = appData.books.find(b => b.id === bookId);
             if (!book) return false;
             
@@ -1557,40 +1321,15 @@
             if (!book.pagesLog) book.pagesLog = [];
             let entry = book.pagesLog.find(l => l.date === isoToday);
             if (!entry) {
-                entry = { date: isoToday, pages: 0, startPage: oldPage, endPage: clampedPage };
+                entry = { date: isoToday, pages: 0 };
                 book.pagesLog.push(entry);
             }
             
-            // Si avanza, sumamos. Si retrocede, restamos hasta un mínimo de 0 (nunca negativo)
+            // Si avanza, suma. Si retrocede (por error), resta solo lo que ya había ganado hoy.
             if (delta > 0) {
-                entry.pages = Math.max(0, (entry.pages || 0)) + delta;
+                entry.pages = (entry.pages || 0) + delta;
             } else if (delta < 0) {
                 entry.pages = Math.max(0, (entry.pages || 0) + delta);
-            }
-            
-            entry.endPage = clampedPage;
-            
-            if (book.adaptiveSpeed) {
-                const secondsToday = book.dailySeconds || 0;
-                // Solo registramos velocidad adaptativa si hubo avance real
-                if (secondsToday > 0 && delta > 0) {
-                    if (!book.pageTimingLog) book.pageTimingLog = [];
-                    let timingEntry = book.pageTimingLog.find(l => l.date === isoToday);
-                    if (timingEntry) {
-                        timingEntry.endPage = clampedPage;
-                        timingEntry.seconds = secondsToday;
-                    } else {
-                        book.pageTimingLog.push({
-                            date: isoToday,
-                            startPage: oldPage,
-                            endPage: clampedPage,
-                            seconds: secondsToday
-                        });
-                    }
-                    if (book.pageTimingLog.length > 50) {
-                        book.pageTimingLog = book.pageTimingLog.slice(-50);
-                    }
-                }
             }
             
             book.currentPage = clampedPage;
@@ -1608,7 +1347,7 @@
             const newPage = parseInt(document.getElementById(`update-page-${id}`).value);
             if (isNaN(newPage)) return;
             
-            const changed = applyPageChange(id, newPage, false);
+            const changed = applyPageChange(id, newPage);
             if (changed) {
                 renderBooks();
                 if(document.getElementById('metricsModal').style.display === 'flex') {
@@ -1639,10 +1378,6 @@
                 book.totalPages = parseInt(document.getElementById(`edit-total-${id}`).value);
                 book.minsPerPage = parseFloat(document.getElementById(`edit-mins-${id}`).value);
                 book.dailyMins = parseInt(document.getElementById(`edit-daily-${id}`).value);
-                
-                const projSelect = document.getElementById(`edit-proj-source-${id}`);
-                if (projSelect) book.projectionSource = projSelect.value;
-                
                 if (book.currentPage > book.totalPages) book.currentPage = book.totalPages;
                 saveData(); renderBooks();
             }
@@ -1670,27 +1405,6 @@
                 btn.innerHTML = '▶️ Continuar'; btn.classList.remove('running');
                 saveData(); updateTimerUI(id);
                 updateDailySummary();
-                
-                if (book.adaptiveSpeed) {
-                    setTimeout(() => {
-                        const input = prompt(`Pausaste tras ${Math.floor(book.dailySeconds / 60)} min.\n¿En qué página quedaste?`, book.currentPage);
-                        if (input !== null && input.trim() !== "") {
-                            const newPage = parseInt(input);
-                            if (!isNaN(newPage) && newPage >= 0) {
-                                const changed = applyPageChange(id, newPage, true);
-                                if (changed) {
-                                    renderBooks();
-                                    if (navigator.vibrate) { try { navigator.vibrate(30); } catch(e) {} }
-                                }
-                            }
-                        }
-                        if (document.getElementById('metricsModal').style.display === 'flex') {
-                            refreshMetricsChart();
-                            updateMetricsStatus();
-                        }
-                    }, 100);
-                }
-                
                 if (document.getElementById('metricsModal').style.display === 'flex') {
                     refreshMetricsChart();
                     updateMetricsStatus();
@@ -2032,20 +1746,14 @@
                 pageBooks.forEach((book) => {
                     const scoreEl = listEl.querySelector(`.book-score[data-book-id="${book.id}"]`);
                     if (!scoreEl) return;
+                    
                     const paginasHoy = getPaginasLeidasHoy(book);
                     const metaPaginas = getMetaPaginas(book);
                     const score = paginasHoy === 0 ? -1 : paginasHoy / metaPaginas;
                     const check = paginasHoy >= metaPaginas ? ' ✅' : '';
                     const sign = score >= 0 ? '+' : '';
                     
-                    let metaText;
-                    if (book.adaptiveSpeed && paginasHoy === 0 && !hasAdaptiveData(book)) {
-                        metaText = `<strong>${paginasHoy}</strong><span style="opacity: 0.5;">/__</span>`;
-                    } else {
-                        metaText = `<strong>${paginasHoy}</strong>/${metaPaginas} pág`;
-                    }
-                    
-                    scoreEl.innerHTML = `<strong>${book.title}</strong>: ${metaText} (${sign}${score.toFixed(2)})${check}`;
+                    scoreEl.innerHTML = `<strong>${book.title}</strong>: ${paginasHoy}/${metaPaginas} pág (${sign}${score.toFixed(2)})${check}`;
                 });
                 
                 renderFinishInfo(allActiveBooks, colorMap, finishEl);
@@ -2067,7 +1775,6 @@
             const finishRows = visibleBooks.map(book => {
                 const color = colorMap[book.id] || BRIGHT_COLORS[0];
                 const stats = calculateStats(book);
-                const projIcon = book.adaptiveSpeed ? getProjectionSourceLabel(book) : '';
                 
                 if (book.currentPage >= book.totalPages) {
                     return `<div class="finish-date-item"><span class="finish-dot" style="background: ${color}"></span><span class="finish-book-name">${book.title}</span><span class="finish-date-text">🏁 Terminado</span></div>`;
@@ -2079,7 +1786,7 @@
                 const yy = d.getFullYear();
                 return `<div class="finish-date-item">
                     <span class="finish-dot" style="background: ${color}"></span>
-                    <span class="finish-book-name">${book.title}${projIcon ? `<span class="finish-source-icon">${projIcon}</span>` : ''}</span>
+                    <span class="finish-book-name">${book.title}</span>
                     <span class="finish-date-text">${dd}/${mm}/${yy}</span>
                     <span class="finish-days">· ${stats.daysRemaining}d</span>
                 </div>`;
@@ -2143,10 +1850,9 @@
             });
             
             const finishDaysList = activeBooks.map(book => {
-                if (book.dailyMins <= 0) return 0;
-                const projMins = getProjectionMinsPerPage(book);
+                const metaP = getMetaPaginas(book);
                 const remainingPages = Math.max(0, book.totalPages - book.currentPage);
-                return Math.ceil((remainingPages * projMins) / book.dailyMins);
+                return Math.ceil(remainingPages / metaP);
             });
             const maxFinishDays = Math.max(0, ...finishDaysList);
             const maxFutureDays = Math.max(14, maxFinishDays + 7, Math.ceil(maxFinishDays * 1.5));
@@ -2175,9 +1881,8 @@
             const labels = timelineDates.map(d => { const p = d.split('-'); return `${p[2]}/${p[1]}`; });
             
             const bookTargets = activeBooks.map(book => {
-                if (book.dailyMins <= 0) return 1;
-                const projMins = getProjectionMinsPerPage(book);
-                return Math.max(1, Math.ceil((book.totalPages * projMins) / book.dailyMins));
+                const metaP = getMetaPaginas(book);
+                return Math.max(1, Math.ceil(book.totalPages / metaP));
             });
             
             const baseDatasets = [];
@@ -2214,7 +1919,6 @@
                 });
                 
                 const color = colorMap[book.id] || BRIGHT_COLORS[0];
-                const projIcon = book.adaptiveSpeed ? getProjectionSourceLabel(book) : '';
                 const radii = timelineDates.map((_, i) => {
                     if (i === todayIdx) {
                         const paginasHoy = getPaginasLeidasHoy(book);
@@ -2226,7 +1930,7 @@
                 });
                 
                 baseDatasets.push({
-                    label: book.title + (goalMetToday ? ' 🏆' : '') + (projIcon ? ` ${projIcon}` : ''),
+                    label: book.title + (goalMetToday ? ' 🏆' : ''),
                     data: dataPoints,
                     borderColor: color,
                     backgroundColor: color + '25',
@@ -2241,7 +1945,7 @@
                     spanGaps: false
                 });
                 
-                bookMetadata.push({ book, color, scoreAtToday: cumScore, target: bookTargets[index], goalMetToday, projIcon });
+                bookMetadata.push({ book, color, scoreAtToday: cumScore, target: bookTargets[index], goalMetToday });
             });
             
             const projectionDatasets = [];
@@ -2295,7 +1999,7 @@
                 if (daysRemaining <= 0) return;
                 const finishIdx = todayIdx + daysRemaining;
                 if (finishIdx >= timelineDates.length || finishIdx < 0) return;
-                finishes.push({ idx: finishIdx, date: timelineDates[finishIdx], color: meta.color, target: meta.target, title: meta.book.title, projIcon: meta.projIcon });
+                finishes.push({ idx: finishIdx, date: timelineDates[finishIdx], color: meta.color, target: meta.target, title: meta.book.title });
             });
             
             const datasets = [...baseDatasets, ...projectionDatasets];
@@ -2468,8 +2172,8 @@
                                         delta = ` (${pagHoy}/${metaP} pág hoy)`;
                                     } else if (idx < todayIdx && book) {
                                         const entry = (book.pagesLog || []).find(l => l.date === timelineDates[idx]);
-                                        const pag = entry ? Math.max(0, entry.pages) : 0;
-                                        const metaDelDia = entry?.metaPages || metaP;
+                                        const pag = entry ? entry.pages : 0;
+                                        const metaDelDia = metaP;
                                         delta = ` (${pag}/${metaDelDia} pág)`;
                                     }
                                     
