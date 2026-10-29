@@ -122,21 +122,23 @@
             white-space: nowrap; transition: transform 0.15s, box-shadow 0.15s, background 0.2s, color 0.2s, border-color 0.2s;
             display: flex; align-items: center; gap: 8px;
             user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
-            touch-action: manipulation;
+            touch-action: pan-y;
             position: relative;
         }
         .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
         .tab-btn-new { background: #eae5dc; border: 1px dashed var(--border-color); color: var(--text-main); }
+        
         .tab-btn.dragging {
-            opacity: 0.7;
-            transform: scale(1.08);
+            opacity: 0.9;
+            transform: scale(1.05);
             box-shadow: 0 6px 16px rgba(114, 47, 55, 0.45);
-            cursor: grabbing;
-            z-index: 100;
-            border-color: var(--primary);
+            z-index: 1000;
+            position: relative;
+            pointer-events: none; /* CRÍTICO: Permite detectar qué hay debajo */
         }
+        
         .tab-btn.long-pressing {
-            animation: longPressPulse 0.6s ease-out;
+            animation: longPressPulse 0.5s ease-out;
         }
         @keyframes longPressPulse {
             0% { box-shadow: 0 0 0 0 rgba(114, 47, 55, 0.55); }
@@ -975,18 +977,22 @@
         function attachTabPointer(el, cat) {
             let pressTimer = null;
             let isDragging = false;
-            let hasMoved = false;
+            let startX = 0, startY = 0;
             let hoveredTab = null;
-            
+            let pointerId = null;
+
             const onDown = (e) => {
                 if (e.target.classList && e.target.classList.contains('tab-delete')) return;
+                if (e.button !== undefined && e.button !== 0 && e.pointerType === 'mouse') return; // Solo click izquierdo
+
+                startX = e.clientX;
+                startY = e.clientY;
+                pointerId = e.pointerId;
+                isDragging = false;
+                hoveredTab = null;
                 
-                isDragging = false; hasMoved = false; hoveredTab = null;
                 el.classList.add('long-pressing');
-                
-                document.addEventListener('pointerup', handleEarlyRelease);
-                document.addEventListener('pointercancel', handleEarlyRelease);
-                
+
                 pressTimer = setTimeout(() => {
                     pressTimer = null;
                     isDragging = true;
@@ -994,50 +1000,97 @@
                     el.classList.add('dragging');
                     if (navigator.vibrate) { try { navigator.vibrate(30); } catch(err) {} }
                     
-                    document.removeEventListener('pointerup', handleEarlyRelease);
-                    document.removeEventListener('pointercancel', handleEarlyRelease);
-                    
-                    document.addEventListener('pointermove', globalMove);
-                    document.addEventListener('pointerup', globalUp);
-                    document.addEventListener('pointercancel', globalCancel);
-                }, 600);
+                    try { el.setPointerCapture(pointerId); } catch(err) {}
+                }, 500);
+
+                document.addEventListener('pointermove', onMove);
+                document.addEventListener('pointerup', onUp);
+                document.addEventListener('pointercancel', onCancel);
             };
-            
-            const handleEarlyRelease = () => {
-                if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
-                el.classList.remove('long-pressing');
-                document.removeEventListener('pointerup', handleEarlyRelease);
-                document.removeEventListener('pointercancel', handleEarlyRelease);
-            };
-            
-            const globalMove = (e) => {
-                if (!isDragging) return;
-                hasMoved = true;
-                if (e.cancelable) e.preventDefault();
-                
-                const point = document.elementFromPoint(e.clientX, e.clientY);
-                if (!point) return;
-                const targetTab = point.closest('.tab-btn');
-                
-                if (targetTab && targetTab !== el && !targetTab.classList.contains('tab-btn-new')) {
-                    hoveredTab = targetTab;
+
+            const onMove = (e) => {
+                if (e.pointerId !== pointerId) return;
+
+                if (!isDragging) {
+                    const dx = Math.abs(e.clientX - startX);
+                    const dy = Math.abs(e.clientY - startY);
+                    if (dx > 10 || dy > 10) {
+                        if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+                        el.classList.remove('long-pressing');
+                    }
                 } else {
-                    hoveredTab = null;
+                    if (e.cancelable) e.preventDefault();
+                    
+                    // Mover visualmente
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+                    el.style.transform = `translate(${dx}px, ${dy}px) scale(1.05)`;
+
+                    // Auto-scroll si estamos cerca de los bordes
+                    const tabsContainer = document.getElementById('tabsContainer');
+                    if (tabsContainer) {
+                        const rect = tabsContainer.getBoundingClientRect();
+                        if (e.clientX - rect.left < 40) {
+                            tabsContainer.scrollLeft -= 8;
+                        } else if (rect.right - e.clientX < 40) {
+                            tabsContainer.scrollLeft += 8;
+                        }
+                    }
+
+                    // Encontrar elemento debajo
+                    const pointEl = document.elementFromPoint(e.clientX, e.clientY);
+                    if (!pointEl) return;
+                    
+                    const targetTab = pointEl.closest('.tab-btn');
+                    if (targetTab && targetTab !== el && !targetTab.classList.contains('tab-btn-new')) {
+                        if (hoveredTab !== targetTab) {
+                            if (hoveredTab) hoveredTab.style.outline = '';
+                            hoveredTab = targetTab;
+                            hoveredTab.style.outline = '2px dashed var(--primary)';
+                        }
+                    } else {
+                        if (hoveredTab) {
+                            hoveredTab.style.outline = '';
+                            hoveredTab = null;
+                        }
+                    }
                 }
             };
-            
-            const globalUp = (e) => {
-                if (!isDragging) return;
-                el.classList.remove('dragging');
-                
-                if (!hasMoved) {
-                    renameCategory(cat);
-                } else if (hoveredTab) {
-                    const fromCat = el.dataset.cat;
-                    const toCat = hoveredTab.dataset.cat;
+
+            const onUp = (e) => {
+                if (e.pointerId !== pointerId) return;
+
+                document.removeEventListener('pointermove', onMove);
+                document.removeEventListener('pointerup', onUp);
+                document.removeEventListener('pointercancel', onCancel);
+
+                if (pressTimer) {
+                    clearTimeout(pressTimer);
+                    pressTimer = null;
+                    el.classList.remove('long-pressing');
                     
-                    if (fromCat && toCat) {
-                        const fromIdx = appData.categories.indexOf(fromCat);
+                    // Fue un tap normal
+                    if (appData.categories.includes(cat)) {
+                        appData.activeCategory = cat;
+                        const searchEl = document.getElementById('bookSearch');
+                        if (searchEl) searchEl.value = '';
+                        const clearBtn = document.getElementById('searchClear');
+                        if (clearBtn) clearBtn.classList.remove('visible');
+                        const searchContainer = document.getElementById('searchContainer');
+                        if (searchContainer) searchContainer.classList.remove('search-active');
+                        saveData(); renderTabs(); renderBooks();
+                    }
+                    return;
+                }
+
+                if (isDragging) {
+                    el.classList.remove('dragging');
+                    el.style.transform = '';
+                    
+                    if (hoveredTab) {
+                        hoveredTab.style.outline = '';
+                        const toCat = hoveredTab.dataset.cat;
+                        const fromIdx = appData.categories.indexOf(cat);
                         const toIdx = appData.categories.indexOf(toCat);
                         
                         if (fromIdx >= 0 && toIdx >= 0 && fromIdx !== toIdx) {
@@ -1046,49 +1099,39 @@
                             saveData();
                             renderTabs();
                         }
+                    } else {
+                        // Si se mantuvo pulsado pero no se movió a ninguna pestaña (distancia < 10px) -> Editar
+                        const dx = Math.abs(e.clientX - startX);
+                        const dy = Math.abs(e.clientY - startY);
+                        if (dx < 10 && dy < 10) {
+                            renameCategory(cat);
+                        }
                     }
+                    
+                    isDragging = false;
+                    hoveredTab = null;
                 }
-                
-                isDragging = false;
-                hasMoved = false;
-                hoveredTab = null;
-                
-                document.removeEventListener('pointermove', globalMove);
-                document.removeEventListener('pointerup', globalUp);
-                document.removeEventListener('pointercancel', globalCancel);
             };
-            
-            const globalCancel = () => {
+
+            const onCancel = (e) => {
+                if (e.pointerId !== pointerId) return;
+                document.removeEventListener('pointermove', onMove);
+                document.removeEventListener('pointerup', onUp);
+                document.removeEventListener('pointercancel', onCancel);
+                
+                if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+                el.classList.remove('long-pressing');
                 el.classList.remove('dragging');
-                isDragging = false;
-                hasMoved = false;
-                hoveredTab = null;
+                el.style.transform = '';
                 
-                document.removeEventListener('pointermove', globalMove);
-                document.removeEventListener('pointerup', globalUp);
-                document.removeEventListener('pointercancel', globalCancel);
+                if (hoveredTab) {
+                    hoveredTab.style.outline = '';
+                    hoveredTab = null;
+                }
+                isDragging = false;
             };
-            
+
             el.addEventListener('pointerdown', onDown);
-            
-            // Manejo normal del toque (cambiar pestaña)
-            el.addEventListener('click', (e) => {
-                if (isDragging) {
-                    e.preventDefault();
-                    return;
-                }
-                if (appData.categories.includes(cat)) {
-                    appData.activeCategory = cat;
-                    const searchEl = document.getElementById('bookSearch');
-                    if (searchEl) searchEl.value = '';
-                    const clearBtn = document.getElementById('searchClear');
-                    if (clearBtn) clearBtn.classList.remove('visible');
-                    const searchContainer = document.getElementById('searchContainer');
-                    if (searchContainer) searchContainer.classList.remove('search-active');
-                    saveData(); renderTabs(); renderBooks();
-                }
-            });
-            
             el.addEventListener('contextmenu', (e) => e.preventDefault());
         }
 
