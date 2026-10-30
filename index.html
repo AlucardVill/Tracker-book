@@ -10,72 +10,65 @@
     <style>
         :root {
             color-scheme: light dark;
-            
-            /* TEMA ESMERALDA (MODO CLARO) */
-            --bg-color: #fcf9f8;       
+            --bg-color: #fcf9f8;
             --bg-gradient: linear-gradient(135deg, #fdfbf7 0%, #f9edf0 100%);
-            --text-main: #261311;      
-            --text-muted: #8c7a76;     
-            --primary: #1c3934;        
+            --text-main: #261311;
+            --text-muted: #8c7a76;
+            --primary: #1c3934;
             --primary-rgb: 28, 57, 52;
-            --primary-hover: #112420;  
-            --hover-bg: #e2e8e7;       
-            --card-bg: #ffffff;        
-            --border-color: #ebdcd3;   
-            --success: #c3955b;        
+            --primary-hover: #112420;
+            --hover-bg: #e2e8e7;
+            --card-bg: #ffffff;
+            --border-color: #ebdcd3;
+            --success: #c3955b;
             --danger: #9b2226;
             --font-family: "Times New Roman", Times, serif;
-            
             --shadow-sm: 0 1px 4px rgba(0,0,0,0.04);
             --shadow-md: 0 4px 12px rgba(38, 19, 17, 0.06);
             --shadow-lg: 0 10px 25px rgba(38, 19, 17, 0.1);
         }
 
-        /* MODO OSCURO (ESMERALDA) */
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg-color: #0a1412;       
+                --bg-color: #0a1412;
                 --bg-gradient: linear-gradient(135deg, #0d1b19 0%, #0a1412 100%);
-                --text-main: #f9edf0;      
-                --text-muted: #8ba39e;     
-                --primary: #439075;        
+                --text-main: #f9edf0;
+                --text-muted: #8ba39e;
+                --primary: #439075;
                 --primary-rgb: 67, 144, 117;
                 --primary-hover: #5eb397;
-                --hover-bg: #1a2e2a;       
-                --card-bg: #132421;        
-                --border-color: #1c3631;   
-                --success: #d4a373;        
+                --hover-bg: #1a2e2a;
+                --card-bg: #132421;
+                --border-color: #1c3631;
+                --success: #d4a373;
                 --danger: #ff7b72;
-                
                 --shadow-sm: 0 1px 4px rgba(0,0,0,0.2);
                 --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
                 --shadow-lg: 0 10px 25px rgba(0,0,0,0.4);
             }
         }
 
-        /* TEMA ÁMBAR (MODO CLARO) */
         body[data-theme="amber"] {
-            --primary: #ba6a36;        
+            --primary: #ba6a36;
             --primary-rgb: 186, 106, 54;
-            --primary-hover: #9c5424;  
-            --hover-bg: #f4e6dc;       
-            --success: #1c3934;        
+            --primary-hover: #9c5424;
+            --hover-bg: #f4e6dc;
+            --success: #1c3934;
         }
 
-        /* TEMA ÁMBAR (MODO OSCURO) */
         @media (prefers-color-scheme: dark) {
             body[data-theme="amber"] {
-                --bg-color: #14100e;       
+                --bg-color: #14100e;
                 --bg-gradient: linear-gradient(135deg, #1a1513 0%, #14100e 100%);
                 --text-main: #f9edf0;
                 --text-muted: #a89b96;
-                --primary: #e08b4f;        
+                --primary: #e08b4f;
                 --primary-rgb: 224, 139, 79;
                 --primary-hover: #f0a66b;
-                --hover-bg: #2b221e;       
-                --card-bg: #241d1a;        
-                --border-color: #382923;   
-                --success: #439075;        
+                --hover-bg: #2b221e;
+                --card-bg: #241d1a;
+                --border-color: #382923;
+                --success: #439075;
             }
         }
 
@@ -83,20 +76,19 @@
 
         body {
             font-family: var(--font-family);
-            background: var(--bg-gradient); 
+            background: var(--bg-gradient);
             background-attachment: fixed;
-            color: var(--text-main); 
+            color: var(--text-main);
             padding-bottom: 80px;
             line-height: 1.5;
             transition: background 0.3s ease, color 0.3s ease;
-            overflow-x: hidden; /* Evita scroll horizontal */
-            overscroll-behavior-x: none; /* Evita que el navegador intercepte el swipe */
-            touch-action: pan-y; /* Permite scroll vertical nativo, delega horizontal a JS */
+            overflow-x: hidden;
+            overscroll-behavior-x: none;
+            touch-action: pan-y;
         }
 
         .container { max-width: 480px; margin: 0 auto; padding: 15px; }
 
-        /* HEADER */
         header { text-align: center; padding: 20px 0 15px 0; margin-bottom: 20px; position: relative; }
         header::after {
             content: '';
@@ -130,14 +122,13 @@
         .summary-item strong { color: var(--primary); font-weight: bold; font-size: 13px; }
         .summary-item.done strong { color: var(--success); }
 
-        /* BOTONES PRINCIPALES */
         .btn-schedule, .btn-metrics {
             padding: 10px 15px; border-radius: 6px; font-size: 15px; cursor: pointer; width: 100%; display: flex;
-            font-family: var(--font-family); align-items: center; justify-content: center; gap: 8px; 
+            font-family: var(--font-family); align-items: center; justify-content: center; gap: 8px;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); margin-bottom: 8px;
             font-weight: bold; letter-spacing: 0.5px;
         }
-        
+
         .btn-schedule {
             background: var(--text-main); color: var(--bg-color); border: none;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -152,18 +143,17 @@
         .btn-metrics:hover { background: var(--hover-bg); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.15); }
         .btn-metrics:active { transform: translateY(1px); box-shadow: none; }
 
-        /* CONFIGURACIÓN */
         .hours-dropdown-btn {
             background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main);
             padding: 10px 14px; border-radius: 6px; font-size: 14px; cursor: pointer; font-family: var(--font-family);
-            width: 100%; display: flex; align-items: center; justify-content: space-between; 
+            width: 100%; display: flex; align-items: center; justify-content: space-between;
             transition: all 0.2s; margin-bottom: 15px; box-shadow: var(--shadow-sm); font-weight: bold;
         }
         .hours-dropdown-btn:hover { background: var(--hover-bg); border-color: var(--primary); }
-        
-        .hours-panel { 
-            background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px; 
-            border-radius: 8px; margin-bottom: 15px; display: none; box-shadow: var(--shadow-md); 
+
+        .hours-panel {
+            background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px;
+            border-radius: 8px; margin-bottom: 15px; display: none; box-shadow: var(--shadow-md);
         }
         .hours-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 6px; margin-top: 10px; }
         .hour-btn { padding: 6px 0; border-radius: 4px; font-size: 12px; text-align: center; cursor: pointer; font-family: var(--font-family); transition: all 0.2s; font-weight: bold; }
@@ -183,6 +173,27 @@
         }
         .btn-theme-toggle:hover { border-color: var(--primary); color: var(--primary); background: var(--hover-bg); }
 
+        /* ===== CONTROL DE TIPOGRAFÍA ===== */
+        .font-size-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color);
+        }
+        .font-size-row > span { font-size: 13px; color: var(--text-main); font-weight: bold; }
+        .font-size-controls { display: flex; align-items: center; gap: 8px; }
+        .btn-font-size {
+            background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main);
+            padding: 6px 12px; border-radius: 15px; font-family: var(--font-family); font-size: 13px;
+            cursor: pointer; transition: all 0.2s; font-weight: bold; min-width: 42px;
+            touch-action: manipulation;
+        }
+        .btn-font-size:hover { border-color: var(--primary); color: var(--primary); background: var(--hover-bg); }
+        .btn-font-size:active { transform: scale(0.95); }
+        .btn-font-size:disabled { opacity: 0.35; cursor: not-allowed; }
+        #textScaleLabel {
+            font-size: 12px; color: var(--text-muted); font-weight: bold;
+            min-width: 42px; text-align: center; font-variant-numeric: tabular-nums;
+        }
+
         .export-import-row { display: flex; gap: 8px; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color); }
         .export-import-row button {
             flex: 1; padding: 8px; font-family: var(--font-family); font-size: 13px; font-weight: bold;
@@ -193,7 +204,6 @@
         .export-import-row button:active { transform: scale(0.97); }
         .export-import-hint { font-size: 11px; color: var(--text-muted); font-style: italic; text-align: center; margin-top: 10px; }
 
-        /* PESTAÑAS (TABS) */
         .tabs-container { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px; scrollbar-width: none; }
         .tabs-container::-webkit-scrollbar { display: none; }
 
@@ -206,7 +216,7 @@
         }
         .tab-btn.active { background: var(--primary); color: var(--bg-color); border-color: var(--primary); box-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.3); }
         .tab-btn-new { background: var(--hover-bg); border: 1.5px dashed var(--border-color); color: var(--text-main); box-shadow: none; }
-        
+
         .tab-btn.dragging {
             opacity: 0.9; transform: scale(1.05); box-shadow: 0 6px 15px rgba(var(--primary-rgb), 0.4);
             z-index: 1000; position: relative; pointer-events: none;
@@ -216,7 +226,7 @@
             0% { box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.55); }
             100% { box-shadow: 0 0 0 10px rgba(var(--primary-rgb), 0); }
         }
-        
+
         .tab-delete {
             background: rgba(0,0,0,0.1); border: none; color: currentColor; border-radius: 50%;
             width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center;
@@ -224,7 +234,6 @@
         }
         .tab-delete:hover { background: rgba(255,255,255,0.3); }
 
-        /* BÚSQUEDA */
         .search-container { position: relative; margin-bottom: 12px; }
         .search-container input {
             width: 100%; padding: 10px 12px 10px 36px; border: 1px solid var(--border-color);
@@ -257,10 +266,9 @@
             font-weight: bold; margin-top: 6px; font-style: normal;
         }
 
-        /* TARJETAS DE LIBROS */
-        .card { 
-            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; 
-            padding: 15px; margin-bottom: 15px; box-shadow: var(--shadow-md); 
+        .card {
+            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px;
+            padding: 15px; margin-bottom: 15px; box-shadow: var(--shadow-md);
             position: relative; transition: transform 0.2s ease, box-shadow 0.2s ease; overflow: hidden;
         }
         .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
@@ -269,24 +277,24 @@
             opacity: 0.9;
         }
         .card.inactive { opacity: 0.6; filter: grayscale(0.5); }
-        
+
         .card-header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 10px; }
         .card-header-info { flex: 1; min-width: 0; }
-        .card-title { 
-            font-size: 18px; color: var(--primary); font-weight: bold; cursor: pointer; 
+        .card-title {
+            font-size: 18px; color: var(--primary); font-weight: bold; cursor: pointer;
             display: inline-block; transition: color 0.2s; margin: 0; line-height: 1.2;
         }
         .card-title:hover { color: var(--primary-hover); text-decoration: underline; }
-        
+
         .card-actions { position: relative; flex-shrink: 0; }
-        .menu-btn { 
+        .menu-btn {
             background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 6px;
-            font-size: 18px; font-weight: bold; color: var(--text-muted); cursor: pointer; 
+            font-size: 18px; font-weight: bold; color: var(--text-muted); cursor: pointer;
             width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
             transition: all 0.2s;
         }
         .menu-btn:hover { color: var(--primary); border-color: var(--primary); background: var(--hover-bg); }
-        
+
         .card-dropdown {
             position: absolute; top: calc(100% + 4px); right: 0;
             background: var(--card-bg); border: 1px solid var(--border-color);
@@ -295,7 +303,7 @@
         }
         .card-dropdown.active { display: flex; animation: fadeIn 0.15s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
-        
+
         .card-dropdown button {
             background: none; border: none; padding: 10px 14px; text-align: left;
             font-family: var(--font-family); font-size: 14px; color: var(--text-main); cursor: pointer; transition: background 0.2s;
@@ -305,22 +313,20 @@
         .card-dropdown button.danger:hover { background: rgba(155, 34, 38, 0.1); }
         .card-dropdown button:first-child { border-bottom: 1px solid var(--border-color); }
 
-        /* CONTROLES DENTRO DE LA TARJETA */
         .card-controls { display: flex; flex-direction: column; gap: 8px; background: var(--bg-color); padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 12px; }
         .status-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; font-size: 13px; font-weight: bold; }
         .status-toggle input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary); }
         .priority-control { display: flex; align-items: center; justify-content: center; gap: 10px; }
         .priority-control label { font-size: 13px; margin: 0; text-transform: none; }
         .priority-control input[type="range"] { width: 110px; accent-color: var(--primary); cursor: pointer; }
-        
-        /* FORMULARIOS */
+
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .form-group.full { grid-column: 1 / -1; }
         label { display: block; font-size: 11px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 4px; font-weight: bold; }
-        input[type="text"], input[type="number"], input[type="search"], textarea { 
-            width: 100%; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; 
-            font-size: 14px; outline: none; transition: all 0.2s; background: var(--bg-color); 
-            font-family: var(--font-family); color: var(--text-main); 
+        input[type="text"], input[type="number"], input[type="search"], textarea {
+            width: 100%; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px;
+            font-size: 14px; outline: none; transition: all 0.2s; background: var(--bg-color);
+            font-family: var(--font-family); color: var(--text-main);
         }
         input:focus, textarea:focus { border-color: var(--primary); background: var(--card-bg); box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.15); }
 
@@ -333,8 +339,7 @@
         .icon-btn:hover { opacity: 1; transform: scale(1.1); }
 
         .edit-section { background: var(--bg-color); border: 1.5px dashed var(--border-color); padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-        
-        /* PROGRESO Y ESTADÍSTICAS */
+
         .progress-header { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; font-weight: bold; }
         .progress-track { background: var(--hover-bg); border-radius: 8px; height: 6px; width: 100%; margin-bottom: 15px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); }
         .progress-fill { background: linear-gradient(90deg, var(--primary) 0%, var(--primary-hover) 100%); height: 100%; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 8px; }
@@ -346,34 +351,45 @@
         .stat-value.highlight { color: var(--primary); }
         .stat-value.success { color: var(--success); font-style: italic; }
 
-        /* ACTUALIZAR PROGRESO */
-        .update-section { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        /* ===== SECCIÓN DE PÁGINA CON BOTONES ± ===== */
+        .update-section { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; row-gap: 8px; }
         .update-label { font-size: 13px; color: var(--text-main); font-weight: bold; }
+        .page-step-group { display: flex; align-items: center; gap: 4px; }
         .update-section input { width: 65px; padding: 6px; text-align: center; border-radius: 6px; border: 1px solid var(--border-color); font-size: 14px; font-weight: bold; color: var(--text-main); background: var(--bg-color); }
+        .btn-step {
+            width: 34px; height: 34px; border-radius: 6px;
+            border: 1px solid var(--border-color); background: var(--card-bg);
+            color: var(--primary); font-size: 20px; font-weight: bold;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-family); transition: all 0.15s;
+            touch-action: manipulation; user-select: none; padding: 0; line-height: 1;
+            flex-shrink: 0;
+        }
+        .btn-step:hover { background: var(--hover-bg); border-color: var(--primary); }
+        .btn-step:active { background: var(--primary); color: var(--bg-color); transform: scale(0.9); }
         .btn-update { background: var(--text-main); color: var(--bg-color); border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; font-family: var(--font-family); transition: opacity 0.2s; }
         .btn-update:hover { opacity: 0.8; }
-        
-        /* CRONÓMETRO */
-        .daily-timer { 
-            border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; 
-            background: linear-gradient(180deg, var(--card-bg) 0%, var(--bg-color) 100%); 
+
+        .daily-timer {
+            border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;
+            background: linear-gradient(180deg, var(--card-bg) 0%, var(--bg-color) 100%);
             text-align: center; box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
         }
         @media (prefers-color-scheme: dark) {
             .daily-timer { box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
         }
-        .timer-display { 
-            font-size: 26px; color: var(--primary); margin: 8px 0; font-variant-numeric: tabular-nums; 
-            font-weight: bold; text-shadow: 0 1px 2px rgba(var(--primary-rgb), 0.2); 
+        .timer-display {
+            font-size: 26px; color: var(--primary); margin: 8px 0; font-variant-numeric: tabular-nums;
+            font-weight: bold; text-shadow: 0 1px 2px rgba(var(--primary-rgb), 0.2);
         }
-        .btn-timer { 
-            background: var(--success); color: var(--bg-color); border: none; padding: 10px 18px; 
-            border-radius: 20px; font-size: 14px; font-weight: bold; cursor: pointer; font-family: var(--font-family); 
-            display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.2s; 
+        .btn-timer {
+            background: var(--success); color: var(--bg-color); border: none; padding: 10px 18px;
+            border-radius: 20px; font-size: 14px; font-weight: bold; cursor: pointer; font-family: var(--font-family);
+            display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.2s;
         }
         .btn-timer:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .btn-timer.running { background: var(--primary); }
-        
+
         .meta-pages-display {
             margin-top: 10px; padding: 8px; background: var(--hover-bg); border: 1px solid var(--border-color);
             border-radius: 6px; font-size: 12px; line-height: 1.5; font-weight: bold;
@@ -383,50 +399,44 @@
 
         .empty-state { text-align: center; color: var(--text-muted); padding: 30px 0; font-size: 16px; font-style: italic; }
 
-        /* MODALES GENERALES */
-        .modal-overlay { 
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); 
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5);
             backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-            display: none; justify-content: center; align-items: center; z-index: 1000; padding: 15px; 
+            display: none; justify-content: center; align-items: center; z-index: 1000; padding: 15px;
         }
-        .modal-content { 
-            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; 
-            width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; padding: 20px; 
+        .modal-content {
+            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px;
+            width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; padding: 20px;
             position: relative; box-shadow: var(--shadow-lg);
             animation: modalEnter 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         @keyframes modalEnter { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        
-        .modal-close { 
-            position: absolute; top: 15px; right: 15px; background: var(--bg-color); border: 1px solid var(--border-color); 
-            width: 30px; height: 30px; border-radius: 50%; font-size: 18px; cursor: pointer; 
+
+        .modal-close {
+            position: absolute; top: 15px; right: 15px; background: var(--bg-color); border: 1px solid var(--border-color);
+            width: 30px; height: 30px; border-radius: 50%; font-size: 18px; cursor: pointer;
             display: flex; align-items: center; justify-content: center; color: var(--text-main); transition: all 0.2s;
         }
         .modal-close:hover { background: var(--hover-bg); color: var(--danger); transform: rotate(90deg); }
 
-        /* ============================================================ */
-        /* NOTAS: MODAL MÁS ANCHO Y TEXTAREA MÁS ALTO                   */
-        /* ============================================================ */
-        #bookModal .modal-content {
-            max-width: 620px;
-        }
+        #bookModal .modal-content { max-width: 620px; }
         #bookModal textarea#modalNotes {
             min-height: 320px;
-            resize: vertical;        /* el usuario puede agrandarlo más si quiere */
+            resize: vertical;
             padding: 12px 14px;
             font-size: 14px;
             line-height: 1.65;
         }
-        
+
         .checklist-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; background: var(--bg-color); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); }
         .checklist-item input[type="checkbox"] { margin-top: 3px; width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary); }
         .checklist-text { flex: 1; font-size: 14px; word-break: break-word; }
         .checklist-text.done { text-decoration: line-through; color: var(--text-muted); opacity: 0.7; }
 
-        .schedule-item { 
-            padding: 12px; border-left: 4px solid var(--primary); background: var(--bg-color); 
-            margin-bottom: 10px; border-radius: 0 6px 6px 0; display: flex; flex-direction: column; gap: 4px; 
-            border-top: 1px solid var(--border-color); border-right: 1px solid var(--border-color); 
+        .schedule-item {
+            padding: 12px; border-left: 4px solid var(--primary); background: var(--bg-color);
+            margin-bottom: 10px; border-radius: 0 6px 6px 0; display: flex; flex-direction: column; gap: 4px;
+            border-top: 1px solid var(--border-color); border-right: 1px solid var(--border-color);
             border-bottom: 1px solid var(--border-color); box-shadow: var(--shadow-sm);
         }
         .schedule-time { font-weight: bold; color: var(--primary); font-size: 14px; }
@@ -437,7 +447,6 @@
         .add-book-modal-title { font-size: 20px; color: var(--primary); margin-bottom: 4px; }
         .add-book-modal-subtitle { font-size: 14px; color: var(--text-muted); font-style: italic; margin-bottom: 15px; }
 
-        /* FAB (Botón flotante) */
         .fab-add {
             position: fixed; bottom: 20px; right: 20px; width: 54px; height: 54px; border-radius: 50%;
             background: var(--primary); color: var(--bg-color); border: none; font-size: 30px; font-weight: 300;
@@ -450,9 +459,6 @@
         .fab-add:active { transform: scale(0.95); }
         .fab-add.hidden { opacity: 0; pointer-events: none; transform: scale(0.5); }
 
-        /* ============================================================ */
-        /* GRÁFICA DE MÉTRICAS (Adaptada a ambos modos)                   */
-        /* ============================================================ */
         .chart-container { position: relative; height: 280px; width: 100%; margin-top: 10px; }
         .btn-reset-zoom { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 14px; border-radius: 15px; font-size: 13px; font-weight: bold; cursor: pointer; font-family: var(--font-family); transition: all 0.2s; }
         .btn-reset-zoom:hover { border-color: var(--primary); color: var(--primary); background: var(--hover-bg); }
@@ -460,7 +466,7 @@
         .metrics-header { display: flex; align-items: flex-start; gap: 10px; margin-top: 10px; }
         .metrics-status { flex: 1; min-width: 0; font-size: 13px; color: var(--text-main); padding: 12px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; line-height: 1.6; text-align: left; }
         .hoy-title { color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; font-weight: bold; }
-        
+
         .hoy-search-container { position: relative; margin-bottom: 8px; margin-top: 2px; }
         .hoy-search-container input { width: 100%; padding: 6px 26px 6px 26px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 12px; font-family: var(--font-family); background: var(--card-bg); outline: none; transition: all 0.2s; line-height: 1.4; color: var(--text-main); }
         .hoy-search-container input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1); }
@@ -508,7 +514,7 @@
         .chart-nav button:disabled { opacity: 0.35; cursor: not-allowed; }
         .chart-nav-center { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
         .chart-range-text { font-size: 11px; color: var(--text-muted); font-style: italic; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; font-weight: bold; }
-        
+
         .chart-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 20px; background: transparent; cursor: pointer; margin: 0; }
         .chart-slider::-webkit-slider-runnable-track { height: 6px; background: var(--border-color); border-radius: 3px; }
         .chart-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; background: var(--primary); border-radius: 50%; margin-top: -7px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid var(--bg-color); }
@@ -537,12 +543,21 @@
             <span id="hoursToggleIcon">▼</span>
         </button>
         <div id="hoursPanel" class="hours-panel">
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px; font-style: italic;">Marca las horas del día en las que sueles estar disponible para leer. El horario inteligente se ajustará automáticamente a estos bloques.</p>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px; font-style: italic;">Marca las horas del día en las que sueles estar disponible para leer.</p>
             <div id="hoursGrid" class="hours-grid"></div>
-            
+
             <div class="theme-toggle-row">
                 <span>Estilo visual:</span>
                 <button id="themeToggleBtn" class="btn-theme-toggle" onclick="toggleTheme()">🌿 Esmeralda</button>
+            </div>
+
+            <div class="font-size-row">
+                <span>Tamaño de texto:</span>
+                <div class="font-size-controls">
+                    <button id="fontDownBtn" class="btn-font-size" onclick="changeTextScale(-1)" aria-label="Reducir texto">A−</button>
+                    <span id="textScaleLabel">100%</span>
+                    <button id="fontUpBtn" class="btn-font-size" onclick="changeTextScale(1)" aria-label="Aumentar texto">A+</button>
+                </div>
             </div>
 
             <div class="export-import-row">
@@ -570,7 +585,7 @@
             <button class="modal-close" onclick="closeModal('addBookModal')">&times;</button>
             <h2 class="add-book-modal-title">Agregar nuevo texto</h2>
             <p class="add-book-modal-subtitle">Se añadirá a la categoría: <strong id="addBookCategoryLabel">—</strong></p>
-            
+
             <form id="bookForm">
                 <div class="form-grid">
                     <div class="form-group full">
@@ -619,7 +634,7 @@
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('scheduleModal')">&times;</button>
             <h2 style="font-size: 20px; color: var(--primary); margin-bottom: 4px;">Itinerario de Lectura</h2>
-            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 15px; font-style: italic;">Calculado dinámicamente según prioridad, tiempo restante y tus horas marcadas como disponibles.</p>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 15px; font-style: italic;">Calculado según prioridad, tiempo restante y horas disponibles.</p>
             <div id="scheduleContent"></div>
         </div>
     </div>
@@ -628,9 +643,7 @@
         <div class="modal-content" style="max-width: 600px;">
             <button class="modal-close" onclick="closeModal('metricsModal')">&times;</button>
             <h2 style="font-size: 20px; color: var(--primary); margin-bottom: 4px;">Métricas de Progreso</h2>
-            <p style="font-size: 14px; color: var(--text-muted); font-style: italic;">
-                Cada línea sube según las páginas leídas vs la meta diaria. Las líneas <strong>punteadas</strong> son proyecciones.
-            </p>
+            <p style="font-size: 14px; color: var(--text-muted); font-style: italic;">Las líneas <strong>punteadas</strong> son proyecciones.</p>
 
             <div class="metrics-header">
                 <div id="metricsStatus" class="metrics-status">
@@ -658,9 +671,7 @@
 
             <div class="chart-container">
                 <canvas id="progressChart"></canvas>
-                <div id="chartEmptyMessage" class="chart-empty-message" style="display: none;">
-                    Activa al menos un libro con el check<br>para verlo en la gráfica
-                </div>
+                <div id="chartEmptyMessage" class="chart-empty-message" style="display: none;">Activa al menos un libro con el check<br>para verlo en la gráfica</div>
             </div>
 
             <div class="chart-nav">
@@ -678,15 +689,12 @@
                 <button onclick="resetZoom()" class="btn-reset-zoom">🎯 Centrar en HOY</button>
                 <button onclick="jumpToFinish()" class="btn-reset-zoom">📅 Ir al final</button>
             </div>
-            <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 12px; font-style: italic;">
-                *El eje vertical se ajusta automáticamente al rango visible.
-            </p>
+            <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 12px; font-style: italic;">*El eje vertical se ajusta automáticamente al rango visible.</p>
         </div>
     </div>
 
     <script>
-        let progressChartInstance = null; 
-
+        let progressChartInstance = null;
         const BRIGHT_COLORS = ['#e63946', '#00b4d8', '#2a9d8f', '#ffb703', '#9b5de5', '#f72585', '#06d6a0', '#ef476f'];
 
         let showPositiveProjection = localStorage.getItem('showPositiveProj') !== 'false';
@@ -699,6 +707,32 @@
         const HOY_PAGE_SIZE = 4;
         let hoySearchTerm = '';
 
+        // ===== CONTROL DE TIPOGRAFÍA =====
+        const TEXT_SCALES = [90, 100, 110, 120, 130];
+        let currentTextScaleIdx = parseInt(localStorage.getItem('textScaleIdx'));
+        if (isNaN(currentTextScaleIdx) || currentTextScaleIdx < 0 || currentTextScaleIdx >= TEXT_SCALES.length) currentTextScaleIdx = 1;
+
+        function applyTextScale() {
+            const scale = TEXT_SCALES[currentTextScaleIdx];
+            // Aplicamos zoom al body (soporte universal en navegadores modernos)
+            document.body.style.zoom = (scale / 100);
+            const label = document.getElementById('textScaleLabel');
+            if (label) label.textContent = scale + '%';
+            const downBtn = document.getElementById('fontDownBtn');
+            const upBtn = document.getElementById('fontUpBtn');
+            if (downBtn) downBtn.disabled = currentTextScaleIdx === 0;
+            if (upBtn) upBtn.disabled = currentTextScaleIdx === TEXT_SCALES.length - 1;
+        }
+
+        function changeTextScale(delta) {
+            const newIdx = Math.max(0, Math.min(TEXT_SCALES.length - 1, currentTextScaleIdx + delta));
+            if (newIdx === currentTextScaleIdx) return;
+            currentTextScaleIdx = newIdx;
+            localStorage.setItem('textScaleIdx', currentTextScaleIdx);
+            applyTextScale();
+            if (navigator.vibrate) { try { navigator.vibrate(15); } catch(e) {} }
+        }
+
         let appData = {
             categories: ['Lecturas Actuales', 'Por Leer'],
             activeCategory: 'Lecturas Actuales',
@@ -706,11 +740,8 @@
             availableHours: [],
             lastDate: new Date().toDateString()
         };
-        let activeTimers = {}; 
+        let activeTimers = {};
 
-        // ============================================================
-        // SISTEMA DE TEMAS Y GRÁFICA
-        // ============================================================
         function applyTheme(theme) {
             const btn = document.getElementById('themeToggleBtn');
             if (theme === 'amber') {
@@ -732,10 +763,8 @@
 
         function updateChartColors() {
             const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
             Chart.defaults.color = isDark ? '#f9edf0' : '#5c5c5c';
             Chart.defaults.borderColor = isDark ? 'rgba(249, 237, 240, 0.1)' : 'rgba(150, 150, 150, 0.15)';
-            
             Chart.defaults.plugins.tooltip.backgroundColor = isDark ? 'rgba(19, 36, 33, 0.95)' : 'rgba(255, 255, 255, 0.95)';
             Chart.defaults.plugins.tooltip.titleColor = isDark ? '#f9edf0' : '#1a1a1a';
             Chart.defaults.plugins.tooltip.bodyColor = isDark ? '#f9edf0' : '#1a1a1a';
@@ -753,51 +782,28 @@
         const savedTheme = localStorage.getItem('appTheme') || 'emerald';
         applyTheme(savedTheme);
         updateChartColors();
+        applyTextScale();
 
-        // ============================================================
-        // FUNCIÓN SWIPE GLOBAL MEJORADA
-        // ============================================================
         let touchStartX = 0;
         let touchStartY = 0;
 
         document.body.addEventListener('touchstart', e => {
-            // Ignorar si hay un modal abierto
             if (document.querySelector('.modal-overlay[style*="display: flex"]')) return;
-            
-            // Ignorar si toca inputs, textareas, sliders o botones interactivos
-            if (e.target.closest('.tabs-container') || 
-                e.target.closest('.chart-nav') ||
-                e.target.closest('.search-container') ||
-                ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(e.target.tagName) || 
-                e.target.type === 'range') {
-                return;
-            }
-
+            if (e.target.closest('.tabs-container') || e.target.closest('.chart-nav') || e.target.closest('.search-container') ||
+                ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(e.target.tagName) || e.target.type === 'range') return;
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
         }, {passive: true});
 
         document.body.addEventListener('touchend', e => {
             if (touchStartX === 0) return;
-            
-            // Ignorar si el modal se abrió durante el toque
-            if (document.querySelector('.modal-overlay[style*="display: flex"]')) {
-                touchStartX = 0;
-                return;
-            }
-
+            if (document.querySelector('.modal-overlay[style*="display: flex"]')) { touchStartX = 0; return; }
             const touchEndX = e.changedTouches[0].clientX;
             const touchEndY = e.changedTouches[0].clientY;
             const deltaX = touchEndX - touchStartX;
             const deltaY = touchEndY - touchStartY;
-            
-            // Verificar que sea un swipe horizontal (movimiento X > 70px, movimiento Y < 50px)
             if (Math.abs(deltaX) > 70 && Math.abs(deltaY) < 50) {
-                if (deltaX > 0) {
-                    changeCategoryBySwipe(-1); // Swipe derecha -> anterior
-                } else {
-                    changeCategoryBySwipe(1);  // Swipe izquierda -> siguiente
-                }
+                if (deltaX > 0) changeCategoryBySwipe(-1); else changeCategoryBySwipe(1);
             }
             touchStartX = 0;
             touchStartY = 0;
@@ -806,31 +812,22 @@
         function changeCategoryBySwipe(direction) {
             const currentIndex = appData.categories.indexOf(appData.activeCategory);
             if (currentIndex === -1) return;
-            
             let newIndex = currentIndex + direction;
             if (newIndex < 0) newIndex = appData.categories.length - 1;
             if (newIndex >= appData.categories.length) newIndex = 0;
-            
             if (newIndex !== currentIndex) {
                 appData.activeCategory = appData.categories[newIndex];
-                
-                // Limpiar búsqueda al cambiar con swipe
                 const searchEl = document.getElementById('bookSearch');
                 if (searchEl) searchEl.value = '';
                 const clearBtn = document.getElementById('searchClear');
                 if (clearBtn) clearBtn.classList.remove('visible');
                 const searchContainer = document.getElementById('searchContainer');
                 if (searchContainer) searchContainer.classList.remove('search-active');
-                
                 saveData(); renderTabs(); renderBooks();
-                
                 if (navigator.vibrate) { try { navigator.vibrate(20); } catch(e) {} }
             }
         }
 
-        // ============================================================
-        // HELPERS PARA PÁGINAS
-        // ============================================================
         function getLocalISO(d = new Date()) {
             return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
         }
@@ -854,19 +851,15 @@
         function getScoreForDate(book, date) {
             if (!book.pagesLog) return null;
             const entry = book.pagesLog.find(l => l.date === date);
-            
             if (date === isoToday) {
                 const leidas = entry ? Math.max(0, (entry.pages || 0)) : 0;
-                if (leidas === 0) return 0; 
-                const meta = getMetaPaginas(book);
-                return leidas / meta;
+                if (leidas === 0) return 0;
+                return leidas / getMetaPaginas(book);
             }
-            
-            if (!entry) return -1; 
+            if (!entry) return -1;
             const pages = Math.max(0, entry.pages || 0);
             if (pages === 0) return -1;
-            const metaDelDia = getMetaPaginas(book);
-            return pages / metaDelDia;
+            return pages / getMetaPaginas(book);
         }
 
         function updateFabVisibility() {
@@ -882,40 +875,31 @@
         function performDayRollover() {
             const nowDateStr = new Date().toDateString();
             if (appData.lastDate === nowDateStr) return false;
-            
             const newIsoToday = getLocalISO();
             const lastDate = new Date(appData.lastDate);
             const todayDate = new Date(nowDateStr);
             const daysDiff = Math.max(1, Math.round((todayDate - lastDate) / 86400000));
-            
             appData.books.forEach(b => {
                 if (b.active) {
                     if (!b.pagesLog) b.pagesLog = [];
-                    
                     for (let i = 1; i < daysDiff; i++) {
                         const md = new Date(lastDate);
                         md.setDate(md.getDate() + i);
                         const mISO = getLocalISO(md);
-                        if (!b.pagesLog.find(l => l.date === mISO)) {
-                            b.pagesLog.push({ date: mISO, pages: 0 });
-                        }
+                        if (!b.pagesLog.find(l => l.date === mISO)) b.pagesLog.push({ date: mISO, pages: 0 });
                     }
                 }
-                
                 b.dailySeconds = 0;
                 const todayEntry = b.history.find(h => h.date === newIsoToday);
                 if(!todayEntry) b.history.push({ date: newIsoToday, page: b.currentPage });
             });
-            
             appData.lastDate = nowDateStr;
             currentDateStr = nowDateStr;
             isoToday = newIsoToday;
-            
             Object.keys(activeTimers).forEach(id => {
                 try { clearInterval(activeTimers[id].interval); } catch(e) {}
                 delete activeTimers[id];
             });
-            
             saveData();
             return true;
         }
@@ -923,7 +907,6 @@
         if (savedData) {
             appData = JSON.parse(savedData);
             if(!appData.availableHours) appData.availableHours = [];
-            
             appData.books.forEach(b => {
                 if(b.notes === undefined) b.notes = "";
                 if(b.checklists === undefined) b.checklists = [];
@@ -932,18 +915,11 @@
                 if(b.dailySeconds === undefined) b.dailySeconds = 0;
                 if(b.pagesLog === undefined) b.pagesLog = [];
                 if(b.metricVisible === undefined) b.metricVisible = true;
-                
                 if (b.pagesLog && Array.isArray(b.pagesLog)) {
-                    b.pagesLog.forEach(entry => {
-                        if (entry.pages !== undefined && entry.pages < 0) entry.pages = 0;
-                    });
+                    b.pagesLog.forEach(entry => { if (entry.pages !== undefined && entry.pages < 0) entry.pages = 0; });
                 }
-                
-                if(b.history === undefined) {
-                    b.history = [{ date: isoToday, page: b.currentPage }];
-                }
+                if(b.history === undefined) b.history = [{ date: isoToday, page: b.currentPage }];
             });
-
             performDayRollover();
         } else {
             appData.lastDate = currentDateStr;
@@ -954,27 +930,17 @@
         function updateDailySummary() {
             const el = document.getElementById('dailySummary');
             if (!el) return;
-            
             const activeBooks = appData.books.filter(b => b.active);
-            if (activeBooks.length === 0) {
-                el.style.display = 'none';
-                return;
-            }
-            
-            let totalSecs = 0;
-            let totalPages = 0;
-            let metCount = 0;
-            
+            if (activeBooks.length === 0) { el.style.display = 'none'; return; }
+            let totalSecs = 0, totalPages = 0, metCount = 0;
             activeBooks.forEach(b => {
                 totalSecs += (b.dailySeconds || 0);
                 const pagHoy = getPaginasLeidasHoy(b);
                 totalPages += pagHoy;
                 if (pagHoy >= getMetaPaginas(b)) metCount++;
             });
-            
             const totalMins = Math.floor(totalSecs / 60);
             const allMet = metCount === activeBooks.length;
-            
             el.style.display = 'inline-flex';
             el.innerHTML = `
                 <span class="summary-item">⏱️ <strong>${totalMins}</strong> min</span>
@@ -1024,40 +990,26 @@
                 const blob = new Blob([dataStr], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
-                a.href = url;
-                a.download = `reading-tracker-${getLocalISO()}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+                a.href = url; a.download = `reading-tracker-${getLocalISO()}.json`;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-            } catch (err) {
-                alert('Error al exportar: ' + err.message);
-            }
+            } catch (err) { alert('Error al exportar: ' + err.message); }
         }
 
-        function importData() {
-            document.getElementById('importFile').click();
-        }
+        function importData() { document.getElementById('importFile').click(); }
 
         function handleImportFile(event) {
             const file = event.target.files[0];
             if (!file) return;
-            
             const reader = new FileReader();
             reader.onload = (e) => {
                 try {
                     const imported = JSON.parse(e.target.result);
-                    
                     if (!imported || typeof imported !== 'object') throw new Error('El archivo no es un JSON válido');
                     if (!Array.isArray(imported.books)) throw new Error('Falta el campo "books"');
                     if (!Array.isArray(imported.categories)) throw new Error('Falta el campo "categories"');
-                    
                     const msg = `¿Importar ${imported.books.length} libro(s) y ${imported.categories.length} categoría(s)?\n\n⚠️ Esto REEMPLAZARÁ todos tus datos actuales.`;
-                    if (!confirm(msg)) {
-                        event.target.value = '';
-                        return;
-                    }
-                    
+                    if (!confirm(msg)) { event.target.value = ''; return; }
                     imported.books.forEach(b => {
                         if (b.metricVisible === undefined) b.metricVisible = true;
                         if (b.pagesLog === undefined) b.pagesLog = [];
@@ -1067,25 +1019,14 @@
                         if (b.notes === undefined) b.notes = "";
                         if (b.checklists === undefined) b.checklists = [];
                         if (b.history === undefined) b.history = [{ date: isoToday, page: b.currentPage || 0 }];
-                        
-                        if (b.pagesLog && Array.isArray(b.pagesLog)) {
-                            b.pagesLog.forEach(entry => {
-                                if (entry.pages !== undefined && entry.pages < 0) entry.pages = 0;
-                            });
-                        }
                     });
                     if (!imported.availableHours) imported.availableHours = [];
-                    if (!imported.categories.includes(imported.activeCategory) && imported.categories.length > 0) {
-                        imported.activeCategory = imported.categories[0];
-                    }
+                    if (!imported.categories.includes(imported.activeCategory) && imported.categories.length > 0) imported.activeCategory = imported.categories[0];
                     imported.lastDate = currentDateStr;
-                    
                     appData = imported;
                     saveData();
                     location.reload();
-                } catch (err) {
-                    alert('Error al importar: ' + err.message);
-                }
+                } catch (err) { alert('Error al importar: ' + err.message); }
                 event.target.value = '';
             };
             reader.readAsText(file);
@@ -1105,15 +1046,11 @@
             const remainingPages = book.totalPages - book.currentPage;
             const remainingMins = remainingPages * book.minsPerPage;
             const metaPaginas = getMetaPaginas(book);
-            
             const daysRemaining = metaPaginas > 0 ? Math.ceil(remainingPages / metaPaginas) : 0;
-            
             const percent = Math.min(((book.currentPage / book.totalPages) * 100), 100).toFixed(1);
             const finishDate = new Date();
             finishDate.setDate(finishDate.getDate() + daysRemaining);
-            const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-            const dateStr = finishDate.toLocaleDateString('es-ES', dateOptions);
-            
+            const dateStr = finishDate.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
             return { totalMins, readMins, remainingMins, remainingPages, daysRemaining, percent, dateStr, finishDate, metaPaginas };
         }
 
@@ -1122,9 +1059,7 @@
         function getBookColorMap() {
             const map = {};
             const allActive = appData.books.filter(b => b.active);
-            allActive.forEach((b, i) => {
-                map[b.id] = BRIGHT_COLORS[i % BRIGHT_COLORS.length];
-            });
+            allActive.forEach((b, i) => { map[b.id] = BRIGHT_COLORS[i % BRIGHT_COLORS.length]; });
             return map;
         }
 
@@ -1146,10 +1081,8 @@
             if (!book) return;
             book.metricVisible = checkboxEl.checked;
             saveData();
-            
             const row = checkboxEl.closest('.book-row');
             if (row) row.classList.toggle('hidden-metric', !book.metricVisible);
-            
             updateMetricsStatus();
             try { renderMetricsChart(); } catch(e) { console.error(e); }
         }
@@ -1182,14 +1115,9 @@
                 const btn = document.createElement('button');
                 btn.innerText = hourLabel;
                 btn.className = isSelected ? 'hour-btn selected' : 'hour-btn unselected';
-                
                 btn.onclick = () => {
-                    if(appData.availableHours.includes(i)) {
-                        appData.availableHours = appData.availableHours.filter(h => h !== i);
-                    } else {
-                        appData.availableHours.push(i);
-                        appData.availableHours.sort((a,b) => a-b);
-                    }
+                    if(appData.availableHours.includes(i)) appData.availableHours = appData.availableHours.filter(h => h !== i);
+                    else { appData.availableHours.push(i); appData.availableHours.sort((a,b) => a-b); }
                     saveData(); renderHoursGrid();
                 };
                 grid.appendChild(btn);
@@ -1202,14 +1130,11 @@
             const trimmed = newName.trim();
             if (!trimmed || trimmed === oldName) return;
             if (appData.categories.includes(trimmed)) { alert('Ya existe una categoría con ese nombre.'); return; }
-            
             const idx = appData.categories.indexOf(oldName);
             if (idx < 0) return;
-            
             appData.categories[idx] = trimmed;
             appData.books.forEach(b => { if (b.category === oldName) b.category = trimmed; });
             if (appData.activeCategory === oldName) appData.activeCategory = trimmed;
-            
             saveData(); renderTabs(); renderBooks();
         }
 
@@ -1219,37 +1144,24 @@
             let startX = 0, startY = 0;
             let hoveredTab = null;
             let pointerId = null;
-
             const onDown = (e) => {
                 if (e.target.classList && e.target.classList.contains('tab-delete')) return;
                 if (e.button !== undefined && e.button !== 0 && e.pointerType === 'mouse') return;
-
-                startX = e.clientX;
-                startY = e.clientY;
-                pointerId = e.pointerId;
-                isDragging = false;
-                hoveredTab = null;
-                
+                startX = e.clientX; startY = e.clientY; pointerId = e.pointerId;
+                isDragging = false; hoveredTab = null;
                 el.classList.add('long-pressing');
-
                 pressTimer = setTimeout(() => {
-                    pressTimer = null;
-                    isDragging = true;
-                    el.classList.remove('long-pressing');
-                    el.classList.add('dragging');
+                    pressTimer = null; isDragging = true;
+                    el.classList.remove('long-pressing'); el.classList.add('dragging');
                     if (navigator.vibrate) { try { navigator.vibrate(30); } catch(err) {} }
-                    
                     try { el.setPointerCapture(pointerId); } catch(err) {}
                 }, 500);
-
                 document.addEventListener('pointermove', onMove);
                 document.addEventListener('pointerup', onUp);
                 document.addEventListener('pointercancel', onCancel);
             };
-
             const onMove = (e) => {
                 if (e.pointerId !== pointerId) return;
-
                 if (!isDragging) {
                     const dx = Math.abs(e.clientX - startX);
                     const dy = Math.abs(e.clientY - startY);
@@ -1259,24 +1171,17 @@
                     }
                 } else {
                     if (e.cancelable) e.preventDefault();
-                    
                     const dx = e.clientX - startX;
                     const dy = e.clientY - startY;
                     el.style.transform = `translate(${dx}px, ${dy}px) scale(1.05)`;
-
                     const tabsContainer = document.getElementById('tabsContainer');
                     if (tabsContainer) {
                         const rect = tabsContainer.getBoundingClientRect();
-                        if (e.clientX - rect.left < 40) {
-                            tabsContainer.scrollLeft -= 8;
-                        } else if (rect.right - e.clientX < 40) {
-                            tabsContainer.scrollLeft += 8;
-                        }
+                        if (e.clientX - rect.left < 40) tabsContainer.scrollLeft -= 8;
+                        else if (rect.right - e.clientX < 40) tabsContainer.scrollLeft += 8;
                     }
-
                     const pointEl = document.elementFromPoint(e.clientX, e.clientY);
                     if (!pointEl) return;
-                    
                     const targetTab = pointEl.closest('.tab-btn');
                     if (targetTab && targetTab !== el && !targetTab.classList.contains('tab-btn-new')) {
                         if (hoveredTab !== targetTab) {
@@ -1285,26 +1190,18 @@
                             hoveredTab.style.outline = '2px dashed var(--primary)';
                         }
                     } else {
-                        if (hoveredTab) {
-                            hoveredTab.style.outline = '';
-                            hoveredTab = null;
-                        }
+                        if (hoveredTab) { hoveredTab.style.outline = ''; hoveredTab = null; }
                     }
                 }
             };
-
             const onUp = (e) => {
                 if (e.pointerId !== pointerId) return;
-
                 document.removeEventListener('pointermove', onMove);
                 document.removeEventListener('pointerup', onUp);
                 document.removeEventListener('pointercancel', onCancel);
-
                 if (pressTimer) {
-                    clearTimeout(pressTimer);
-                    pressTimer = null;
+                    clearTimeout(pressTimer); pressTimer = null;
                     el.classList.remove('long-pressing');
-                    
                     if (appData.categories.includes(cat)) {
                         appData.activeCategory = cat;
                         const searchEl = document.getElementById('bookSearch');
@@ -1317,54 +1214,36 @@
                     }
                     return;
                 }
-
                 if (isDragging) {
-                    el.classList.remove('dragging');
-                    el.style.transform = '';
-                    
+                    el.classList.remove('dragging'); el.style.transform = '';
                     if (hoveredTab) {
                         hoveredTab.style.outline = '';
                         const toCat = hoveredTab.dataset.cat;
                         const fromIdx = appData.categories.indexOf(cat);
                         const toIdx = appData.categories.indexOf(toCat);
-                        
                         if (fromIdx >= 0 && toIdx >= 0 && fromIdx !== toIdx) {
                             const [moved] = appData.categories.splice(fromIdx, 1);
                             appData.categories.splice(toIdx, 0, moved);
-                            saveData();
-                            renderTabs();
+                            saveData(); renderTabs();
                         }
                     } else {
                         const dx = Math.abs(e.clientX - startX);
                         const dy = Math.abs(e.clientY - startY);
-                        if (dx < 10 && dy < 10) {
-                            renameCategory(cat);
-                        }
+                        if (dx < 10 && dy < 10) renameCategory(cat);
                     }
-                    
-                    isDragging = false;
-                    hoveredTab = null;
+                    isDragging = false; hoveredTab = null;
                 }
             };
-
             const onCancel = (e) => {
                 if (e.pointerId !== pointerId) return;
                 document.removeEventListener('pointermove', onMove);
                 document.removeEventListener('pointerup', onUp);
                 document.removeEventListener('pointercancel', onCancel);
-                
                 if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
-                el.classList.remove('long-pressing');
-                el.classList.remove('dragging');
-                el.style.transform = '';
-                
-                if (hoveredTab) {
-                    hoveredTab.style.outline = '';
-                    hoveredTab = null;
-                }
+                el.classList.remove('long-pressing'); el.classList.remove('dragging'); el.style.transform = '';
+                if (hoveredTab) { hoveredTab.style.outline = ''; hoveredTab = null; }
                 isDragging = false;
             };
-
             el.addEventListener('pointerdown', onDown);
             el.addEventListener('contextmenu', (e) => e.preventDefault());
         }
@@ -1379,12 +1258,8 @@
                 btn.className = isActive ? 'tab-btn active' : 'tab-btn';
                 btn.dataset.cat = cat;
                 const tabText = `${cat} (${activeCount})`;
-                
-                if(isActive) {
-                    btn.innerHTML = `${tabText} <span class="tab-delete" onclick="deleteCategory('${cat}', event)" title="Eliminar lista">&times;</span>`;
-                } else {
-                    btn.innerText = tabText;
-                }
+                if(isActive) btn.innerHTML = `${tabText} <span class="tab-delete" onclick="deleteCategory('${cat}', event)" title="Eliminar lista">&times;</span>`;
+                else btn.innerText = tabText;
                 attachTabPointer(btn, cat);
                 tabsContainer.appendChild(btn);
             });
@@ -1429,11 +1304,9 @@
         function openAddBookModal() {
             const label = document.getElementById('addBookCategoryLabel');
             if (label) label.textContent = appData.activeCategory;
-            
             document.getElementById('addBookModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
             updateFabVisibility();
-            
             setTimeout(() => {
                 const titleInput = document.getElementById('title');
                 if (titleInput) { try { titleInput.focus(); } catch(e) {} }
@@ -1443,24 +1316,16 @@
         function renderBooks() {
             const booksList = document.getElementById('booksList');
             booksList.innerHTML = '';
-            
             const searchEl = document.getElementById('bookSearch');
             const searchTerm = (searchEl ? searchEl.value : '').trim().toLowerCase();
             const isGlobalSearch = searchTerm.length > 0;
-            
             let filteredBooks;
-            if (isGlobalSearch) {
-                filteredBooks = appData.books.filter(b => b.title.toLowerCase().includes(searchTerm));
-            } else {
-                filteredBooks = appData.books.filter(b => b.category === appData.activeCategory);
-            }
+            if (isGlobalSearch) filteredBooks = appData.books.filter(b => b.title.toLowerCase().includes(searchTerm));
+            else filteredBooks = appData.books.filter(b => b.category === appData.activeCategory);
 
             if (filteredBooks.length === 0) {
-                if (isGlobalSearch) {
-                    booksList.innerHTML = `<div class="empty-state">Sin resultados para "${searchEl.value}"<br><span style="font-size: 13px; color: var(--text-muted); font-style: normal;">🔍 Busqué en todas las categorías</span></div>`;
-                } else {
-                    booksList.innerHTML = '<div class="empty-state">El registro está vacío.</div>';
-                }
+                if (isGlobalSearch) booksList.innerHTML = `<div class="empty-state">Sin resultados para "${searchEl.value}"<br><span style="font-size: 13px; color: var(--text-muted); font-style: normal;">🔍 Busqué en todas las categorías</span></div>`;
+                else booksList.innerHTML = '<div class="empty-state">El registro está vacío.</div>';
                 return;
             }
 
@@ -1485,16 +1350,14 @@
                 const metaPaginas = getMetaPaginas(book);
                 const paginasHoy = getPaginasLeidasHoy(book);
                 const isMetaMet = paginasHoy >= metaPaginas;
-                
+
                 const card = document.createElement('div');
                 card.className = `card ${!book.active ? 'inactive' : ''}`;
 
                 card.innerHTML = `
                     <div class="card-header-top">
                         <div class="card-header-info">
-                            <h3 class="card-title" onclick="openNotesModal(${book.id})" title="Toca para abrir notas">
-                                ${book.title}
-                            </h3>
+                            <h3 class="card-title" onclick="openNotesModal(${book.id})" title="Toca para abrir notas">${book.title}</h3>
                             ${isGlobalSearch ? `<div class="card-category-badge">📁 ${book.category}</div>` : ''}
                         </div>
                         <div class="card-actions">
@@ -1513,12 +1376,12 @@
                         </label>
                         <div class="priority-control">
                             <label>Prioridad: <span id="val-pri-${book.id}">${book.priority}%</span></label>
-                            <input type="range" min="0" max="100" value="${book.priority}" 
+                            <input type="range" min="0" max="100" value="${book.priority}"
                                 oninput="document.getElementById('val-pri-${book.id}').innerText = this.value + '%'"
                                 onchange="updatePriority(${book.id}, this.value)">
                         </div>
                     </div>
-                    
+
                     <div id="edit-section-${book.id}" class="edit-section" style="display: none;">
                         <div class="form-grid">
                             <div class="form-group full">
@@ -1552,10 +1415,14 @@
                             </div>
                             <div class="progress-track"><div class="progress-fill" style="width: ${stats.percent}%"></div></div>
                         </div>
-                        
+
                         <div class="update-section">
                             <span class="update-label">Página:</span>
-                            <input type="number" id="update-page-${book.id}" value="${book.currentPage}">
+                            <div class="page-step-group">
+                                <button class="btn-step" onclick="stepPage(${book.id}, -1)" title="Restar 1 página" aria-label="Restar 1 página">−</button>
+                                <input type="number" id="update-page-${book.id}" value="${book.currentPage}">
+                                <button class="btn-step" onclick="stepPage(${book.id}, 1)" title="Sumar 1 página" aria-label="Sumar 1 página">+</button>
+                            </div>
                             <button onclick="updatePage(${book.id})" class="btn-update">Actualizar</button>
                         </div>
 
@@ -1566,20 +1433,14 @@
                                 <div id="timer-fill-${book.id}" class="progress-fill" style="width: 0%; background: linear-gradient(90deg, var(--success), var(--primary));"></div>
                             </div>
                             <div style="display: flex; justify-content: center; gap: 10px; align-items: center; margin-top: 10px;">
-                                <button id="btn-timer-${book.id}" onclick="toggleTimer(${book.id})" class="btn-timer ${isTimerRunning ? 'running' : ''}">
-                                    ${btnTimerText}
-                                </button>
+                                <button id="btn-timer-${book.id}" onclick="toggleTimer(${book.id})" class="btn-timer ${isTimerRunning ? 'running' : ''}">${btnTimerText}</button>
                                 <button onclick="editTimer(${book.id})" class="icon-btn" style="font-size: 18px;" title="Ingresar tiempo manualmente">✏️</button>
                                 <button onclick="resetTimer(${book.id})" class="icon-btn" style="font-size: 18px;" title="Reiniciar a cero">🔄</button>
                             </div>
-                            
                             <div class="meta-pages-display ${isMetaMet ? 'meta-pages-success' : ''}">
                                 <div>Meta páginas: <strong>${paginasHoy}</strong>/${metaPaginas}</div>
                             </div>
-                            
-                            <p id="timer-msg-${book.id}" style="color: var(--success); font-style: italic; font-weight: bold; margin-top: 10px; display: none; font-size: 14px;">
-                                ¡Objetivo alcanzado! 🏆
-                            </p>
+                            <p id="timer-msg-${book.id}" style="color: var(--success); font-style: italic; font-weight: bold; margin-top: 10px; display: none; font-size: 14px;">¡Objetivo alcanzado! 🏆</p>
                         </div>
 
                         <div class="stats-grid" style="margin-top: 15px;">
@@ -1594,29 +1455,24 @@
                 booksList.appendChild(card);
                 setTimeout(() => updateTimerUI(book.id), 0);
             });
-            
             updateDailySummary();
         }
 
         document.getElementById('bookForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const initPage = parseInt(document.getElementById('currentPage').value) || 0;
-            
             appData.books.push({
                 id: Date.now(), title: document.getElementById('title').value, category: appData.activeCategory,
-                totalPages: parseInt(document.getElementById('totalPages').value), 
+                totalPages: parseInt(document.getElementById('totalPages').value),
                 minsPerPage: parseFloat(document.getElementById('minsPerPage').value),
                 dailyMins: parseInt(document.getElementById('dailyMins').value), currentPage: initPage,
                 notes: "", checklists: [], active: true, priority: 50, dailySeconds: 0,
-                metricVisible: true,
-                pagesLog: [],
+                metricVisible: true, pagesLog: [],
                 history: [{ date: isoToday, page: initPage }]
             });
-            
             document.getElementById('bookSearch').value = '';
             document.getElementById('searchClear').classList.remove('visible');
             document.getElementById('searchContainer').classList.remove('search-active');
-            
             saveData(); renderTabs(); renderBooks(); this.reset(); document.getElementById('currentPage').value = 0;
             closeModal('addBookModal');
         });
@@ -1624,33 +1480,20 @@
         function applyPageChange(bookId, newPage) {
             const book = appData.books.find(b => b.id === bookId);
             if (!book) return false;
-            
             const oldPage = book.currentPage;
             const clampedPage = Math.max(0, Math.min(newPage, book.totalPages));
             const delta = clampedPage - oldPage;
-            
             if (delta === 0) return false;
-            
             if (!book.pagesLog) book.pagesLog = [];
             let entry = book.pagesLog.find(l => l.date === isoToday);
-            if (!entry) {
-                entry = { date: isoToday, pages: 0 };
-                book.pagesLog.push(entry);
-            }
-            
-            if (delta > 0) {
-                entry.pages = (entry.pages || 0) + delta;
-            } else if (delta < 0) {
-                entry.pages = Math.max(0, (entry.pages || 0) + delta);
-            }
-            
+            if (!entry) { entry = { date: isoToday, pages: 0 }; book.pagesLog.push(entry); }
+            if (delta > 0) entry.pages = (entry.pages || 0) + delta;
+            else if (delta < 0) entry.pages = Math.max(0, (entry.pages || 0) + delta);
             book.currentPage = clampedPage;
-            
             if (!book.history) book.history = [];
             const existingIndex = book.history.findIndex(h => h.date === isoToday);
             if (existingIndex >= 0) book.history[existingIndex].page = clampedPage;
             else book.history.push({ date: isoToday, page: clampedPage });
-            
             saveData();
             return true;
         }
@@ -1658,10 +1501,11 @@
         function updatePage(id) {
             const newPage = parseInt(document.getElementById(`update-page-${id}`).value);
             if (isNaN(newPage)) return;
-            
             const changed = applyPageChange(id, newPage);
             if (changed) {
+                const scrollY = window.scrollY;
                 renderBooks();
+                window.scrollTo(0, scrollY);
                 if(document.getElementById('metricsModal').style.display === 'flex') {
                     refreshMetricsChart();
                     updateMetricsStatus();
@@ -1669,17 +1513,41 @@
             }
         }
 
+        // ===== NUEVO: BOTONES ± PARA AVANZAR PÁGINA =====
+        function stepPage(id, delta) {
+            const book = appData.books.find(b => b.id === id);
+            if (!book) return;
+            const inputEl = document.getElementById(`update-page-${id}`);
+            // Base: usar lo que haya escrito el usuario; si no, la página actual del libro
+            let base = book.currentPage;
+            if (inputEl) {
+                const typed = parseInt(inputEl.value);
+                if (!isNaN(typed)) base = typed;
+            }
+            const newPage = Math.max(0, Math.min(base + delta, book.totalPages));
+            if (newPage === book.currentPage) return;
+            applyPageChange(id, newPage);
+            const scrollY = window.scrollY;
+            renderBooks();
+            window.scrollTo(0, scrollY);
+            if (document.getElementById('metricsModal').style.display === 'flex') {
+                refreshMetricsChart();
+                updateMetricsStatus();
+            }
+            if (navigator.vibrate) { try { navigator.vibrate(10); } catch(e) {} }
+        }
+
         function deleteBook(id) {
-            if(confirm('¿Eliminar este registro de forma permanente?')) { 
+            if(confirm('¿Eliminar este registro de forma permanente?')) {
                 if(activeTimers[id]) clearInterval(activeTimers[id].interval);
-                appData.books = appData.books.filter(b => b.id !== id); saveData(); renderTabs(); renderBooks(); 
+                appData.books = appData.books.filter(b => b.id !== id); saveData(); renderTabs(); renderBooks();
             }
         }
 
         function toggleEdit(id) {
             const editSection = document.getElementById(`edit-section-${id}`);
             const viewSection = document.getElementById(`view-section-${id}`);
-            if (editSection.style.display === 'none') { editSection.style.display = 'block'; viewSection.style.display = 'none'; } 
+            if (editSection.style.display === 'none') { editSection.style.display = 'block'; viewSection.style.display = 'none'; }
             else { editSection.style.display = 'none'; viewSection.style.display = 'block'; }
             document.querySelectorAll('.card-dropdown.active').forEach(el => el.classList.remove('active'));
         }
@@ -1708,19 +1576,15 @@
         function toggleTimer(id) {
             const book = appData.books.find(b => b.id === id);
             const btn = document.getElementById(`btn-timer-${id}`);
-            
             if (activeTimers[id]) {
                 clearInterval(activeTimers[id].interval);
                 const elapsed = Math.floor((Date.now() - activeTimers[id].startTick) / 1000);
                 book.dailySeconds = activeTimers[id].initial + elapsed;
                 delete activeTimers[id];
-                
                 btn.innerHTML = '▶️ Continuar'; btn.classList.remove('running');
-                saveData(); updateTimerUI(id);
-                updateDailySummary();
+                saveData(); updateTimerUI(id); updateDailySummary();
                 if (document.getElementById('metricsModal').style.display === 'flex') {
-                    refreshMetricsChart();
-                    updateMetricsStatus();
+                    refreshMetricsChart(); updateMetricsStatus();
                 }
             } else {
                 btn.innerHTML = '⏸️ Pausar'; btn.classList.add('running');
@@ -1731,7 +1595,7 @@
                         const elapsed = Math.floor((Date.now() - activeTimers[id].startTick) / 1000);
                         book.dailySeconds = activeTimers[id].initial + elapsed;
                         updateTimerUI(id);
-                        if (book.dailySeconds % 60 === 0) saveData(); 
+                        if (book.dailySeconds % 60 === 0) saveData();
                     }, 1000)
                 };
             }
@@ -1744,23 +1608,16 @@
             const currentSecs = book.dailySeconds || 0;
             const m = Math.floor(currentSecs / 60).toString().padStart(2, '0');
             const s = (currentSecs % 60).toString().padStart(2, '0');
-            
             const display = document.getElementById(`timer-display-${id}`);
             if (display) display.innerText = `${m}:${s} / ${book.dailyMins}:00`;
             const percent = Math.min((currentSecs / targetSeconds) * 100, 100);
             const fill = document.getElementById(`timer-fill-${id}`);
             if (fill) fill.style.width = `${percent}%`;
-            
             const metaPaginas = getMetaPaginas(book);
             const paginasHoy = getPaginasLeidasHoy(book);
             const msg = document.getElementById(`timer-msg-${id}`);
-            if (msg) {
-                if (paginasHoy >= metaPaginas) msg.style.display = 'block';
-                else msg.style.display = 'none';
-            }
-            
+            if (msg) msg.style.display = paginasHoy >= metaPaginas ? 'block' : 'none';
             updateDailySummary();
-            
             if (document.getElementById('metricsModal').style.display === 'flex') {
                 updateMetricsStatus();
                 scheduleChartRefresh();
@@ -1782,8 +1639,7 @@
                         }
                         saveData(); updateTimerUI(id);
                         if (document.getElementById('metricsModal').style.display === 'flex') {
-                            refreshMetricsChart();
-                            updateMetricsStatus();
+                            refreshMetricsChart(); updateMetricsStatus();
                         }
                     }
                 }
@@ -1796,10 +1652,9 @@
                 if (book) {
                     book.dailySeconds = 0;
                     if(activeTimers[id]) { clearInterval(activeTimers[id].interval); delete activeTimers[id]; }
-                    saveData(); renderBooks(); 
+                    saveData(); renderBooks();
                     if (document.getElementById('metricsModal').style.display === 'flex') {
-                        refreshMetricsChart();
-                        updateMetricsStatus();
+                        refreshMetricsChart(); updateMetricsStatus();
                     }
                 }
             }
@@ -1808,26 +1663,20 @@
         function generateSchedule() {
             let activeBooks = appData.books.filter(b => b.active === true && b.currentPage < b.totalPages);
             let booksToRead = [];
-            
             activeBooks.forEach(book => {
                 const readMinsToday = Math.floor((book.dailySeconds || 0) / 60);
                 const remainingMins = book.dailyMins - readMinsToday;
                 if (remainingMins > 0) booksToRead.push({ ...book, remainingMins: remainingMins });
             });
-
-            if(booksToRead.length === 0) { 
-                alert("¡Felicidades! Ya cumpliste el tiempo de todas tus lecturas activas por hoy (o no hay lecturas pendientes)."); 
-                return; 
+            if(booksToRead.length === 0) {
+                alert("¡Felicidades! Ya cumpliste el tiempo de todas tus lecturas activas por hoy (o no hay lecturas pendientes).");
+                return;
             }
-
             booksToRead.sort((a, b) => b.priority - a.priority);
-
-            let currentTime = new Date();
             const formatTimeOpts = { hour: '2-digit', minute: '2-digit', hour12: false };
             let scheduleHTML = '';
-            let virtTime = new Date(currentTime.getTime());
+            let virtTime = new Date();
             let selectedHours = appData.availableHours || [];
-
             function advanceToValidTime(timeObj) {
                 if (selectedHours.length === 0) return;
                 let loops = 0;
@@ -1836,7 +1685,6 @@
                     loops++;
                 }
             }
-
             booksToRead.forEach(book => {
                 let minsLeftToSchedule = book.remainingMins;
                 if (selectedHours.length === 0) {
@@ -1854,15 +1702,12 @@
                         virtTime.setMinutes(virtTime.getMinutes() + blockMins);
                         const endTime = virtTime.toLocaleTimeString([], formatTimeOpts);
                         let titleDisplay = book.title;
-                        if (minsLeftToSchedule > blockMins || partCount > 1) {
-                            titleDisplay += ` (Parte ${partCount})`; partCount++;
-                        }
+                        if (minsLeftToSchedule > blockMins || partCount > 1) { titleDisplay += ` (Parte ${partCount})`; partCount++; }
                         scheduleHTML += `<div class="schedule-item"><span class="schedule-time">${startTime} - ${endTime}</span><span class="schedule-title"><span class="schedule-category">${book.category}</span>${titleDisplay}</span><span class="schedule-meta">Prioridad: ${book.priority}% | Duración: ${blockMins} min</span></div>`;
                         minsLeftToSchedule -= blockMins;
                     }
                 }
             });
-
             document.getElementById('scheduleContent').innerHTML = scheduleHTML;
             document.getElementById('scheduleModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
@@ -1932,35 +1777,26 @@
             const endIdx = Math.min(chartViewStart + chartViewSize - 1, maxIdx);
             const slider = document.getElementById('chartSlider');
             if (slider) {
-                slider.min = 0;
-                slider.max = maxStart;
-                slider.value = chartViewStart;
+                slider.min = 0; slider.max = maxStart; slider.value = chartViewStart;
                 slider.disabled = maxStart <= 0;
             }
             const navBtns = document.querySelectorAll('.chart-nav button');
             if (navBtns.length >= 4) {
                 const atStart = chartViewStart <= 0;
                 const atEnd = chartViewStart >= maxStart;
-                navBtns[0].disabled = atStart;
-                navBtns[1].disabled = atStart;
-                navBtns[3].disabled = atEnd;
-                navBtns[4].disabled = atEnd;
+                navBtns[0].disabled = atStart; navBtns[1].disabled = atStart;
+                navBtns[3].disabled = atEnd; navBtns[4].disabled = atEnd;
             }
             const startParts = dates[chartViewStart].split('-');
             const endParts = dates[endIdx].split('-');
             const label = document.getElementById('chartRangeText');
-            if (label) {
-                label.textContent = `${startParts[2]}/${startParts[1]}/${startParts[0].slice(2)} → ${endParts[2]}/${endParts[1]}/${endParts[0].slice(2)}`;
-            }
+            if (label) label.textContent = `${startParts[2]}/${startParts[1]}/${startParts[0].slice(2)} → ${endParts[2]}/${endParts[1]}/${endParts[0].slice(2)}`;
         }
 
         function jumpToFinish() {
             if (!progressChartInstance) return;
             const finishes = progressChartInstance._bookFinishes || [];
-            if (finishes.length === 0) {
-                alert('No hay fechas finales por mostrar (libros terminados o sin libros visibles).');
-                return;
-            }
+            if (finishes.length === 0) { alert('No hay fechas finales por mostrar.'); return; }
             const maxFinishIdx = Math.max(...finishes.map(f => f.idx));
             const maxIdx = progressChartInstance._timelineDates.length - 1;
             const maxStart = Math.max(0, maxIdx - chartViewSize + 1);
@@ -1971,21 +1807,16 @@
         function openMetricsModal() {
             document.getElementById('btnPosProj').classList.toggle('active', showPositiveProjection);
             document.getElementById('btnWarnProj').classList.toggle('active', showWarningProjection);
-            chartViewStart = -1;
-            hoyPageIndex = 0;
-            hoySearchTerm = '';
+            chartViewStart = -1; hoyPageIndex = 0; hoySearchTerm = '';
             const hSearch = document.getElementById('hoySearch');
             if (hSearch) hSearch.value = '';
             const hClear = document.getElementById('hoySearchClear');
             if (hClear) hClear.classList.remove('visible');
-            
             document.getElementById('metricsModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
             updateFabVisibility();
-            
             updateMetricsStatus();
-            try { renderMetricsChart(); } catch (err) { console.error('Error al renderizar la gráfica:', err); }
-            
+            try { renderMetricsChart(); } catch (err) { console.error(err); }
             setTimeout(() => {
                 if (progressChartInstance) { try { progressChartInstance.resize(); } catch(e) {} }
                 updateNavUI();
@@ -1999,39 +1830,29 @@
                 const pagEl = document.getElementById('hoyPagination');
                 const finishEl = document.getElementById('metricsFinishInfo');
                 if (!listEl || !pagEl || !finishEl) return;
-                
                 if (allActiveBooks.length === 0) {
                     listEl.innerHTML = '<em>Sin lecturas activas</em>';
                     pagEl.innerHTML = '';
                     finishEl.innerHTML = '<em style="color: var(--text-muted)">—</em>';
-                    listEl.dataset.structureKey = 'empty';
-                    return;
+                    listEl.dataset.structureKey = 'empty'; return;
                 }
-                
                 let filtered = allActiveBooks;
                 if (hoySearchTerm) filtered = allActiveBooks.filter(b => b.title.toLowerCase().includes(hoySearchTerm));
-                
                 const colorMap = getBookColorMap();
-                
                 if (filtered.length === 0) {
                     const rawTerm = document.getElementById('hoySearch') ? document.getElementById('hoySearch').value : '';
                     listEl.innerHTML = `<em style="color: var(--text-muted); font-size: 12px;">Sin resultados para "${rawTerm}"</em>`;
                     pagEl.innerHTML = '';
                     listEl.dataset.structureKey = 'no-results';
-                    renderFinishInfo(allActiveBooks, colorMap, finishEl);
-                    return;
+                    renderFinishInfo(allActiveBooks, colorMap, finishEl); return;
                 }
-                
                 const totalPages = Math.max(1, Math.ceil(filtered.length / HOY_PAGE_SIZE));
                 if (hoyPageIndex >= totalPages) hoyPageIndex = totalPages - 1;
                 if (hoyPageIndex < 0) hoyPageIndex = 0;
-                
                 const start = hoyPageIndex * HOY_PAGE_SIZE;
                 const pageBooks = filtered.slice(start, start + HOY_PAGE_SIZE);
-                
                 const structureKey = pageBooks.map(b => b.id).join(',') + '|' + hoyPageIndex + '|' + totalPages + '|' + filtered.length + '|' + hoySearchTerm;
                 const needsRebuild = listEl.dataset.structureKey !== structureKey;
-                
                 if (needsRebuild) {
                     const rows = pageBooks.map((book) => {
                         const color = colorMap[book.id] || BRIGHT_COLORS[0];
@@ -2044,31 +1865,24 @@
                     }).join('');
                     listEl.innerHTML = rows;
                     listEl.dataset.structureKey = structureKey;
-                    
                     if (totalPages > 1) {
                         pagEl.innerHTML = `<div class="hoy-pagination">
                             <button onclick="changeHoyPage(-1)" ${hoyPageIndex === 0 ? 'disabled' : ''} aria-label="Anterior">◀</button>
                             <span>${hoyPageIndex + 1} / ${totalPages}</span>
                             <button onclick="changeHoyPage(1)" ${hoyPageIndex >= totalPages - 1 ? 'disabled' : ''} aria-label="Siguiente">▶</button>
                         </div>`;
-                    } else {
-                        pagEl.innerHTML = '';
-                    }
+                    } else pagEl.innerHTML = '';
                 }
-                
                 pageBooks.forEach((book) => {
                     const scoreEl = listEl.querySelector(`.book-score[data-book-id="${book.id}"]`);
                     if (!scoreEl) return;
-                    
                     const paginasHoy = getPaginasLeidasHoy(book);
                     const metaPaginas = getMetaPaginas(book);
                     const score = paginasHoy === 0 ? -1 : paginasHoy / metaPaginas;
                     const check = paginasHoy >= metaPaginas ? ' ✅' : '';
                     const sign = score >= 0 ? '+' : '';
-                    
                     scoreEl.innerHTML = `<strong>${book.title}</strong>: ${paginasHoy}/${metaPaginas} pág (${sign}${score.toFixed(2)})${check}`;
                 });
-                
                 renderFinishInfo(allActiveBooks, colorMap, finishEl);
             } catch (err) {
                 console.error('Error en updateMetricsStatus:', err);
@@ -2079,20 +1893,16 @@
 
         function renderFinishInfo(allActiveBooks, colorMap, finishEl) {
             const visibleBooks = allActiveBooks.filter(b => b.metricVisible !== false);
-            
             if (visibleBooks.length === 0) {
                 finishEl.innerHTML = `<strong class="finish-header">📅 Fechas finales estimadas</strong><div style="color: var(--text-muted); font-style: italic; font-size: 12px; padding: 4px 0;">Activa un libro con el check para ver su fecha</div>`;
                 return;
             }
-            
             const finishRows = visibleBooks.map(book => {
                 const color = colorMap[book.id] || BRIGHT_COLORS[0];
                 const stats = calculateStats(book);
-                
                 if (book.currentPage >= book.totalPages) {
                     return `<div class="finish-date-item"><span class="finish-dot" style="background: ${color}"></span><span class="finish-book-name">${book.title}</span><span class="finish-date-text">🏁 Terminado</span></div>`;
                 }
-                
                 const d = stats.finishDate;
                 const dd = String(d.getDate()).padStart(2, '0');
                 const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -2104,7 +1914,6 @@
                     <span class="finish-days">· ${stats.daysRemaining}d</span>
                 </div>`;
             }).join('');
-            
             finishEl.innerHTML = `<strong class="finish-header">📅 Fechas finales estimadas</strong>${finishRows}`;
         }
 
@@ -2120,48 +1929,29 @@
         function refreshMetricsChart() {
             if (!progressChartInstance) return;
             if (document.getElementById('metricsModal').style.display !== 'flex') return;
-            try { renderMetricsChart(); } catch (err) { console.error('Error refrescando gráfica:', err); }
+            try { renderMetricsChart(); } catch (err) { console.error(err); }
         }
 
         let chartRefreshTimeout = null;
         function scheduleChartRefresh() {
             if (chartRefreshTimeout) return;
-            chartRefreshTimeout = setTimeout(() => {
-                chartRefreshTimeout = null;
-                refreshMetricsChart();
-            }, 2500);
+            chartRefreshTimeout = setTimeout(() => { chartRefreshTimeout = null; refreshMetricsChart(); }, 2500);
         }
 
         function renderMetricsChart() {
             const ctx = document.getElementById('progressChart').getContext('2d');
             const emptyMsg = document.getElementById('chartEmptyMessage');
-            
             const allActiveBooks = appData.books.filter(b => b.active);
             const activeBooks = allActiveBooks.filter(b => b.metricVisible !== false);
-            
-            if (progressChartInstance) { 
-                try { progressChartInstance.destroy(); } catch(e) {}
-                progressChartInstance = null; 
-            }
-            
-            if (activeBooks.length === 0) {
-                if (emptyMsg) emptyMsg.style.display = 'block';
-                return;
-            } else {
-                if (emptyMsg) emptyMsg.style.display = 'none';
-            }
-            
+            if (progressChartInstance) { try { progressChartInstance.destroy(); } catch(e) {} progressChartInstance = null; }
+            if (activeBooks.length === 0) { if (emptyMsg) emptyMsg.style.display = 'block'; return; }
+            else { if (emptyMsg) emptyMsg.style.display = 'none'; }
             const colorMap = getBookColorMap();
-            
             let earliestDateStr = isoToday;
             activeBooks.forEach(book => {
                 const dates = [...(book.history || []).map(h => h.date), ...(book.pagesLog || []).map(l => l.date)].filter(Boolean);
-                if (dates.length > 0) {
-                    const e = dates.sort()[0];
-                    if (e < earliestDateStr) earliestDateStr = e;
-                }
+                if (dates.length > 0) { const e = dates.sort()[0]; if (e < earliestDateStr) earliestDateStr = e; }
             });
-            
             const finishDaysList = activeBooks.map(book => {
                 const metaP = getMetaPaginas(book);
                 const remainingPages = Math.max(0, book.totalPages - book.currentPage);
@@ -2169,68 +1959,49 @@
             });
             const maxFinishDays = Math.max(0, ...finishDaysList);
             const maxFutureDays = Math.max(14, maxFinishDays + 7, Math.ceil(maxFinishDays * 1.5));
-            
             const startDate = new Date(earliestDateStr + 'T00:00:00');
             startDate.setDate(startDate.getDate() - 1);
-            
             const endDate = new Date();
             endDate.setDate(endDate.getDate() + maxFutureDays);
             endDate.setHours(0, 0, 0, 0);
-            
             const timelineDates = [];
             const cursor = new Date(startDate);
-            while (cursor <= endDate) {
-                timelineDates.push(getLocalISO(cursor));
-                cursor.setDate(cursor.getDate() + 1);
-            }
-            
+            while (cursor <= endDate) { timelineDates.push(getLocalISO(cursor)); cursor.setDate(cursor.getDate() + 1); }
             const todayIdx = timelineDates.indexOf(isoToday);
             const maxIdx = timelineDates.length - 1;
             const maxStart = Math.max(0, maxIdx - chartViewSize + 1);
-            
             if (chartViewStart < 0) chartViewStart = Math.max(0, todayIdx - Math.floor(chartViewSize / 2));
             chartViewStart = Math.max(0, Math.min(chartViewStart, maxStart));
-            
             const labels = timelineDates.map(d => { const p = d.split('-'); return `${p[2]}/${p[1]}`; });
-            
             const bookTargets = activeBooks.map(book => {
                 const metaP = getMetaPaginas(book);
                 return Math.max(1, Math.ceil(book.totalPages / metaP));
             });
-            
             const baseDatasets = [];
             const bookMetadata = [];
-            
             activeBooks.forEach((book, index) => {
                 const allDates = [...(book.history || []).map(h => h.date), ...(book.pagesLog || []).map(l => l.date)].filter(Boolean).sort();
                 const firstDate = allDates[0] || isoToday;
                 const startIdx = timelineDates.indexOf(firstDate);
-                
                 let cumScore = 0;
                 const dataPoints = [];
                 let goalMetToday = false;
-                
                 timelineDates.forEach((date, i) => {
                     if (i === startIdx - 1) { dataPoints.push(0); return; }
                     if (i < startIdx - 1) { dataPoints.push(null); return; }
                     if (i > todayIdx) { dataPoints.push(null); return; }
-                    
                     const score = getScoreForDate(book, date);
-                    
                     if (i === todayIdx) {
                         const paginasHoy = getPaginasLeidasHoy(book);
                         const metaHoy = getMetaPaginas(book);
                         if (paginasHoy >= metaHoy) goalMetToday = true;
                         if (paginasHoy > 0) cumScore += paginasHoy / metaHoy;
-                        dataPoints.push(cumScore);
-                        return;
+                        dataPoints.push(cumScore); return;
                     }
-                    
                     if (score === null || score === -1) cumScore -= 1;
                     else cumScore += score;
                     dataPoints.push(cumScore);
                 });
-                
                 const color = colorMap[book.id] || BRIGHT_COLORS[0];
                 const radii = timelineDates.map((_, i) => {
                     if (i === todayIdx) {
@@ -2241,26 +2012,16 @@
                     if (i === startIdx - 1) return 5;
                     return 0;
                 });
-                
                 baseDatasets.push({
                     label: book.title + (goalMetToday ? ' 🏆' : ''),
-                    data: dataPoints,
-                    borderColor: color,
-                    backgroundColor: color + '25',
-                    borderWidth: 3,
+                    data: dataPoints, borderColor: color, backgroundColor: color + '25', borderWidth: 3,
                     pointRadius: radii,
                     pointBackgroundColor: timelineDates.map((_, i) => i === todayIdx && goalMetToday ? '#2d6a4f' : color),
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 2,
-                    pointHoverRadius: 8,
-                    fill: false,
-                    tension: 0,
-                    spanGaps: false
+                    pointBorderColor: '#ffffff', pointBorderWidth: 2, pointHoverRadius: 8,
+                    fill: false, tension: 0, spanGaps: false
                 });
-                
                 bookMetadata.push({ book, color, scoreAtToday: cumScore, target: bookTargets[index], goalMetToday });
             });
-            
             const projectionDatasets = [];
             bookMetadata.forEach(meta => {
                 if (showPositiveProjection) {
@@ -2269,19 +2030,7 @@
                         if (i === todayIdx) return meta.scoreAtToday;
                         return Math.min(meta.scoreAtToday + (i - todayIdx), meta.target);
                     });
-                    projectionDatasets.push({
-                        label: `${meta.book.title} 📈`,
-                        data: projData,
-                        borderColor: meta.color + '99',
-                        backgroundColor: 'transparent',
-                        borderWidth: 2,
-                        borderDash: [6, 5],
-                        pointRadius: 0,
-                        pointHoverRadius: 4,
-                        fill: false,
-                        tension: 0,
-                        spanGaps: false
-                    });
+                    projectionDatasets.push({ label: `${meta.book.title} 📈`, data: projData, borderColor: meta.color + '99', backgroundColor: 'transparent', borderWidth: 2, borderDash: [6, 5], pointRadius: 0, pointHoverRadius: 4, fill: false, tension: 0, spanGaps: false });
                 }
                 if (showWarningProjection) {
                     const warnData = timelineDates.map((_, i) => {
@@ -2289,22 +2038,9 @@
                         if (i === todayIdx) return meta.scoreAtToday;
                         return Math.max(meta.scoreAtToday - (i - todayIdx), -30);
                     });
-                    projectionDatasets.push({
-                        label: `${meta.book.title} 📉`,
-                        data: warnData,
-                        borderColor: 'rgba(150, 150, 150, 0.7)',
-                        backgroundColor: 'transparent',
-                        borderWidth: 2,
-                        borderDash: [5, 5],
-                        pointRadius: 0,
-                        pointHoverRadius: 4,
-                        fill: false,
-                        tension: 0,
-                        spanGaps: false
-                    });
+                    projectionDatasets.push({ label: `${meta.book.title} 📉`, data: warnData, borderColor: 'rgba(150, 150, 150, 0.7)', backgroundColor: 'transparent', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, pointHoverRadius: 4, fill: false, tension: 0, spanGaps: false });
                 }
             });
-            
             const finishes = [];
             bookMetadata.forEach((meta, i) => {
                 if (meta.book.currentPage >= meta.book.totalPages) return;
@@ -2314,12 +2050,10 @@
                 if (finishIdx >= timelineDates.length || finishIdx < 0) return;
                 finishes.push({ idx: finishIdx, date: timelineDates[finishIdx], color: meta.color, target: meta.target, title: meta.book.title });
             });
-            
             const datasets = [...baseDatasets, ...projectionDatasets];
             const xMinInitial = chartViewStart;
             const xMaxInitial = Math.min(chartViewStart + chartViewSize - 1, maxIdx);
             const initialYRange = computeYRange({ datasets }, xMinInitial, xMaxInitial);
-            
             const zeroLine = {
                 id: 'zeroLine',
                 beforeDatasetsDraw(chart) {
@@ -2330,16 +2064,11 @@
                     ctx.save();
                     const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
                     ctx.strokeStyle = isDark ? 'rgba(249, 237, 240, 0.2)' : 'rgba(114, 47, 55, 0.35)';
-                    ctx.lineWidth = 1.5;
-                    ctx.setLineDash([6, 4]);
-                    ctx.beginPath();
-                    ctx.moveTo(chartArea.left, y);
-                    ctx.lineTo(chartArea.right, y);
-                    ctx.stroke();
+                    ctx.lineWidth = 1.5; ctx.setLineDash([6, 4]);
+                    ctx.beginPath(); ctx.moveTo(chartArea.left, y); ctx.lineTo(chartArea.right, y); ctx.stroke();
                     ctx.restore();
                 }
             };
-            
             const todayMarker = {
                 id: 'todayMarker',
                 beforeDatasetsDraw(chart) {
@@ -2350,12 +2079,8 @@
                     ctx.save();
                     const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
                     ctx.strokeStyle = isDark ? 'rgba(249, 237, 240, 0.3)' : 'rgba(114, 47, 55, 0.3)';
-                    ctx.lineWidth = 1.5;
-                    ctx.setLineDash([3, 3]);
-                    ctx.beginPath();
-                    ctx.moveTo(x, chartArea.top);
-                    ctx.lineTo(x, chartArea.bottom);
-                    ctx.stroke();
+                    ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]);
+                    ctx.beginPath(); ctx.moveTo(x, chartArea.top); ctx.lineTo(x, chartArea.bottom); ctx.stroke();
                     ctx.fillStyle = isDark ? 'rgba(249, 237, 240, 0.85)' : 'rgba(114, 47, 55, 0.85)';
                     ctx.font = 'bold italic 11px "Times New Roman", serif';
                     ctx.textAlign = 'center';
@@ -2363,7 +2088,6 @@
                     ctx.restore();
                 }
             };
-            
             const finishMarkers = {
                 id: 'finishMarkers',
                 afterDatasetsDraw(chart) {
@@ -2373,28 +2097,17 @@
                     if (finList.length === 0) return;
                     ctx.save();
                     const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                    
                     finList.forEach(f => {
                         const y = scales.y.getPixelForValue(f.target);
                         if (y < chartArea.top + 2 || y > chartArea.bottom - 2) return;
-                        ctx.strokeStyle = f.color + '70';
-                        ctx.lineWidth = 1.5;
-                        ctx.setLineDash([4, 4]);
-                        ctx.beginPath();
-                        ctx.moveTo(chartArea.left, y);
-                        ctx.lineTo(chartArea.right, y);
-                        ctx.stroke();
+                        ctx.strokeStyle = f.color + '70'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]);
+                        ctx.beginPath(); ctx.moveTo(chartArea.left, y); ctx.lineTo(chartArea.right, y); ctx.stroke();
                     });
                     finList.forEach((f, i) => {
                         const x = scales.x.getPixelForValue(f.idx);
                         if (x < chartArea.left || x > chartArea.right) return;
-                        ctx.strokeStyle = f.color;
-                        ctx.lineWidth = 2;
-                        ctx.setLineDash([6, 4]);
-                        ctx.beginPath();
-                        ctx.moveTo(x, chartArea.top);
-                        ctx.lineTo(x, chartArea.bottom);
-                        ctx.stroke();
+                        ctx.strokeStyle = f.color; ctx.lineWidth = 2; ctx.setLineDash([6, 4]);
+                        ctx.beginPath(); ctx.moveTo(x, chartArea.top); ctx.lineTo(x, chartArea.bottom); ctx.stroke();
                         const p = f.date.split('-');
                         const dateLabel = `📅 ${p[2]}/${p[1]}`;
                         const targetLabel = `🎯 +${f.target}d`;
@@ -2407,21 +2120,12 @@
                         const boxH = 30;
                         const bx = Math.max(chartArea.left + 2, Math.min(x - boxW / 2, chartArea.right - boxW - 2));
                         const by = chartArea.top + 28 + (i % 3) * 34;
-                        
                         ctx.fillStyle = isDark ? 'rgba(19, 36, 33, 0.95)' : 'rgba(255, 255, 255, 0.95)';
-                        ctx.strokeStyle = f.color;
-                        ctx.lineWidth = 1.5;
-                        ctx.beginPath();
-                        ctx.rect(bx, by, boxW, boxH);
-                        ctx.fill();
-                        ctx.stroke();
-                        
-                        ctx.fillStyle = f.color;
-                        ctx.font = 'bold 10px "Times New Roman", serif';
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
+                        ctx.strokeStyle = f.color; ctx.lineWidth = 1.5;
+                        ctx.beginPath(); ctx.rect(bx, by, boxW, boxH); ctx.fill(); ctx.stroke();
+                        ctx.fillStyle = f.color; ctx.font = 'bold 10px "Times New Roman", serif';
+                        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                         ctx.fillText(dateLabel, bx + boxW / 2, by + 9);
-                        
                         ctx.font = 'italic 9px "Times New Roman", serif';
                         ctx.fillStyle = f.color + 'cc';
                         ctx.fillText(targetLabel, bx + boxW / 2, by + 21);
@@ -2429,31 +2133,16 @@
                     ctx.restore();
                 }
             };
-            
             const zoomEnabled = typeof ChartZoom !== 'undefined';
-            
             progressChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: { labels, datasets },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: false,
+                    responsive: true, maintainAspectRatio: false, animation: false,
                     interaction: { mode: 'index', intersect: false },
                     scales: {
-                        y: {
-                            min: initialYRange.min,
-                            max: initialYRange.max,
-                            title: { display: true, text: 'Progreso (páginas leídas vs meta)', font: { size: 11 } },
-                            grid: { color: Chart.defaults.borderColor },
-                            ticks: { precision: 0, stepSize: 1 }
-                        },
-                        x: {
-                            min: xMinInitial,
-                            max: xMaxInitial,
-                            grid: { display: false },
-                            ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 8, font: { size: 10 } }
-                        }
+                        y: { min: initialYRange.min, max: initialYRange.max, title: { display: true, text: 'Progreso (páginas leídas vs meta)', font: { size: 11 } }, grid: { color: Chart.defaults.borderColor }, ticks: { precision: 0, stepSize: 1 } },
+                        x: { min: xMinInitial, max: xMaxInitial, grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 8, font: { size: 10 } } }
                     },
                     plugins: {
                         legend: { display: false },
@@ -2474,31 +2163,16 @@
                                     const idx = c.dataIndex;
                                     const book = c.dataset._book;
                                     const labelStr = c.dataset.label || '';
-                                    const isProjection = labelStr.endsWith('📈');
-                                    const isWarning = labelStr.endsWith('📉');
-                                    if (isProjection) {
-                                        const display = Number.isInteger(v) ? v : v.toFixed(1);
-                                        return `📈 Si cumples: ${display > 0 ? '+' : ''}${display}`;
-                                    }
-                                    if (isWarning) {
-                                        const display = Number.isInteger(v) ? v : v.toFixed(1);
-                                        return `📉 Si no lees: ${display > 0 ? '+' : ''}${display}`;
-                                    }
-                                    
+                                    if (labelStr.endsWith('📈')) return `📈 Si cumples: ${v > 0 ? '+' : ''}${Number.isInteger(v) ? v : v.toFixed(1)}`;
+                                    if (labelStr.endsWith('📉')) return `📉 Si no lees: ${v > 0 ? '+' : ''}${Number.isInteger(v) ? v : v.toFixed(1)}`;
                                     const metaP = getMetaPaginas(book);
                                     let delta = '';
-                                    if (idx === todayIdx && book) {
-                                        const pagHoy = getPaginasLeidasHoy(book);
-                                        delta = ` (${pagHoy}/${metaP} pág hoy)`;
-                                    } else if (idx < todayIdx && book) {
+                                    if (idx === todayIdx && book) delta = ` (${getPaginasLeidasHoy(book)}/${metaP} pág hoy)`;
+                                    else if (idx < todayIdx && book) {
                                         const entry = (book.pagesLog || []).find(l => l.date === timelineDates[idx]);
-                                        const pag = entry ? entry.pages : 0;
-                                        const metaDelDia = metaP;
-                                        delta = ` (${pag}/${metaDelDia} pág)`;
+                                        delta = ` (${entry ? entry.pages : 0}/${metaP} pág)`;
                                     }
-                                    
-                                    const display = Number.isInteger(v) ? v : v.toFixed(2);
-                                    return `${c.dataset.label}: ${display > 0 ? '+' : ''}${display}${delta}`;
+                                    return `${c.dataset.label}: ${v > 0 ? '+' : ''}${Number.isInteger(v) ? v : v.toFixed(2)}${delta}`;
                                 }
                             }
                         },
@@ -2507,9 +2181,7 @@
                             zoom: {
                                 pan: { enabled: false },
                                 zoom: {
-                                    wheel: { enabled: true },
-                                    pinch: { enabled: false },
-                                    mode: 'x',
+                                    wheel: { enabled: true }, pinch: { enabled: false }, mode: 'x',
                                     onZoom: ({ chart }) => {
                                         chartViewStart = Math.round(chart.scales.x.min);
                                         chartViewSize = Math.round(chart.scales.x.max - chart.scales.x.min) + 1;
@@ -2526,14 +2198,10 @@
                 },
                 plugins: [zeroLine, todayMarker, finishMarkers]
             });
-            
             progressChartInstance._timelineDates = timelineDates;
             progressChartInstance._todayIdx = todayIdx;
             progressChartInstance._bookFinishes = finishes;
-            
-            baseDatasets.forEach((ds, i) => {
-                progressChartInstance.data.datasets[i]._book = activeBooks[i];
-            });
+            baseDatasets.forEach((ds, i) => { progressChartInstance.data.datasets[i]._book = activeBooks[i]; });
         }
 
         function closeModal(modalId) {
@@ -2602,21 +2270,17 @@
             if (now - lastFocusRefresh < 800) return;
             lastFocusRefresh = now;
             const rolled = performDayRollover();
-            try { renderBooks(); } catch(e) { console.error(e); }
-            try { updateDailySummary(); } catch(e) { console.error(e); }
+            try { renderBooks(); } catch(e) {}
+            try { updateDailySummary(); } catch(e) {}
             try {
                 const metricsModal = document.getElementById('metricsModal');
-                if (metricsModal && metricsModal.style.display === 'flex') {
-                    updateMetricsStatus();
-                    refreshMetricsChart();
-                }
-            } catch(e) { console.error(e); }
+                if (metricsModal && metricsModal.style.display === 'flex') { updateMetricsStatus(); refreshMetricsChart(); }
+            } catch(e) {}
             if (rolled && navigator.vibrate) { try { navigator.vibrate([30, 50, 30]); } catch(e) {} }
         }
-        
         document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshOnFocus(); });
         window.addEventListener('focus', refreshOnFocus);
-        
+
         setInterval(() => {
             if (document.hidden) return;
             if (performDayRollover()) {
