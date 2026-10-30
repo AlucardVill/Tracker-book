@@ -1289,9 +1289,46 @@
             el.addEventListener('contextmenu', (e) => e.preventDefault());
         }
 
+        // ===== CENTRAR LA PESTAÑA ACTIVA EN EL VIEWPORT VISIBLE =====
+        function scrollActiveTabIntoView() {
+            const tabsContainer = document.getElementById('tabsContainer');
+            if (!tabsContainer) return;
+            const activeTab = tabsContainer.querySelector('.tab-btn.active');
+            if (!activeTab) return;
+
+            // Esperamos un frame para asegurar que el layout está calculado
+            requestAnimationFrame(() => {
+                const containerRect = tabsContainer.getBoundingClientRect();
+                const tabRect = activeTab.getBoundingClientRect();
+                const padding = 8;
+
+                // ¿La pestaña activa está completamente visible?
+                const fullyVisible =
+                    tabRect.left >= containerRect.left + padding &&
+                    tabRect.right <= containerRect.right - padding;
+
+                if (fullyVisible) return; // Nada que hacer
+
+                // Centrar la pestaña activa dentro del contenedor
+                const tabCenter = tabRect.left + tabRect.width / 2;
+                const containerCenter = containerRect.left + containerRect.width / 2;
+                const newScrollLeft = tabsContainer.scrollLeft + (tabCenter - containerCenter);
+
+                tabsContainer.scrollTo({
+                    left: Math.max(0, newScrollLeft),
+                    behavior: 'smooth'
+                });
+            });
+        }
+
         function renderTabs() {
             const tabsContainer = document.getElementById('tabsContainer');
+
+            // Guardar posición del scroll ANTES de vaciar el contenedor
+            const savedScroll = tabsContainer.scrollLeft;
+
             tabsContainer.innerHTML = '';
+
             appData.categories.forEach(cat => {
                 const activeCount = appData.books.filter(b => b.category === cat && b.active).length;
                 const btn = document.createElement('button');
@@ -1299,11 +1336,12 @@
                 btn.className = isActive ? 'tab-btn active' : 'tab-btn';
                 btn.dataset.cat = cat;
                 const tabText = `${cat} (${activeCount})`;
-                if(isActive) btn.innerHTML = `${tabText} <span class="tab-delete" onclick="deleteCategory('${cat}', event)" title="Eliminar lista">&times;</span>`;
+                if (isActive) btn.innerHTML = `${tabText} <span class="tab-delete" onclick="deleteCategory('${cat}', event)" title="Eliminar lista">&times;</span>`;
                 else btn.innerText = tabText;
                 attachTabPointer(btn, cat);
                 tabsContainer.appendChild(btn);
             });
+
             const addBtn = document.createElement('button');
             addBtn.className = 'tab-btn tab-btn-new';
             addBtn.innerText = '+ Nueva Categoría';
@@ -1316,6 +1354,12 @@
                 }
             };
             tabsContainer.appendChild(addBtn);
+
+            // Restaurar scroll (evita el parpadeo a 0)
+            tabsContainer.scrollLeft = savedScroll;
+
+            // Si la pestaña activa quedó fuera de vista, centrarla
+            scrollActiveTabIntoView();
         }
 
         function deleteCategory(cat, event) {
